@@ -8,12 +8,12 @@
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
   :root{
-    --bg:#eaf8e6;          /* pale green background */
-    --card:#ffdcd2;        /* light peach court cards */
-    --ink:#20242a;         /* text */
-    --muted:#4b5563;       /* muted text */
-    --border:#cbd5e1;      /* soft border */
-    --accent:#1f2937;      /* dark header ink */
+    --bg:#eaf8e6;
+    --card:#ffdcd2;
+    --ink:#20242a;
+    --muted:#4b5563;
+    --border:#cbd5e1;
+    --accent:#1f2937;
   }
   *{box-sizing:border-box}
   body{
@@ -41,19 +41,20 @@
 
   .court{
     background:var(--card); border:1px solid var(--border); border-radius:8px;
-    min-height:120px; padding:10px 14px; position:relative;
+    min-height:140px; padding:10px 14px; position:relative;
     display:flex; flex-direction:column; justify-content:flex-start;
   }
   .court .title{
     text-align:center; font-weight:800; margin:2px 0 6px; font-size:16px;
   }
   .court .sub{
-    text-align:center; color:var(--accent); font-weight:700; font-size:14px; margin-bottom:8px;
+    text-align:center; color:var(--accent); font-weight:700; font-size:14px; margin-bottom:6px;
   }
   .court .line{height:1px; background:var(--border); margin:6px 0}
   .row{display:flex; justify-content:center; align-items:center; gap:6px; min-height:22px}
   .vs{font-size:12px; color:var(--muted)}
   .team{font-size:13px; text-align:center}
+  .timeinfo{font-size:12px; text-align:center; color:var(--muted); margin-top:6px; line-height:1.4}
   .empty .team, .empty .sub{color:#9aa1b1}
   .footer{
     margin-top:28px; background:var(--card); border:1px solid var(--border);
@@ -85,7 +86,7 @@
     </header>
 
     <section class="grid" id="courtsGrid">
-      <!-- 16 courts are injected here -->
+      <!-- 16 courts injected here -->
     </section>
 
     <section class="footer">
@@ -97,15 +98,10 @@
   </div>
 
 <script>
-  // ====== CONFIG ======
-  // Replace with your Google Sheet CSV export URL
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrbxnR_sR21PWkZNhsqpzlnaQJ7AXhWmUN0aA_r9nXIxsdfQ6OnFsBEf9_aeVCIpZPIjhBAA5KraS_/pub?gid=0&single=true&output=csv";
-
-  // Number of courts and upcoming rows to show
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/XXXXX/export?format=csv&gid=YYYYY";
   const NUM_COURTS = 16;
-  const UPCOMING_COUNT = 10;
+  const UPCOMING_COUNT = 5;
 
-  // ====== DOM helpers ======
   const courtsGrid = document.getElementById('courtsGrid');
   const upList = document.getElementById('upcomingList');
   const lastUpdated = document.getElementById('lastUpdated');
@@ -113,60 +109,64 @@
   const sourceNote = document.getElementById('sourceNote');
   const refreshBtn = document.getElementById('refreshBtn');
 
-  // Build the court placeholders once
   function buildCourtShells(){
     courtsGrid.innerHTML = '';
     for(let i=1;i<=NUM_COURTS;i++){
       const card = document.createElement('article');
       card.className = 'court empty';
       card.dataset.court = i;
-
       card.innerHTML = `
         <div class="title">Court ${i}</div>
-        <div class="sub" data-sub> </div>
+        <div class="sub" data-sub></div>
         <div class="line"></div>
-        <div class="row"><div class="team" data-team1> </div></div>
+        <div class="row"><div class="team" data-team1></div></div>
         <div class="row"><div class="vs">vs</div></div>
-        <div class="row"><div class="team" data-team2> </div></div>
+        <div class="row"><div class="team" data-team2></div></div>
+        <div class="timeinfo" data-times></div>
       `;
       courtsGrid.appendChild(card);
     }
   }
 
-  // Robust trimming
   const tidy = v => (v==null ? '' : String(v).trim());
-
-  // Treat empty / 0 / NA as "no court"
   function isCourtEmpty(v){
-    const t = tidy(v);
-    if (!t) return true;
-    const low = t.toLowerCase();
-    if (['na','n/a','none','null','-','—','0'].includes(low)) return true;
-    return false;
+    const t = tidy(v).toLowerCase();
+    return !t || ['na','n/a','none','null','-','—','0'].includes(t);
   }
-
-  // Parse US "Sun 6/23/2024 8:00 AM" safely
   function toDateOrNull(v){
     const s = tidy(v);
     if(!s) return null;
     const d = new Date(s);
     return isNaN(d.getTime()) ? null : d;
   }
+  function formatTime(dt){
+    if(!dt) return '';
+    let h = dt.getHours(), m = dt.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if(h === 0) h = 12;
+    const mm = m.toString().padStart(2,'0');
+    return `${h}:${mm} ${ampm}`;
+  }
+  function formatDuration(since){
+    if(!since) return '';
+    const now = new Date();
+    let diff = (now - since)/60000;
+    if(diff < 1) return 'Just started';
+    const hrs = Math.floor(diff/60);
+    const mins = Math.floor(diff % 60);
+    if(hrs > 0) return `${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''} ago`;
+    return `${mins} min${mins!==1?'s':''} ago`;
+  }
 
-  // Core: load + render
   async function loadCSV(){
     errMsg.hidden = true;
     sourceNote.textContent = 'Loading CSV…';
-
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
       skipEmptyLines: 'greedy',
       complete: (res) => {
         try{
-          if (res.errors && res.errors.length){
-            console.warn(res.errors);
-          }
           renderFromRows(res.data);
           sourceNote.textContent = 'Source: Google Drive CSV';
         }catch(e){
@@ -184,94 +184,70 @@
 
   function renderFromRows(rows){
     buildCourtShells();
-
-    // Normalize rows to a predictable shape
-    // Expecting headers: Time, Event, Round, Team 1, Team 2, Court
     const normalized = rows.map((r, idx) => {
       const obj = {
-        _row: idx, // keep original order for "first 5 without court"
+        _row: idx,
+        startRaw: tidy(r['Start Time']),
+        startTime: toDateOrNull(r['Start Time']),
         timeRaw: tidy(r['Time']),
         time: toDateOrNull(r['Time']),
         event: tidy(r['Event']),
         round: tidy(r['Round']),
-        team1: tidy(r['Team 1']),
-        team2: tidy(r['Team 2']),
-        courtRaw: tidy(r['Court'])
+        team1: tidy(r['Team 1']) || tidy(r['Team1']),
+        team2: tidy(r['Team 2']) || tidy(r['Team2']),
+        courtRaw: tidy(r['Court']) || tidy(r['Court #'])
       };
-      // try fallback header variants just in case
-      if(!obj.team1 && tidy(r['Team1'])) obj.team1 = tidy(r['Team1']);
-      if(!obj.team2 && tidy(r['Team2'])) obj.team2 = tidy(r['Team2']);
-      if(!obj.courtRaw && tidy(r['Court #'])) obj.courtRaw = tidy(r['Court #']);
-
-      // numeric court if possible
-      const num = parseInt(obj.courtRaw, 10);
-      obj.court = (!isCourtEmpty(obj.courtRaw) && !Number.isNaN(num)) ? num : null;
-
+      const num = parseInt(obj.courtRaw,10);
+      obj.court = (!isCourtEmpty(obj.courtRaw) && !isNaN(num)) ? num : null;
       return obj;
     });
 
-    // ====== Fill most recent per court ======
-    // group by court, pick entry with latest time (if same court appears multiple times)
     const latestByCourt = new Map();
     for(const r of normalized){
       if(r.court==null) continue;
-      const key = r.court;
-      const prev = latestByCourt.get(key);
-      if(!prev){
-        latestByCourt.set(key, r);
-      }else{
-        // choose the one with the most recent (max) time; if either missing time, prefer the one that *has* a time
-        const tA = prev.time ? prev.time.getTime() : -Infinity;
-        const tB = r.time ? r.time.getTime() : -Infinity;
-        if (tB >= tA) latestByCourt.set(key, r);
-      }
+      const prev = latestByCourt.get(r.court);
+      if(!prev || ((r.time?.getTime()||0) > (prev.time?.getTime()||0))) latestByCourt.set(r.court, r);
     }
 
-    // write to DOM
-    for(const [courtNum, row] of latestByCourt.entries()){
-      if(courtNum < 1 || courtNum > NUM_COURTS) continue;
-      const card = courtsGrid.querySelector(`.court[data-court="${courtNum}"]`);
+    for(const [num,row] of latestByCourt.entries()){
+      const card = courtsGrid.querySelector(`.court[data-court="${num}"]`);
       if(!card) continue;
-
       const sub = card.querySelector('[data-sub]');
-      const t1  = card.querySelector('[data-team1]');
-      const t2  = card.querySelector('[data-team2]');
+      const t1 = card.querySelector('[data-team1]');
+      const t2 = card.querySelector('[data-team2]');
+      const times = card.querySelector('[data-times]');
 
-      const subTxt = (row.event && row.round) ? `${row.event} - ${row.round}`
-                    : (row.event || row.round || ' ');
+      const subTxt = (row.event && row.round) ? `${row.event} - ${row.round}` : (row.event || row.round || ' ');
       sub.textContent = subTxt;
       t1.textContent = row.team1 || ' ';
       t2.textContent = row.team2 || ' ';
 
+      const sched = formatTime(row.startTime);
+      const start = formatTime(row.time);
+      const dur = formatDuration(row.time);
+      times.innerHTML = `
+        <div>Scheduled Time: ${sched || '—'}</div>
+        <div>Start Time: ${start || '—'}</div>
+        <div>Duration: ${dur || '—'}</div>
+      `;
+
       card.classList.remove('empty');
     }
 
-    // ====== Upcoming (first 5 rows with NO court number, by original order) ======
     const upcoming = normalized.filter(r => r.court==null).slice(0, UPCOMING_COUNT);
-
     upList.innerHTML = '';
-    if(upcoming.length === 0){
-      upList.innerHTML = `<li>No upcoming matches listed.</li>`;
-    }else{
-      for(const r of upcoming){
-        const li = document.createElement('li');
-        const vs = `${r.team1 || '—'}  vs  ${r.team2 || '—'}`;
-        li.textContent = vs;
-        upList.appendChild(li);
-      }
+    if(upcoming.length===0) upList.innerHTML='<li>No upcoming matches listed.</li>';
+    else for(const r of upcoming){
+      const li=document.createElement('li');
+      li.textContent = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
+      upList.appendChild(li);
     }
 
-    // stamp
-    const now = new Date();
-    lastUpdated.textContent = `Last updated: ${now.toLocaleString()}`;
+    lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
   }
 
-  // Initial load + manual refresh
   loadCSV();
   refreshBtn.addEventListener('click', loadCSV);
-
-  // Optional: auto-refresh every 60s (toggle if you want)
-  // setInterval(loadCSV, 60000);
 </script>
 </body>
 </html>
