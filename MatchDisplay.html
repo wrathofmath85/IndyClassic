@@ -1,3 +1,9 @@
+Skip to content
+Chat history
+
+You said:
+Can you make the following changes to the code below and send full drop in code after: 1) Move the upcoming matches to the top, Determine who is on court by using the Court column and the latest time from Time column (this column now only has time, before it had date and time)
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -115,7 +121,7 @@
       const card = document.createElement('article');
       card.className = 'court empty';
       card.dataset.court = i;
-      card.innerHTML = `
+      card.innerHTML = 
         <div class="title">Court ${i}</div>
         <div class="sub" data-sub></div>
         <div class="line"></div>
@@ -123,7 +129,7 @@
         <div class="row"><div class="vs">vs</div></div>
         <div class="row"><div class="team" data-team2></div></div>
         <div class="timeinfo" data-times></div>
-      `;
+      ;
       courtsGrid.appendChild(card);
     }
   }
@@ -145,7 +151,7 @@
     const ampm = h >= 12 ? 'PM' : 'AM';
     h = h % 12; if(h === 0) h = 12;
     const mm = m.toString().padStart(2,'0');
-    return `${h}:${mm} ${ampm}`;
+    return ${h}:${mm} ${ampm};
   }
   function formatDuration(since){
     if(!since) return '';
@@ -154,8 +160,8 @@
     if(diff < 1) return 'Just started';
     const hrs = Math.floor(diff/60);
     const mins = Math.floor(diff % 60);
-    if(hrs > 0) return `${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''} ago`;
-    return `${mins} min${mins!==1?'s':''} ago`;
+    if(hrs > 0) return ${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''} ago;
+    return ${mins} min${mins!==1?'s':''} ago;
   }
 
   async function loadCSV(){
@@ -210,6 +216,309 @@
     }
 
     for(const [num,row] of latestByCourt.entries()){
+      const card = courtsGrid.querySelector(.court[data-court="${num}"]);
+      if(!card) continue;
+      const sub = card.querySelector('[data-sub]');
+      const t1 = card.querySelector('[data-team1]');
+      const t2 = card.querySelector('[data-team2]');
+      const times = card.querySelector('[data-times]');
+
+      const subTxt = (row.event && row.round) ? ${row.event} - ${row.round} : (row.event || row.round || ' ');
+      sub.textContent = subTxt;
+      t1.textContent = row.team1 || ' ';
+      t2.textContent = row.team2 || ' ';
+
+      const sched = formatTime(row.startTime);
+      const start = formatTime(row.time);
+      const dur = formatDuration(row.time);
+      times.innerHTML = 
+        <div>Scheduled Time: ${sched || '—'}</div>
+        <div>Start Time: ${start || '—'}</div>
+        <div>Duration: ${dur || '—'}</div>
+      ;
+
+      card.classList.remove('empty');
+    }
+
+    const upcoming = normalized.filter(r => r.court==null).slice(0, UPCOMING_COUNT);
+    upList.innerHTML = '';
+    if(upcoming.length===0) upList.innerHTML='<li>No upcoming matches listed.</li>';
+    else for(const r of upcoming){
+      const li=document.createElement('li');
+      li.textContent = ${r.team1 || '—'} vs ${r.team2 || '—'};
+      upList.appendChild(li);
+    }
+
+    lastUpdated.textContent = Last updated: ${new Date().toLocaleString()};
+  }
+
+  loadCSV();
+  refreshBtn.addEventListener('click', loadCSV);
+</script>
+</body>
+</html>
+ChatGPT said:
+
+Thought for 20s
+Got it—here’s full drop-in code with:
+
+Upcoming Matches moved to the top.
+
+“On court” detection per court now picks the row with the latest Time (which is time-only now). I parse those times as today’s date + that clock time to rank them correctly. Duration is computed from that parsed time as well.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Indy Classic — Courts</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+  :root{
+    --bg:#eaf8e6;
+    --card:#ffdcd2;
+    --ink:#20242a;
+    --muted:#4b5563;
+    --border:#cbd5e1;
+    --accent:#1f2937;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1160px; margin:24px auto; padding:0 16px 64px}
+  header{display:flex; align-items:end; justify-content:space-between; gap:12px; margin-bottom:16px}
+  h1{margin:0; font-size:28px; font-weight:800; color:var(--accent)}
+  .ts{font-size:12px; color:var(--muted)}
+  .controls{display:flex; gap:8px; align-items:center}
+  button{
+    border:1px solid var(--border); background:#fff; color:var(--ink);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+  }
+  button:hover{filter:brightness(0.98)}
+
+  /* Upcoming (moved to top) */
+  .upcoming{
+    margin:16px 0 22px; background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:12px 14px;
+  }
+  .upcoming h2{
+    text-align:center; margin:4px 0 10px; font-size:16px; font-weight:800; color:var(--accent);
+  }
+  .up-list{margin:0; padding:0; list-style:none}
+  .up-list li{
+    display:flex; gap:8px; justify-content:center; align-items:center;
+    padding:6px 4px; border-top:1px dashed var(--border); font-size:13px;
+  }
+  .up-list li:first-child{border-top:none}
+  .stamp{font-size:11px; color:var(--muted); text-align:center; margin-top:6px}
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+    gap:28px 48px;
+  }
+  @media (max-width:800px){
+    .grid{grid-template-columns: 1fr; gap:18px}
+  }
+
+  .court{
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    min-height:140px; padding:10px 14px; position:relative;
+    display:flex; flex-direction:column; justify-content:flex-start;
+  }
+  .court .title{
+    text-align:center; font-weight:800; margin:2px 0 6px; font-size:16px;
+  }
+  .court .sub{
+    text-align:center; color:var(--accent); font-weight:700; font-size:14px; margin-bottom:6px;
+  }
+  .court .line{height:1px; background:var(--border); margin:6px 0}
+  .row{display:flex; justify-content:center; align-items:center; gap:6px; min-height:22px}
+  .vs{font-size:12px; color:var(--muted)}
+  .team{font-size:13px; text-align:center}
+  .timeinfo{font-size:12px; text-align:center; color:var(--muted); margin-top:6px; line-height:1.4}
+  .empty .team, .empty .sub{color:#9aa1b1}
+
+  .err{color:#b42318; font-weight:700; text-align:center; margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Court Assignments</h1>
+        <div class="ts" id="sourceNote">Loading CSV…</div>
+      </div>
+      <div class="controls">
+        <button id="refreshBtn" title="Reload CSV">Refresh</button>
+      </div>
+    </header>
+
+    <!-- UPCOMING MOVED TO TOP -->
+    <section class="upcoming">
+      <h2>Upcoming Matches</h2>
+      <ul class="up-list" id="upcomingList"></ul>
+      <div class="stamp" id="lastUpdated"></div>
+      <div class="err" id="errorMsg" hidden></div>
+    </section>
+
+    <section class="grid" id="courtsGrid">
+      <!-- 16 courts injected here -->
+    </section>
+  </div>
+
+<script>
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrbxnR_sR21PWkZNhsqpzlnaQJ7AXhWmUN0aA_r9nXIxsdfQ6OnFsBEf9_aeVCIpZPIjhBAA5KraS_/pub?gid=0&single=true&output=csv";
+  const NUM_COURTS = 16;
+  const UPCOMING_COUNT = 5;
+
+  const courtsGrid = document.getElementById('courtsGrid');
+  const upList = document.getElementById('upcomingList');
+  const lastUpdated = document.getElementById('lastUpdated');
+  const errMsg = document.getElementById('errorMsg');
+  const sourceNote = document.getElementById('sourceNote');
+  const refreshBtn = document.getElementById('refreshBtn');
+
+  function buildCourtShells(){
+    courtsGrid.innerHTML = '';
+    for(let i=1;i<=NUM_COURTS;i++){
+      const card = document.createElement('article');
+      card.className = 'court empty';
+      card.dataset.court = i;
+      card.innerHTML = `
+        <div class="title">Court ${i}</div>
+        <div class="sub" data-sub></div>
+        <div class="line"></div>
+        <div class="row"><div class="team" data-team1></div></div>
+        <div class="row"><div class="vs">vs</div></div>
+        <div class="row"><div class="team" data-team2></div></div>
+        <div class="timeinfo" data-times></div>
+      `;
+      courtsGrid.appendChild(card);
+    }
+  }
+
+  const tidy = v => (v==null ? '' : String(v).trim());
+  function isCourtEmpty(v){
+    const t = tidy(v).toLowerCase();
+    return !t || ['na','n/a','none','null','-','—','0'].includes(t);
+  }
+
+  // Parse "3:15 PM" as today's local date at that time
+  function parseTimeToday(s){
+    const str = tidy(s);
+    if(!str) return null;
+    const m = str.match(/^(\d{1,2}):(\d{2})\s*([ap]m)$/i);
+    if(!m) return null;
+    let [ , hh, mm, ap ] = m;
+    let h = parseInt(hh,10);
+    const min = parseInt(mm,10);
+    ap = ap.toLowerCase();
+    if(h === 12) h = 0;
+    if(ap === 'pm') h += 12;
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min, 0, 0);
+    return d;
+  }
+
+  // Try full Date first; if that fails and looks like a clock, parse as today
+  function toDateOrNullFlexible(v){
+    const s = tidy(v);
+    if(!s) return null;
+    const d = new Date(s);
+    if(!isNaN(d.getTime())) return d;
+    const t = parseTimeToday(s);
+    return t ?? null;
+  }
+
+  function formatTime(dt){
+    if(!dt) return '';
+    let h = dt.getHours(), m = dt.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if(h === 0) h = 12;
+    const mm = m.toString().padStart(2,'0');
+    return `${h}:${mm} ${ampm}`;
+  }
+  function formatDuration(since){
+    if(!since) return '';
+    const now = new Date();
+    let diff = (now - since)/60000;
+    if(diff < 1) return 'Just started';
+    const hrs = Math.floor(diff/60);
+    const mins = Math.floor(diff % 60);
+    if(hrs > 0) return `${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''} ago`;
+    return `${mins} min${mins!==1?'s':''} ago`;
+  }
+
+  async function loadCSV(){
+    errMsg.hidden = true;
+    sourceNote.textContent = 'Loading CSV…';
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: 'greedy',
+      complete: (res) => {
+        try{
+          renderFromRows(res.data);
+          sourceNote.textContent = 'Source: Google Drive CSV';
+        }catch(e){
+          errMsg.hidden = false;
+          errMsg.textContent = 'Error rendering data: ' + e.message;
+        }
+      },
+      error: (e) => {
+        errMsg.hidden = false;
+        errMsg.textContent = 'CSV load failed: ' + e.message;
+        sourceNote.textContent = 'Failed to load CSV';
+      }
+    });
+  }
+
+  function renderFromRows(rows){
+    buildCourtShells();
+
+    // Normalize + parse
+    const normalized = rows.map((r, idx) => {
+      const startRaw = tidy(r['Start Time']);
+      const timeRaw  = tidy(r['Time']);
+      const courtRaw = tidy(r['Court']) || tidy(r['Court #']);
+      const team1    = tidy(r['Team 1']) || tidy(r['Team1']);
+      const team2    = tidy(r['Team 2']) || tidy(r['Team2']);
+      const event    = tidy(r['Event']);
+      const round    = tidy(r['Round']);
+
+      // Court as number or null
+      const num = parseInt(courtRaw, 10);
+      const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
+
+      // Parse times (Time is time-only now → interpret as today)
+      const startTime = toDateOrNullFlexible(startRaw); // supports date+time or time-only
+      const time = toDateOrNullFlexible(timeRaw);       // latest by court key
+
+      return {
+        _row: idx,
+        startRaw, startTime,
+        timeRaw, time,
+        event, round, team1, team2,
+        courtRaw, court
+      };
+    });
+
+    // Determine ON-COURT: latest 'time' per court (ignore rows with no time)
+    const latestByCourt = new Map();
+    for(const r of normalized){
+      if(r.court==null || !r.time) continue; // require a valid time for ranking
+      const prev = latestByCourt.get(r.court);
+      if(!prev || r.time.getTime() > prev.time.getTime()){
+        latestByCourt.set(r.court, r);
+      }
+    }
+
+    // Paint courts
+    for(const [num,row] of latestByCourt.entries()){
       const card = courtsGrid.querySelector(`.court[data-court="${num}"]`);
       if(!card) continue;
       const sub = card.querySelector('[data-sub]');
@@ -234,20 +543,35 @@
       card.classList.remove('empty');
     }
 
-    const upcoming = normalized.filter(r => r.court==null).slice(0, UPCOMING_COUNT);
+    // Upcoming (rows without a court assignment)
+    const upcoming = normalized
+      .filter(r => r.court==null)
+      .sort((a,b) => {
+        // Prefer Start Time if available, otherwise plain Time; nulls last
+        const aKey = a.startTime ?? a.time ?? new Date(8640000000000000); // max date for nulls
+        const bKey = b.startTime ?? b.time ?? new Date(8640000000000000);
+        return aKey - bKey;
+      })
+      .slice(0, UPCOMING_COUNT);
+
     upList.innerHTML = '';
-    if(upcoming.length===0) upList.innerHTML='<li>No upcoming matches listed.</li>';
-    else for(const r of upcoming){
-      const li=document.createElement('li');
-      li.textContent = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
-      upList.appendChild(li);
+    if(upcoming.length===0){
+      upList.innerHTML='<li>No upcoming matches listed.</li>';
+    }else{
+      for(const r of upcoming){
+        const when = formatTime(r.startTime ?? r.time);
+        const li=document.createElement('li');
+        li.textContent = `${r.team1 || '—'} vs ${r.team2 || '—'}${when ? ' — ' + when : ''}`;
+        upList.appendChild(li);
+      }
     }
 
     lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
   }
 
-  loadCSV();
-  refreshBtn.addEventListener('click', loadCSV);
-</script>
-</body>
-</html>
+  loadCSV()
+
+
+
+No file chosenNo file chosen
+ChatGPT can make mistakes. Check important info.
