@@ -31,7 +31,7 @@
   }
   button:hover{filter:brightness(0.98)}
 
-  /* Upcoming (moved to top) */
+  /* Upcoming (top) */
   .upcoming{
     margin:16px 0 22px; background:var(--card); border:1px solid var(--border);
     border-radius:8px; padding:12px 14px;
@@ -139,40 +139,60 @@
     return !t || ['na','n/a','none','null','-','—','0'].includes(t);
   }
 
-  // Parse "3:15 PM" as today's local date at that time
+  // Parse "3:15 PM", "3:15:42 PM", or 24h "15:15" / "15:15:42" as today's local date/time
   function parseTimeToday(s){
     const str = tidy(s);
     if(!str) return null;
-    const m = str.match(/^(\d{1,2}):(\d{2})\s*([ap]m)$/i);
-    if(!m) return null;
-    let [ , hh, mm, ap ] = m;
-    let h = parseInt(hh,10);
-    const min = parseInt(mm,10);
-    ap = ap.toLowerCase();
-    if(h === 12) h = 0;
-    if(ap === 'pm') h += 12;
-    const now = new Date();
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min, 0, 0);
-    return d;
+
+    // AM/PM with optional seconds
+    let m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]m)$/i);
+    if(m){
+      let [, hh, mm, ss, ap] = m;
+      let h = parseInt(hh,10);
+      const min = parseInt(mm,10);
+      const sec = ss ? parseInt(ss,10) : 0;
+      ap = ap.toLowerCase();
+      if(h === 12) h = 0;
+      if(ap === 'pm') h += 12;
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min, sec, 0);
+    }
+
+    // 24-hour with optional seconds (e.g., "17:37" or "17:37:31")
+    m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))$/);
+    if(m || (m = str.match(/^(\d{1,2}):(\d{2})$/))){
+      let [, hh, mm, ss] = m;
+      const h = parseInt(hh,10);
+      const min = parseInt(mm,10);
+      const sec = ss ? parseInt(ss,10) : 0;
+      if(h>=0 && h<24 && min>=0 && min<60 && sec>=0 && sec<60){
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min, sec, 0);
+      }
+    }
+
+    // Last resort: Date() attempt (handles full datetime strings)
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
   }
 
-  // Try full Date first; if that fails and looks like a clock, parse as today
+  // Start Time may be full date/time (kept as-is if parseable), otherwise try time-only
   function toDateOrNullFlexible(v){
     const s = tidy(v);
     if(!s) return null;
     const d = new Date(s);
     if(!isNaN(d.getTime())) return d;
-    const t = parseTimeToday(s);
-    return t ?? null;
+    return parseTimeToday(s);
   }
 
   function formatTime(dt){
     if(!dt) return '';
-    let h = dt.getHours(), m = dt.getMinutes();
+    let h = dt.getHours(), m = dt.getMinutes(), s = dt.getSeconds();
     const ampm = h >= 12 ? 'PM' : 'AM';
     h = h % 12; if(h === 0) h = 12;
     const mm = m.toString().padStart(2,'0');
-    return `${h}:${mm} ${ampm}`;
+    const ss = s ? (':' + s.toString().padStart(2,'0')) : '';
+    return `${h}:${mm}${ss} ${ampm}`;
   }
   function formatDuration(since){
     if(!since) return '';
@@ -222,13 +242,12 @@
       const event    = tidy(r['Event']);
       const round    = tidy(r['Round']);
 
-      // Court as number or null
       const num = parseInt(courtRaw, 10);
       const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
 
-      // Parse times (Time is time-only now → interpret as today)
-      const startTime = toDateOrNullFlexible(startRaw); // supports date+time or time-only
-      const time = toDateOrNullFlexible(timeRaw);       // latest by court key
+      // Parse times (Time is time-only now, possibly with seconds)
+      const startTime = toDateOrNullFlexible(startRaw); // may be full date+time
+      const time = parseTimeToday(timeRaw) ?? null;     // interpret strictly as today's time
 
       return {
         _row: idx,
@@ -239,12 +258,15 @@
       };
     });
 
-    // Determine ON-COURT: latest 'time' per court (ignore rows with no time)
+    // Determine ON-COURT: latest 'time' per court (fallback to startTime if no time present)
     const latestByCourt = new Map();
     for(const r of normalized){
-      if(r.court==null || !r.time) continue; // require a valid time for ranking
+      if(r.court==null) continue;
+      const key = r.time ?? r.startTime ?? null;
+      if(!key) continue;
       const prev = latestByCourt.get(r.court);
-      if(!prev || r.time.getTime() > prev.time.getTime()){
+      const prevKey = prev ? (prev.time ?? prev.startTime) : null;
+      if(!prev || key.getTime() > prevKey.getTime()){
         latestByCourt.set(r.court, r);
       }
     }
@@ -269,18 +291,17 @@
       times.innerHTML = `
         <div>Scheduled Time: ${sched || '—'}</div>
         <div>Start Time: ${start || '—'}</div>
-        <div>Duration: ${dur || '—'}</div>
+        <div>Duration: ${row.time ? (dur || '—') : '—'}</div>
       `;
 
       card.classList.remove('empty');
     }
 
-    // Upcoming (rows without a court assignment)
+    // Upcoming = rows without a court assignment
     const upcoming = normalized
       .filter(r => r.court==null)
       .sort((a,b) => {
-        // Prefer Start Time if available, otherwise plain Time; nulls last
-        const aKey = a.startTime ?? a.time ?? new Date(8640000000000000); // max date for nulls
+        const aKey = a.startTime ?? a.time ?? new Date(8640000000000000);
         const bKey = b.startTime ?? b.time ?? new Date(8640000000000000);
         return aKey - bKey;
       })
