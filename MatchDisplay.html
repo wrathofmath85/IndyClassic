@@ -15,13 +15,11 @@
     --text: rgba(255,255,255,.92);
     --muted: rgba(255,255,255,.72);
     --glass: rgba(255,255,255,.10);
-    --glass2: rgba(255,255,255,.07);
     --glassBorder: rgba(255,255,255,.18);
     --shadow: 0 18px 50px rgba(0,0,0,.35);
     --radius: 18px;
 
     --ok: rgba(34,197,94,.18);
-    --warn: rgba(99,102,241,.18);
     --danger: rgba(244,63,94,.18);
   }
 
@@ -62,10 +60,9 @@
     padding-bottom: 42px;
   }
 
-  /* top bar */
   header{
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     justify-content:space-between;
     gap: 14px;
     margin: 10px 0 18px;
@@ -94,38 +91,6 @@
     text-overflow: ellipsis;
   }
 
-  .controls{
-    display:flex;
-    gap: 10px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-
-  .btn{
-    border: 1px solid var(--glassBorder);
-    background: rgba(255,255,255,.10);
-    color: var(--text);
-    padding: 10px 14px;
-    border-radius: 14px;
-    cursor:pointer;
-    font-weight: 700;
-    box-shadow: 0 10px 24px rgba(0,0,0,.18);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  @media (hover:hover) and (pointer:fine){
-    .btn:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.14);
-      border-color: rgba(255,255,255,.26);
-      box-shadow: 0 14px 34px rgba(0,0,0,.25);
-    }
-  }
-  .btn:active{ transform: scale(.99); }
-
   /* glass panels */
   .panel{
     background: var(--glass);
@@ -136,27 +101,49 @@
     -webkit-backdrop-filter: blur(14px);
   }
 
-  /* Upcoming */
-  .upcoming{
-    padding: 14px 14px 10px;
-    margin-bottom: 18px;
+  /* Last Match Placed */
+  .lastmatch{
+    padding: 14px 14px 12px;
+    margin-bottom: 12px;
   }
-
-  .up-head{
+  .panel-head{
     display:flex;
     align-items:baseline;
     justify-content:space-between;
     gap: 10px;
     padding: 4px 6px 10px;
   }
-
-  .up-head h2{
+  .panel-head h2{
     margin:0;
     font-size: 15px;
     font-weight: 850;
     letter-spacing: -0.01em;
   }
+  .pillrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 10px;
+    padding: 6px;
+  }
+  .pill{
+    font-size: 12.5px;
+    color: rgba(255,255,255,.85);
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 8px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pill b{
+    color: rgba(255,255,255,.92);
+    font-weight: 850;
+  }
 
+  /* Upcoming */
+  .upcoming{
+    padding: 14px 14px 10px;
+    margin-bottom: 18px;
+  }
   .stamp{
     font-size: 12px;
     color: var(--muted);
@@ -198,16 +185,6 @@
     text-overflow: ellipsis;
   }
 
-  .pill{
-    font-size: 12px;
-    color: var(--muted);
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
-    padding: 6px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
   .err{
     margin: 10px 6px 6px;
     padding: 10px 12px;
@@ -218,15 +195,19 @@
     font-weight: 750;
   }
 
-  /* Courts grid */
-  .grid{
+  /* Courts columns (desktop: 1-8 left, 9-16 right) */
+  .courts-layout{
     display:grid;
-    grid-template-columns: repeat(2, minmax(280px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 18px;
   }
-
+  .col{
+    display:flex;
+    flex-direction:column;
+    gap: 18px;
+  }
   @media (max-width: 900px){
-    .grid{ grid-template-columns: 1fr; }
+    .courts-layout{ grid-template-columns: 1fr; }
   }
 
   .court{
@@ -236,7 +217,6 @@
     overflow:hidden;
   }
 
-  /* subtle shine */
   .court::before{
     content:"";
     position:absolute;
@@ -337,6 +317,7 @@
     font-size: 12px;
     color: var(--muted);
     font-weight: 800;
+    text-align:center;
   }
 
   .timeinfo{
@@ -364,14 +345,9 @@
     body{ padding: 16px; }
     header{ align-items:flex-start; }
     h1{ font-size: 24px; }
-    .btn{ padding: 10px 12px; border-radius: 13px; }
     .up-list li{ padding: 10px 10px; }
     .court{ padding: 13px; }
     .teamrow{ padding: 10px; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .btn{ transition:none; }
   }
 </style>
 </head>
@@ -386,25 +362,35 @@
         <h1>Court Assignments</h1>
         <div class="ts" id="sourceNote">Loading CSV…</div>
       </div>
-      <div class="controls">
-        <button class="btn" id="refreshBtn" title="Reload CSV">Refresh</button>
-      </div>
+      <div class="ts" id="autoNote">Auto-refresh: every 15 seconds</div>
     </header>
 
-    <!-- UPCOMING -->
-    <section class="panel upcoming">
-      <div class="up-head">
-        <h2>Upcoming Matches</h2>
-        <div class="stamp" id="lastUpdated"></div>
+    <!-- LAST MATCH PLACED -->
+    <section class="panel lastmatch">
+      <div class="panel-head">
+        <h2>Last Match Placed</h2>
+        <div class="stamp" id="lastPlacedStamp">—</div>
       </div>
-
-      <ul class="up-list" id="upcomingList"></ul>
-
+      <div class="pillrow" id="lastPlacedRow">
+        <div class="pill"><b>Scheduled:</b> —</div>
+        <div class="pill"><b>Actual:</b> —</div>
+      </div>
       <div class="err" id="errorMsg" hidden></div>
     </section>
 
-    <section class="grid" id="courtsGrid">
-      <!-- 16 courts injected here -->
+    <!-- UPCOMING -->
+    <section class="panel upcoming">
+      <div class="panel-head">
+        <h2>Upcoming Matches</h2>
+        <div class="stamp" id="lastUpdated"></div>
+      </div>
+      <ul class="up-list" id="upcomingList"></ul>
+    </section>
+
+    <!-- COURTS: LEFT 1-8, RIGHT 9-16 ON DESKTOP -->
+    <section class="courts-layout" aria-label="Courts">
+      <div class="col" id="courtsLeft" aria-label="Courts 1 through 8"></div>
+      <div class="col" id="courtsRight" aria-label="Courts 9 through 16"></div>
     </section>
   </div>
 
@@ -412,16 +398,24 @@
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrbxnR_sR21PWkZNhsqpzlnaQJ7AXhWmUN0aA_r9nXIxsdfQ6OnFsBEf9_aeVCIpZPIjhBAA5KraS_/pub?gid=0&single=true&output=csv";
   const NUM_COURTS = 16;
   const UPCOMING_COUNT = 5;
+  const REFRESH_MS = 15000;
 
-  const courtsGrid = document.getElementById('courtsGrid');
+  const courtsLeft = document.getElementById('courtsLeft');
+  const courtsRight = document.getElementById('courtsRight');
   const upList = document.getElementById('upcomingList');
   const lastUpdated = document.getElementById('lastUpdated');
   const errMsg = document.getElementById('errorMsg');
   const sourceNote = document.getElementById('sourceNote');
-  const refreshBtn = document.getElementById('refreshBtn');
+
+  const lastPlacedRow = document.getElementById('lastPlacedRow');
+  const lastPlacedStamp = document.getElementById('lastPlacedStamp');
+
+  let loading = false;
 
   function buildCourtShells(){
-    courtsGrid.innerHTML = '';
+    courtsLeft.innerHTML = '';
+    courtsRight.innerHTML = '';
+
     for(let i=1;i<=NUM_COURTS;i++){
       const card = document.createElement('article');
       card.className = 'panel court empty';
@@ -449,7 +443,9 @@
           <div>Duration: —</div>
         </div>
       `;
-      courtsGrid.appendChild(card);
+
+      if(i <= 8) courtsLeft.appendChild(card);
+      else courtsRight.appendChild(card);
     }
   }
 
@@ -464,7 +460,6 @@
     const str = tidy(s);
     if(!str) return null;
 
-    // AM/PM with optional seconds
     let m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]m)$/i);
     if(m){
       let [, hh, mm, ss, ap] = m;
@@ -478,7 +473,6 @@
       return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min, sec, 0);
     }
 
-    // 24-hour with optional seconds (e.g., "17:37" or "17:37:31")
     m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))$/);
     if(m || (m = str.match(/^(\d{1,2}):(\d{2})$/))){
       let [, hh, mm, ss] = m;
@@ -491,12 +485,10 @@
       }
     }
 
-    // Last resort: Date() attempt (handles full datetime strings)
     const d = new Date(str);
     return isNaN(d.getTime()) ? null : d;
   }
 
-  // Start Time may be full date/time (kept as-is if parseable), otherwise try time-only
   function toDateOrNullFlexible(v){
     const s = tidy(v);
     if(!s) return null;
@@ -526,30 +518,10 @@
     return `${mins} min${mins!==1?'s':''} ago`;
   }
 
-  async function loadCSV(){
-    errMsg.hidden = true;
-    sourceNote.textContent = 'Loading CSV…';
-
-    Papa.parse(CSV_URL, {
-      download: true,
-      header: true,
-      skipEmptyLines: 'greedy',
-      complete: (res) => {
-        try{
-          renderFromRows(res.data);
-          sourceNote.textContent = 'Source: Google Drive CSV';
-        }catch(e){
-          errMsg.hidden = false;
-          errMsg.textContent = 'Error rendering data: ' + e.message;
-          sourceNote.textContent = 'Error reading CSV';
-        }
-      },
-      error: (e) => {
-        errMsg.hidden = false;
-        errMsg.textContent = 'CSV load failed: ' + e.message;
-        sourceNote.textContent = 'Failed to load CSV';
-      }
-    });
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
   }
 
   function setBadge(card, label, kind){
@@ -558,6 +530,20 @@
     badge.classList.remove('live','empty');
     if(kind === 'live') badge.classList.add('live');
     if(kind === 'empty') badge.classList.add('empty');
+  }
+
+  function setLastPlaced(latestRow){
+    const scheduled = formatTime(latestRow?.startTime) || '—';
+    const actual = formatTime(latestRow?.time) || '—';
+
+    lastPlacedRow.innerHTML = `
+      <div class="pill"><b>Scheduled:</b> ${scheduled}</div>
+      <div class="pill"><b>Actual:</b> ${actual}</div>
+      <div class="pill"><b>Court:</b> ${latestRow?.court ?? '—'}</div>
+    `;
+
+    const matchText = latestRow ? `${latestRow.team1 || '—'} vs ${latestRow.team2 || '—'}` : '—';
+    lastPlacedStamp.textContent = latestRow ? matchText : '—';
   }
 
   function renderFromRows(rows){
@@ -587,7 +573,19 @@
       };
     });
 
-    // Latest per court (time first, fallback startTime)
+    // LAST MATCH PLACED = most recent row that HAS a court, based on actual time (fallback scheduled)
+    const placedCandidates = normalized
+      .filter(r => r.court != null && (r.time || r.startTime));
+
+    let lastPlaced = null;
+    for(const r of placedCandidates){
+      const key = (r.time ?? r.startTime);
+      const bestKey = lastPlaced ? (lastPlaced.time ?? lastPlaced.startTime) : null;
+      if(!lastPlaced || key.getTime() > bestKey.getTime()) lastPlaced = r;
+    }
+    setLastPlaced(lastPlaced);
+
+    // Determine ON-COURT: latest 'time' per court (fallback to startTime)
     const latestByCourt = new Map();
     for(const r of normalized){
       if(r.court==null) continue;
@@ -602,7 +600,7 @@
 
     // Paint courts
     for(const [num,row] of latestByCourt.entries()){
-      const card = courtsGrid.querySelector(`.court[data-court="${num}"]`);
+      const card = document.querySelector(`.court[data-court="${num}"]`);
       if(!card) continue;
 
       const sub = card.querySelector('[data-sub]');
@@ -629,7 +627,7 @@
       setBadge(card, 'Live', 'live');
     }
 
-    // Upcoming = no court assignment
+    // Upcoming = rows without a court assignment
     const upcoming = normalized
       .filter(r => r.court==null)
       .sort((a,b) => {
@@ -642,13 +640,12 @@
     upList.innerHTML = '';
     if(upcoming.length===0){
       const li=document.createElement('li');
-      li.innerHTML = `<div class="up-left"><div class="up-match">No upcoming matches listed.</div></div>`;
+      li.innerHTML = `<div class="up-left"><div class="up-match">No upcoming matches listed.</div></div><div class="pill">—</div>`;
       upList.appendChild(li);
     }else{
       for(const r of upcoming){
         const when = formatTime(r.startTime ?? r.time);
         const li=document.createElement('li');
-
         const matchText = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
         li.innerHTML = `
           <div class="up-left">
@@ -663,14 +660,44 @@
     lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
+  function loadCSV(){
+    if(loading) return;
+    loading = true;
+
+    errMsg.hidden = true;
+    sourceNote.textContent = 'Loading CSV…';
+
+    // cache-bust so GitHub Pages + Google CSV don’t serve a stale response
+    const url = CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+
+    Papa.parse(url, {
+      download: true,
+      header: true,
+      skipEmptyLines: 'greedy',
+      complete: (res) => {
+        try{
+          renderFromRows(res.data);
+          sourceNote.textContent = 'Source: Google Drive CSV';
+        }catch(e){
+          errMsg.hidden = false;
+          errMsg.textContent = 'Error rendering data: ' + e.message;
+          sourceNote.textContent = 'Error reading CSV';
+        } finally {
+          loading = false;
+        }
+      },
+      error: (e) => {
+        errMsg.hidden = false;
+        errMsg.textContent = 'CSV load failed: ' + e.message;
+        sourceNote.textContent = 'Failed to load CSV';
+        loading = false;
+      }
+    });
   }
 
+  // initial load + auto refresh
   loadCSV();
-  refreshBtn.addEventListener('click', loadCSV);
+  setInterval(loadCSV, REFRESH_MS);
 </script>
 </body>
 </html>
