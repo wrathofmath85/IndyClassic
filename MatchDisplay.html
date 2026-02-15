@@ -39,7 +39,6 @@
     overflow-x:hidden;
   }
 
-  /* floating blobs */
   .blob{
     position:fixed;
     width:440px; height:440px;
@@ -91,7 +90,6 @@
     text-overflow: ellipsis;
   }
 
-  /* glass panels */
   .panel{
     background: var(--glass);
     border: 1px solid var(--glassBorder);
@@ -101,11 +99,11 @@
     -webkit-backdrop-filter: blur(14px);
   }
 
-  /* Last Match Placed */
   .lastmatch{
     padding: 14px 14px 12px;
     margin-bottom: 12px;
   }
+
   .panel-head{
     display:flex;
     align-items:baseline;
@@ -113,18 +111,21 @@
     gap: 10px;
     padding: 4px 6px 10px;
   }
+
   .panel-head h2{
     margin:0;
     font-size: 15px;
     font-weight: 850;
     letter-spacing: -0.01em;
   }
+
   .pillrow{
     display:flex;
     flex-wrap:wrap;
     gap: 10px;
     padding: 6px;
   }
+
   .pill{
     font-size: 12.5px;
     color: rgba(255,255,255,.85);
@@ -139,14 +140,9 @@
     font-weight: 850;
   }
 
-  /* Upcoming */
   .upcoming{
     padding: 14px 14px 10px;
     margin-bottom: 18px;
-  }
-  .stamp{
-    font-size: 12px;
-    color: var(--muted);
   }
 
   .up-list{
@@ -195,7 +191,6 @@
     font-weight: 750;
   }
 
-  /* Courts columns (desktop: 1-8 left, 9-16 right) */
   .courts-layout{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -340,7 +335,6 @@
     font-weight: 650;
   }
 
-  /* mobile polish */
   @media (max-width: 480px){
     body{ padding: 16px; }
     header{ align-items:flex-start; }
@@ -359,21 +353,22 @@
   <div class="wrap">
     <header>
       <div class="titleblock">
-        <h1>Court Assignments</h1>
-        <div class="ts" id="sourceNote">Loading CSV…</div>
+        <h1>Indy Classic Court Assignments</h1>
+        <div class="ts" id="sourceNote">Loading…</div>
       </div>
-      <div class="ts" id="autoNote">Auto-refresh: every 15 seconds</div>
+      <div class="ts">Auto-refresh: every 15 seconds</div>
     </header>
 
     <!-- LAST MATCH PLACED -->
     <section class="panel lastmatch">
       <div class="panel-head">
         <h2>Last Match Placed</h2>
-        <div class="stamp" id="lastPlacedStamp">—</div>
       </div>
       <div class="pillrow" id="lastPlacedRow">
+        <div class="pill"><b>Match:</b> —</div>
         <div class="pill"><b>Scheduled:</b> —</div>
         <div class="pill"><b>Actual:</b> —</div>
+        <div class="pill"><b>Court:</b> —</div>
       </div>
       <div class="err" id="errorMsg" hidden></div>
     </section>
@@ -382,12 +377,11 @@
     <section class="panel upcoming">
       <div class="panel-head">
         <h2>Upcoming Matches</h2>
-        <div class="stamp" id="lastUpdated"></div>
       </div>
       <ul class="up-list" id="upcomingList"></ul>
     </section>
 
-    <!-- COURTS: LEFT 1-8, RIGHT 9-16 ON DESKTOP -->
+    <!-- COURTS -->
     <section class="courts-layout" aria-label="Courts">
       <div class="col" id="courtsLeft" aria-label="Courts 1 through 8"></div>
       <div class="col" id="courtsRight" aria-label="Courts 9 through 16"></div>
@@ -403,12 +397,9 @@
   const courtsLeft = document.getElementById('courtsLeft');
   const courtsRight = document.getElementById('courtsRight');
   const upList = document.getElementById('upcomingList');
-  const lastUpdated = document.getElementById('lastUpdated');
   const errMsg = document.getElementById('errorMsg');
   const sourceNote = document.getElementById('sourceNote');
-
   const lastPlacedRow = document.getElementById('lastPlacedRow');
-  const lastPlacedStamp = document.getElementById('lastPlacedStamp');
 
   let loading = false;
 
@@ -455,7 +446,6 @@
     return !t || ['na','n/a','none','null','-','—','0'].includes(t);
   }
 
-  // Parse "3:15 PM", "3:15:42 PM", or 24h "15:15" / "15:15:42" as today's local date/time
   function parseTimeToday(s){
     const str = tidy(s);
     if(!str) return null;
@@ -514,8 +504,8 @@
     if(diff < 1) return 'Just started';
     const hrs = Math.floor(diff/60);
     const mins = Math.floor(diff % 60);
-    if(hrs > 0) return `${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''} ago`;
-    return `${mins} min${mins!==1?'s':''} ago`;
+    if(hrs > 0) return `${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''}`;
+    return `${mins} min${mins!==1?'s':''}`;
   }
 
   function escapeHtml(s){
@@ -533,17 +523,17 @@
   }
 
   function setLastPlaced(latestRow){
+    const matchText = latestRow ? `${latestRow.team1 || '—'} vs ${latestRow.team2 || '—'}` : '—';
     const scheduled = formatTime(latestRow?.startTime) || '—';
     const actual = formatTime(latestRow?.time) || '—';
+    const court = (latestRow?.court ?? '—');
 
     lastPlacedRow.innerHTML = `
+      <div class="pill"><b>Match:</b> ${escapeHtml(matchText)}</div>
       <div class="pill"><b>Scheduled:</b> ${scheduled}</div>
       <div class="pill"><b>Actual:</b> ${actual}</div>
-      <div class="pill"><b>Court:</b> ${latestRow?.court ?? '—'}</div>
+      <div class="pill"><b>Court:</b> ${court}</div>
     `;
-
-    const matchText = latestRow ? `${latestRow.team1 || '—'} vs ${latestRow.team2 || '—'}` : '—';
-    lastPlacedStamp.textContent = latestRow ? matchText : '—';
   }
 
   function renderFromRows(rows){
@@ -573,10 +563,8 @@
       };
     });
 
-    // LAST MATCH PLACED = most recent row that HAS a court, based on actual time (fallback scheduled)
-    const placedCandidates = normalized
-      .filter(r => r.court != null && (r.time || r.startTime));
-
+    // last match placed = most recent row with a court, based on actual time (fallback scheduled)
+    const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
     let lastPlaced = null;
     for(const r of placedCandidates){
       const key = (r.time ?? r.startTime);
@@ -585,7 +573,7 @@
     }
     setLastPlaced(lastPlaced);
 
-    // Determine ON-COURT: latest 'time' per court (fallback to startTime)
+    // latest per court
     const latestByCourt = new Map();
     for(const r of normalized){
       if(r.court==null) continue;
@@ -598,7 +586,6 @@
       }
     }
 
-    // Paint courts
     for(const [num,row] of latestByCourt.entries()){
       const card = document.querySelector(`.court[data-court="${num}"]`);
       if(!card) continue;
@@ -627,7 +614,7 @@
       setBadge(card, 'Live', 'live');
     }
 
-    // Upcoming = rows without a court assignment
+    // upcoming
     const upcoming = normalized
       .filter(r => r.court==null)
       .sort((a,b) => {
@@ -656,8 +643,6 @@
         upList.appendChild(li);
       }
     }
-
-    lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
   }
 
   function loadCSV(){
@@ -665,9 +650,8 @@
     loading = true;
 
     errMsg.hidden = true;
-    sourceNote.textContent = 'Loading CSV…';
+    sourceNote.textContent = 'Loading…';
 
-    // cache-bust so GitHub Pages + Google CSV don’t serve a stale response
     const url = CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
 
     Papa.parse(url, {
@@ -677,11 +661,11 @@
       complete: (res) => {
         try{
           renderFromRows(res.data);
-          sourceNote.textContent = 'Source: Google Drive CSV';
+          sourceNote.textContent = '';
         }catch(e){
           errMsg.hidden = false;
           errMsg.textContent = 'Error rendering data: ' + e.message;
-          sourceNote.textContent = 'Error reading CSV';
+          sourceNote.textContent = '';
         } finally {
           loading = false;
         }
@@ -689,13 +673,12 @@
       error: (e) => {
         errMsg.hidden = false;
         errMsg.textContent = 'CSV load failed: ' + e.message;
-        sourceNote.textContent = 'Failed to load CSV';
+        sourceNote.textContent = '';
         loading = false;
       }
     });
   }
 
-  // initial load + auto refresh
   loadCSV();
   setInterval(loadCSV, REFRESH_MS);
 </script>
