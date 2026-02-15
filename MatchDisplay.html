@@ -4,96 +4,402 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Indy Classic — Courts</title>
+
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <style>
   :root{
-    --bg:#eaf8e6;
-    --card:#ffdcd2;
-    --ink:#20242a;
-    --muted:#4b5563;
-    --border:#cbd5e1;
-    --accent:#1f2937;
+    --bg1:#0f172a;
+    --bg2:#1e293b;
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.72);
+    --glass: rgba(255,255,255,.10);
+    --glass2: rgba(255,255,255,.07);
+    --glassBorder: rgba(255,255,255,.18);
+    --shadow: 0 18px 50px rgba(0,0,0,.35);
+    --radius: 18px;
+
+    --ok: rgba(34,197,94,.18);
+    --warn: rgba(99,102,241,.18);
+    --danger: rgba(244,63,94,.18);
   }
+
   *{box-sizing:border-box}
+  html,body{height:100%}
+
   body{
-    margin:0; background:var(--bg); color:var(--ink);
+    margin:0;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    color: var(--text);
+    background:
+      radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
+      radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
+      linear-gradient(135deg, var(--bg1), var(--bg2));
+    min-height:100vh;
+    padding: 22px;
+    overflow-x:hidden;
   }
-  .wrap{max-width:1160px; margin:24px auto; padding:0 16px 64px}
-  header{display:flex; align-items:end; justify-content:space-between; gap:12px; margin-bottom:16px}
-  h1{margin:0; font-size:28px; font-weight:800; color:var(--accent)}
-  .ts{font-size:12px; color:var(--muted)}
-  .controls{display:flex; gap:8px; align-items:center}
-  button{
-    border:1px solid var(--border); background:#fff; color:var(--ink);
-    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
-  }
-  button:hover{filter:brightness(0.98)}
 
-  /* Upcoming (top) */
+  /* floating blobs */
+  .blob{
+    position:fixed;
+    width:440px; height:440px;
+    border-radius:999px;
+    filter: blur(44px);
+    opacity:.22;
+    z-index:0;
+    pointer-events:none;
+  }
+  .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
+  .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
+
+  .wrap{
+    max-width:1180px;
+    margin: 0 auto;
+    position:relative;
+    z-index:1;
+    padding-bottom: 42px;
+  }
+
+  /* top bar */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 14px;
+    margin: 10px 0 18px;
+  }
+
+  .titleblock{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width: 0;
+  }
+
+  h1{
+    margin:0;
+    font-size: 28px;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .ts{
+    font-size: 12.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .controls{
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .btn{
+    border: 1px solid var(--glassBorder);
+    background: rgba(255,255,255,.10);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 14px;
+    cursor:pointer;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (hover:hover) and (pointer:fine){
+    .btn:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.14);
+      border-color: rgba(255,255,255,.26);
+      box-shadow: 0 14px 34px rgba(0,0,0,.25);
+    }
+  }
+  .btn:active{ transform: scale(.99); }
+
+  /* glass panels */
+  .panel{
+    background: var(--glass);
+    border: 1px solid var(--glassBorder);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* Upcoming */
   .upcoming{
-    margin:16px 0 22px; background:var(--card); border:1px solid var(--border);
-    border-radius:8px; padding:12px 14px;
+    padding: 14px 14px 10px;
+    margin-bottom: 18px;
   }
-  .upcoming h2{
-    text-align:center; margin:4px 0 10px; font-size:16px; font-weight:800; color:var(--accent);
-  }
-  .up-list{margin:0; padding:0; list-style:none}
-  .up-list li{
-    display:flex; gap:8px; justify-content:center; align-items:center;
-    padding:6px 4px; border-top:1px dashed var(--border); font-size:13px;
-  }
-  .up-list li:first-child{border-top:none}
-  .stamp{font-size:11px; color:var(--muted); text-align:center; margin-top:6px}
 
+  .up-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap: 10px;
+    padding: 4px 6px 10px;
+  }
+
+  .up-head h2{
+    margin:0;
+    font-size: 15px;
+    font-weight: 850;
+    letter-spacing: -0.01em;
+  }
+
+  .stamp{
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .up-list{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    padding: 6px;
+  }
+
+  .up-list li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+
+  .up-left{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap: 4px;
+  }
+
+  .up-match{
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pill{
+    font-size: 12px;
+    color: var(--muted);
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .err{
+    margin: 10px 6px 6px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--danger);
+    border: 1px solid rgba(255,255,255,.18);
+    color: rgba(255,255,255,.92);
+    font-weight: 750;
+  }
+
+  /* Courts grid */
   .grid{
     display:grid;
     grid-template-columns: repeat(2, minmax(280px, 1fr));
-    gap:28px 48px;
+    gap: 18px;
   }
-  @media (max-width:800px){
-    .grid{grid-template-columns: 1fr; gap:18px}
+
+  @media (max-width: 900px){
+    .grid{ grid-template-columns: 1fr; }
   }
 
   .court{
-    background:var(--card); border:1px solid var(--border); border-radius:8px;
-    min-height:140px; padding:10px 14px; position:relative;
-    display:flex; flex-direction:column; justify-content:flex-start;
+    padding: 14px 14px 12px;
+    min-height: 150px;
+    position:relative;
+    overflow:hidden;
   }
-  .court .title{
-    text-align:center; font-weight:800; margin:2px 0 6px; font-size:16px;
-  }
-  .court .sub{
-    text-align:center; color:var(--accent); font-weight:700; font-size:14px; margin-bottom:6px;
-  }
-  .court .line{height:1px; background:var(--border); margin:6px 0}
-  .row{display:flex; justify-content:center; align-items:center; gap:6px; min-height:22px}
-  .vs{font-size:12px; color:var(--muted)}
-  .team{font-size:13px; text-align:center}
-  .timeinfo{font-size:12px; text-align:center; color:var(--muted); margin-top:6px; line-height:1.4}
-  .empty .team, .empty .sub{color:#9aa1b1}
 
-  .err{color:#b42318; font-weight:700; text-align:center; margin-top:8px}
+  /* subtle shine */
+  .court::before{
+    content:"";
+    position:absolute;
+    top:-40%;
+    left:-20%;
+    width: 60%;
+    height: 120%;
+    transform: rotate(18deg);
+    background: radial-gradient(circle at 30% 40%, rgba(255,255,255,.18), transparent 55%);
+    opacity:.30;
+    pointer-events:none;
+  }
+
+  .court-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap: 10px;
+    position:relative;
+    z-index:1;
+  }
+
+  .court-title{
+    display:flex;
+    flex-direction:column;
+    gap: 4px;
+    min-width:0;
+  }
+
+  .court-title .title{
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    font-size: 16px;
+    line-height: 1.1;
+  }
+
+  .court-title .sub{
+    font-weight: 750;
+    font-size: 13px;
+    color: rgba(255,255,255,.80);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .badge{
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.10);
+    color: rgba(255,255,255,.90);
+    flex: 0 0 auto;
+  }
+  .badge.live{ background: var(--ok); }
+  .badge.empty{ opacity: .65; }
+
+  .line{
+    height:1px;
+    background: rgba(255,255,255,.16);
+    margin: 10px 0 10px;
+    position:relative;
+    z-index:1;
+  }
+
+  .match{
+    display:flex;
+    flex-direction:column;
+    gap: 8px;
+    position:relative;
+    z-index:1;
+  }
+
+  .teamrow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    text-align:center;
+  }
+
+  .team{
+    font-size: 13.5px;
+    font-weight: 750;
+    line-height: 1.2;
+    min-width: 0;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vs{
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 800;
+  }
+
+  .timeinfo{
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    font-size: 12.5px;
+    color: rgba(255,255,255,.78);
+    line-height: 1.55;
+    text-align:center;
+    position:relative;
+    z-index:1;
+  }
+
+  .empty .team,
+  .empty .court-title .sub{
+    color: rgba(255,255,255,.55);
+    font-weight: 650;
+  }
+
+  /* mobile polish */
+  @media (max-width: 480px){
+    body{ padding: 16px; }
+    header{ align-items:flex-start; }
+    h1{ font-size: 24px; }
+    .btn{ padding: 10px 12px; border-radius: 13px; }
+    .up-list li{ padding: 10px 10px; }
+    .court{ padding: 13px; }
+    .teamrow{ padding: 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .btn{ transition:none; }
+  }
 </style>
 </head>
+
 <body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+
   <div class="wrap">
     <header>
-      <div>
+      <div class="titleblock">
         <h1>Court Assignments</h1>
         <div class="ts" id="sourceNote">Loading CSV…</div>
       </div>
       <div class="controls">
-        <button id="refreshBtn" title="Reload CSV">Refresh</button>
+        <button class="btn" id="refreshBtn" title="Reload CSV">Refresh</button>
       </div>
     </header>
 
-    <!-- UPCOMING MOVED TO TOP -->
-    <section class="upcoming">
-      <h2>Upcoming Matches</h2>
+    <!-- UPCOMING -->
+    <section class="panel upcoming">
+      <div class="up-head">
+        <h2>Upcoming Matches</h2>
+        <div class="stamp" id="lastUpdated"></div>
+      </div>
+
       <ul class="up-list" id="upcomingList"></ul>
-      <div class="stamp" id="lastUpdated"></div>
+
       <div class="err" id="errorMsg" hidden></div>
     </section>
 
@@ -118,16 +424,30 @@
     courtsGrid.innerHTML = '';
     for(let i=1;i<=NUM_COURTS;i++){
       const card = document.createElement('article');
-      card.className = 'court empty';
+      card.className = 'panel court empty';
       card.dataset.court = i;
       card.innerHTML = `
-        <div class="title">Court ${i}</div>
-        <div class="sub" data-sub></div>
+        <div class="court-top">
+          <div class="court-title">
+            <div class="title">Court ${i}</div>
+            <div class="sub" data-sub>—</div>
+          </div>
+          <div class="badge empty" data-badge>Empty</div>
+        </div>
+
         <div class="line"></div>
-        <div class="row"><div class="team" data-team1></div></div>
-        <div class="row"><div class="vs">vs</div></div>
-        <div class="row"><div class="team" data-team2></div></div>
-        <div class="timeinfo" data-times></div>
+
+        <div class="match">
+          <div class="teamrow"><div class="team" data-team1>—</div></div>
+          <div class="vs">vs</div>
+          <div class="teamrow"><div class="team" data-team2>—</div></div>
+        </div>
+
+        <div class="timeinfo" data-times>
+          <div>Scheduled Time: —</div>
+          <div>Start Time: —</div>
+          <div>Duration: —</div>
+        </div>
       `;
       courtsGrid.appendChild(card);
     }
@@ -194,6 +514,7 @@
     const ss = s ? (':' + s.toString().padStart(2,'0')) : '';
     return `${h}:${mm}${ss} ${ampm}`;
   }
+
   function formatDuration(since){
     if(!since) return '';
     const now = new Date();
@@ -208,6 +529,7 @@
   async function loadCSV(){
     errMsg.hidden = true;
     sourceNote.textContent = 'Loading CSV…';
+
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
@@ -219,6 +541,7 @@
         }catch(e){
           errMsg.hidden = false;
           errMsg.textContent = 'Error rendering data: ' + e.message;
+          sourceNote.textContent = 'Error reading CSV';
         }
       },
       error: (e) => {
@@ -229,10 +552,17 @@
     });
   }
 
+  function setBadge(card, label, kind){
+    const badge = card.querySelector('[data-badge]');
+    badge.textContent = label;
+    badge.classList.remove('live','empty');
+    if(kind === 'live') badge.classList.add('live');
+    if(kind === 'empty') badge.classList.add('empty');
+  }
+
   function renderFromRows(rows){
     buildCourtShells();
 
-    // Normalize + parse
     const normalized = rows.map((r, idx) => {
       const startRaw = tidy(r['Start Time']);
       const timeRaw  = tidy(r['Time']);
@@ -245,9 +575,8 @@
       const num = parseInt(courtRaw, 10);
       const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
 
-      // Parse times (Time is time-only now, possibly with seconds)
-      const startTime = toDateOrNullFlexible(startRaw); // may be full date+time
-      const time = parseTimeToday(timeRaw) ?? null;     // interpret strictly as today's time
+      const startTime = toDateOrNullFlexible(startRaw);
+      const time = parseTimeToday(timeRaw) ?? null;
 
       return {
         _row: idx,
@@ -258,7 +587,7 @@
       };
     });
 
-    // Determine ON-COURT: latest 'time' per court (fallback to startTime if no time present)
+    // Latest per court (time first, fallback startTime)
     const latestByCourt = new Map();
     for(const r of normalized){
       if(r.court==null) continue;
@@ -275,19 +604,21 @@
     for(const [num,row] of latestByCourt.entries()){
       const card = courtsGrid.querySelector(`.court[data-court="${num}"]`);
       if(!card) continue;
+
       const sub = card.querySelector('[data-sub]');
       const t1 = card.querySelector('[data-team1]');
       const t2 = card.querySelector('[data-team2]');
       const times = card.querySelector('[data-times]');
 
-      const subTxt = (row.event && row.round) ? `${row.event} - ${row.round}` : (row.event || row.round || ' ');
+      const subTxt = (row.event && row.round) ? `${row.event} — ${row.round}` : (row.event || row.round || '—');
       sub.textContent = subTxt;
-      t1.textContent = row.team1 || ' ';
-      t2.textContent = row.team2 || ' ';
+      t1.textContent = row.team1 || '—';
+      t2.textContent = row.team2 || '—';
 
       const sched = formatTime(row.startTime);
       const start = formatTime(row.time);
       const dur = formatDuration(row.time);
+
       times.innerHTML = `
         <div>Scheduled Time: ${sched || '—'}</div>
         <div>Start Time: ${start || '—'}</div>
@@ -295,9 +626,10 @@
       `;
 
       card.classList.remove('empty');
+      setBadge(card, 'Live', 'live');
     }
 
-    // Upcoming = rows without a court assignment
+    // Upcoming = no court assignment
     const upcoming = normalized
       .filter(r => r.court==null)
       .sort((a,b) => {
@@ -309,17 +641,32 @@
 
     upList.innerHTML = '';
     if(upcoming.length===0){
-      upList.innerHTML='<li>No upcoming matches listed.</li>';
+      const li=document.createElement('li');
+      li.innerHTML = `<div class="up-left"><div class="up-match">No upcoming matches listed.</div></div>`;
+      upList.appendChild(li);
     }else{
       for(const r of upcoming){
         const when = formatTime(r.startTime ?? r.time);
         const li=document.createElement('li');
-        li.textContent = `${r.team1 || '—'} vs ${r.team2 || '—'}${when ? ' — ' + when : ''}`;
+
+        const matchText = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
+        li.innerHTML = `
+          <div class="up-left">
+            <div class="up-match">${escapeHtml(matchText)}</div>
+          </div>
+          <div class="pill">${when || 'Time TBD'}</div>
+        `;
         upList.appendChild(li);
       }
     }
 
     lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
   }
 
   loadCSV();
