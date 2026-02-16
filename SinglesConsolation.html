@@ -10,24 +10,19 @@
 
   <style>
     :root{
-      --bg1:#0f172a;
-      --bg2:#1e293b;
+      --bg1:#0f172a; --bg2:#1e293b;
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.72);
       --glass: rgba(255,255,255,.10);
-      --glass2: rgba(255,255,255,.07);
       --glassBorder: rgba(255,255,255,.18);
       --shadow: 0 18px 50px rgba(0,0,0,.35);
       --radius: 18px;
-
       --ok: rgba(34,197,94,.18);
       --warn: rgba(99,102,241,.18);
       --danger: rgba(244,63,94,.18);
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
-
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -40,48 +35,18 @@
       padding: 22px;
       overflow-x:hidden;
     }
-
     .blob{
-      position:fixed;
-      width:440px; height:440px;
-      border-radius:999px;
-      filter: blur(44px);
-      opacity:.22;
-      z-index:0;
-      pointer-events:none;
+      position:fixed; width:440px; height:440px;
+      border-radius:999px; filter: blur(44px); opacity:.22;
+      z-index:0; pointer-events:none;
     }
     .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
     .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
 
-    .wrap{
-      max-width: 860px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      padding-bottom: 42px;
-    }
-
-    header{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap: 14px;
-      margin: 10px 0 18px;
-      flex-wrap:wrap;
-    }
-
-    h1{
-      margin:0;
-      font-size: 26px;
-      font-weight: 850;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-    }
-
-    .subhead{
-      font-size: 12.5px;
-      color: var(--muted);
-    }
+    .wrap{ max-width: 860px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
+    header{ display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; margin: 10px 0 18px; flex-wrap:wrap; }
+    h1{ margin:0; font-size: 26px; font-weight: 850; letter-spacing: -0.02em; line-height: 1.15; }
+    .subhead{ font-size: 12.5px; color: var(--muted); }
 
     .panel{
       background: var(--glass);
@@ -93,23 +58,8 @@
       padding: 18px;
     }
 
-    .panel + .panel{ margin-top: 14px; }
-
-    .titleRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap: 10px;
-      margin-bottom: 10px;
-      flex-wrap:wrap;
-    }
-
-    .titleRow h2{
-      margin:0;
-      font-size: 15px;
-      font-weight: 850;
-      letter-spacing: -0.01em;
-    }
+    .titleRow{ display:flex; justify-content:space-between; align-items:baseline; gap: 10px; margin-bottom: 10px; flex-wrap:wrap; }
+    .titleRow h2{ margin:0; font-size: 15px; font-weight: 850; letter-spacing: -0.01em; }
 
     .pill{
       font-size: 12.5px;
@@ -122,30 +72,14 @@
     }
 
     .notice{
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 16px;
+      display:flex; flex-direction:column; gap: 10px;
+      padding: 14px; border-radius: 16px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
     }
 
-    .notice strong{ font-weight: 850; }
-
-    .form{
-      display:flex;
-      flex-direction:column;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    label{
-      font-size: 12.5px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
+    .form{ display:flex; flex-direction:column; gap: 12px; margin-top: 8px; }
+    label{ font-size: 12.5px; color: var(--muted); font-weight: 700; }
     select{
       width:100%;
       padding: 12px 12px;
@@ -192,14 +126,10 @@
       }
     }
     .btn:active{ transform: scale(.99); }
-    .btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      transform:none;
-    }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
     .status{
-      margin-top: 10px;
+      margin-top: 14px;
       padding: 12px 12px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.18);
@@ -213,8 +143,7 @@
     .status.err{ background: var(--danger); display:block; }
 
     .spinner{
-      width: 18px;
-      height: 18px;
+      width: 18px; height: 18px;
       border-radius: 999px;
       border: 2px solid rgba(255,255,255,.35);
       border-top-color: rgba(255,255,255,.95);
@@ -246,27 +175,25 @@
       <div class="pill" id="modePill">Checking status…</div>
     </header>
 
-    <section class="panel" id="mainPanel">
-      <!-- injected -->
-    </section>
-
+    <section class="panel" id="mainPanel"></section>
     <div class="status" id="statusBox"></div>
   </div>
 
 <script>
-  // ====== CSVs you provided ======
+  // Control CSV
   const CONTROL_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=1244457974&single=true&output=csv";
 
+  // Entry list CSV
   const ENTRY_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
 
-  // This is read-only CSV for the submissions sheet (used only to check which random numbers are already taken)
+  // Submissions CSV (read-only; used to avoid duplicate numbers client-side)
   const SUBMISSIONS_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
-  // ====== YOU MUST SET THIS to your Apps Script Web App URL once you deploy it ======
-  const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyqBT5I_5K7yHCFl1H_le_fZl_PO3EzKU6KEGFFyEv_8-YB-aZUYXjrLs-SQIP8V22f/exec";
+  // IMPORTANT: paste your deployed Apps Script Web App URL here
+  const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
 
   const mainPanel = document.getElementById("mainPanel");
   const modePill = document.getElementById("modePill");
@@ -279,6 +206,7 @@
   function showStatus(type, msg){
     statusBox.className = "status " + type;
     statusBox.textContent = msg;
+    statusBox.style.display = "block";
   }
   function clearStatus(){
     statusBox.className = "status";
@@ -299,7 +227,6 @@
     });
   }
 
-  // CONTROL CSV has columns: View, Current
   function getControlFlags(rows){
     const flags = {};
     for(const r of rows){
@@ -308,6 +235,12 @@
       if(view) flags[view] = (cur === "Y");
     }
     return flags;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
   }
 
   function renderComingSoon(){
@@ -332,31 +265,47 @@
       </div>
       <div class="notice">
         <div><strong>This page is not active right now.</strong></div>
-        <div style="color: var(--muted); font-size: 13px;">
-          If you expected Entry Open, check the control sheet values.
-        </div>
       </div>
     `;
+  }
+
+  async function loadUsedNumbers(){
+    const rows = await parseCSV(SUBMISSIONS_CSV);
+    const used = new Set();
+    for(const r of rows){
+      const n = Number(tidy(r["Number"] || r["number"] || r["D"]));
+      if(!Number.isNaN(n)) used.add(n);
+    }
+    return used;
+  }
+
+  function pickUniqueNumber(used){
+    if(used.size >= 1000) return null;
+    for(let tries=0; tries<5000; tries++){
+      const candidate = Math.floor(Math.random() * 1000) + 1;
+      if(!used.has(candidate)) return candidate;
+    }
+    // fallback scan
+    for(let i=1;i<=1000;i++) if(!used.has(i)) return i;
+    return null;
   }
 
   async function renderEntryOpen(){
     modePill.textContent = "Entry Open";
     clearStatus();
 
-    // Load entry list
     let entryRows = [];
     try{
       entryRows = await parseCSV(ENTRY_CSV);
     }catch(e){
-      showStatus("err", "Could not load the entry list CSV.");
+      showStatus("err", "Could not load the entry list.");
       mainPanel.innerHTML = `
         <div class="titleRow"><h2>Entry</h2><div class="pill">Error</div></div>
-        <div class="notice">Unable to load the entry list.</div>
+        <div class="notice">Unable to load the entry list CSV.</div>
       `;
       return;
     }
 
-    // Filter Include=Y and build options
     const players = entryRows
       .map(r => ({
         name: tidy(r["Name"]),
@@ -398,7 +347,6 @@
     const singlesBox = document.getElementById("singlesBox");
     const submitBtn = document.getElementById("submitBtn");
 
-    // Populate dropdown
     for(const p of players){
       const label = `${p.firstname} ${p.name}`.trim();
       const opt = document.createElement("option");
@@ -432,37 +380,42 @@
       }
 
       const opt = select.selectedOptions[0];
-      const firstname = opt.dataset.firstname || "";
-      const name = opt.dataset.name || "";
-      const singles = opt.dataset.singles || "";
+      const firstname = opt?.dataset?.firstname || "";
+      const name = opt?.dataset?.name || "";
+      const singles = opt?.dataset?.singles || "";
 
       if(!firstname || !name){
         showStatus("err", "Please select your name.");
         return;
       }
 
-      // UI: spinner + disable
+      // Spinner UI
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<span class="spinner"></span>Submitting…`;
 
       try{
-        // Optional: load existing numbers client-side as a “hint”; server will still enforce uniqueness
-        // (kept light — server is the source of truth)
-        await parseCSV(SUBMISSIONS_CSV).catch(() => []);
-
-        const resp = await fetch(APPS_SCRIPT_WEBAPP_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ firstname, name, singles })
-        });
-
-        const data = await resp.json().catch(() => ({}));
-
-        if(!resp.ok || !data.ok){
-          throw new Error(data.error || "Submission failed.");
+        // Pick an unused number client-side
+        const used = await loadUsedNumbers().catch(() => new Set());
+        const number = pickUniqueNumber(used);
+        if(number == null){
+          throw new Error("All numbers 1–1000 are already used.");
         }
 
-        showStatus("ok", `Submitted! Your entry number is ${data.number}.`);
+        // CORS-safe POST: FormData + no custom headers + no-cors mode
+        const fd = new FormData();
+        fd.append("firstname", firstname);
+        fd.append("name", name);
+        fd.append("singles", singles);
+        fd.append("number", String(number));
+
+        await fetch(APPS_SCRIPT_WEBAPP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: fd
+        });
+
+        // With no-cors we can’t read the response, so we treat “no network error” as success.
+        showStatus("ok", `Submitted! Your entry number is ${number}.`);
       }catch(e){
         showStatus("err", e.message || "Submission failed.");
       }finally{
@@ -481,9 +434,6 @@
       const controlRows = await parseCSV(CONTROL_CSV);
       const flags = getControlFlags(controlRows);
 
-      // Priority per your request:
-      // Coming Soon Y => show coming soon
-      // else if Entry Open Y => show entry form
       if(flags["Coming Soon"]){
         renderComingSoon();
       }else if(flags["Entry Open"]){
