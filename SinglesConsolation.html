@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Indy Classic Singles Consolation</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#1e293b;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --glass: rgba(255,255,255,.10);
+      --glass2: rgba(255,255,255,.07);
+      --glassBorder: rgba(255,255,255,.18);
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --ok: rgba(34,197,94,.18);
+      --warn: rgba(99,102,241,.18);
+      --danger: rgba(244,63,94,.18);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding: 22px;
+      overflow-x:hidden;
+    }
+
+    .blob{
+      position:fixed;
+      width:440px; height:440px;
+      border-radius:999px;
+      filter: blur(44px);
+      opacity:.22;
+      z-index:0;
+      pointer-events:none;
+    }
+    .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
+    .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
+
+    .wrap{
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      padding-bottom: 42px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      margin: 10px 0 18px;
+      flex-wrap:wrap;
+    }
+
+    h1{
+      margin:0;
+      font-size: 26px;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .subhead{
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .panel{
+      background: var(--glass);
+      border: 1px solid var(--glassBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 18px;
+    }
+
+    .panel + .panel{ margin-top: 14px; }
+
+    .titleRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap:wrap;
+    }
+
+    .titleRow h2{
+      margin:0;
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+    }
+
+    .pill{
+      font-size: 12.5px;
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 8px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .notice{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .notice strong{ font-weight: 850; }
+
+    .form{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    label{
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(15,23,42,.35);
+      color: var(--text);
+      outline: none;
+    }
+
+    .infoBox{
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.85);
+      line-height: 1.45;
+      font-size: 13px;
+      min-height: 48px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+    }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.12);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media (hover:hover) and (pointer:fine){
+      .btn:hover{
+        transform: translateY(-2px);
+        background: rgba(255,255,255,.16);
+        border-color: rgba(255,255,255,.26);
+        box-shadow: 0 14px 34px rgba(0,0,0,.25);
+      }
+    }
+    .btn:active{ transform: scale(.99); }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .status{
+      margin-top: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      font-size: 13px;
+      color: rgba(255,255,255,.9);
+      display:none;
+    }
+    .status.ok{ background: var(--ok); display:block; }
+    .status.warn{ background: var(--warn); display:block; }
+    .status.err{ background: var(--danger); display:block; }
+
+    .spinner{
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: rgba(255,255,255,.95);
+      display:inline-block;
+      vertical-align: -3px;
+      animation: spin .9s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 480px){
+      body{ padding: 16px; }
+      h1{ font-size: 22px; }
+      .panel{ padding: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Indy Classic Singles Consolation</h1>
+        <div class="subhead" id="smallNote">Loading…</div>
+      </div>
+      <div class="pill" id="modePill">Checking status…</div>
+    </header>
+
+    <section class="panel" id="mainPanel">
+      <!-- injected -->
+    </section>
+
+    <div class="status" id="statusBox"></div>
+  </div>
+
+<script>
+  // ====== CSVs you provided ======
+  const CONTROL_CSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=1244457974&single=true&output=csv";
+
+  const ENTRY_CSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
+
+  // This is read-only CSV for the submissions sheet (used only to check which random numbers are already taken)
+  const SUBMISSIONS_CSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
+
+  // ====== YOU MUST SET THIS to your Apps Script Web App URL once you deploy it ======
+  const APPS_SCRIPT_WEBAPP_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+  const mainPanel = document.getElementById("mainPanel");
+  const modePill = document.getElementById("modePill");
+  const smallNote = document.getElementById("smallNote");
+  const statusBox = document.getElementById("statusBox");
+
+  const tidy = v => (v == null ? "" : String(v).trim());
+  const upper = v => tidy(v).toUpperCase();
+
+  function showStatus(type, msg){
+    statusBox.className = "status " + type;
+    statusBox.textContent = msg;
+  }
+  function clearStatus(){
+    statusBox.className = "status";
+    statusBox.textContent = "";
+    statusBox.style.display = "none";
+  }
+
+  function parseCSV(url){
+    return new Promise((resolve, reject) => {
+      const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
+      Papa.parse(bust, {
+        download: true,
+        header: true,
+        skipEmptyLines: "greedy",
+        complete: (res) => resolve(res.data || []),
+        error: (e) => reject(e)
+      });
+    });
+  }
+
+  // CONTROL CSV has columns: View, Current
+  function getControlFlags(rows){
+    const flags = {};
+    for(const r of rows){
+      const view = tidy(r["View"]);
+      const cur = upper(r["Current"]);
+      if(view) flags[view] = (cur === "Y");
+    }
+    return flags;
+  }
+
+  function renderComingSoon(){
+    modePill.textContent = "Coming Soon";
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Status</h2>
+        <div class="pill">Not open yet</div>
+      </div>
+      <div class="notice">
+        <div><strong>Indy Classic Singles Consolation Coming Soon</strong></div>
+      </div>
+    `;
+  }
+
+  function renderNotActive(){
+    modePill.textContent = "Not Active";
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Status</h2>
+        <div class="pill">Unavailable</div>
+      </div>
+      <div class="notice">
+        <div><strong>This page is not active right now.</strong></div>
+        <div style="color: var(--muted); font-size: 13px;">
+          If you expected Entry Open, check the control sheet values.
+        </div>
+      </div>
+    `;
+  }
+
+  async function renderEntryOpen(){
+    modePill.textContent = "Entry Open";
+    clearStatus();
+
+    // Load entry list
+    let entryRows = [];
+    try{
+      entryRows = await parseCSV(ENTRY_CSV);
+    }catch(e){
+      showStatus("err", "Could not load the entry list CSV.");
+      mainPanel.innerHTML = `
+        <div class="titleRow"><h2>Entry</h2><div class="pill">Error</div></div>
+        <div class="notice">Unable to load the entry list.</div>
+      `;
+      return;
+    }
+
+    // Filter Include=Y and build options
+    const players = entryRows
+      .map(r => ({
+        name: tidy(r["Name"]),
+        firstname: tidy(r["Firstname"]),
+        singles: tidy(r["Singles"]),
+        include: upper(r["Include"])
+      }))
+      .filter(p => p.include === "Y" && (p.name || p.firstname))
+      .sort((a,b) => (a.firstname + " " + a.name).localeCompare(b.firstname + " " + b.name));
+
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Enter Consolation Draws</h2>
+        <div class="pill">2026 Indy Classic</div>
+      </div>
+
+      <div class="notice">
+        <div><strong>Select your name from the drop down menu and SUBMIT to enter the 2026 Indy Classic consolation draws</strong></div>
+      </div>
+
+      <div class="form">
+        <div>
+          <label for="playerSelect">Your name</label>
+          <select id="playerSelect">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Singles</label>
+          <div class="infoBox" id="singlesBox">Select a name to see Singles info</div>
+        </div>
+
+        <button class="btn" id="submitBtn" disabled>Submit</button>
+      </div>
+    `;
+
+    const select = document.getElementById("playerSelect");
+    const singlesBox = document.getElementById("singlesBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Populate dropdown
+    for(const p of players){
+      const label = `${p.firstname} ${p.name}`.trim();
+      const opt = document.createElement("option");
+      opt.value = label;
+      opt.textContent = label;
+      opt.dataset.firstname = p.firstname;
+      opt.dataset.name = p.name;
+      opt.dataset.singles = p.singles;
+      select.appendChild(opt);
+    }
+
+    select.addEventListener("change", () => {
+      clearStatus();
+      const opt = select.selectedOptions[0];
+      const singles = opt?.dataset?.singles || "";
+      if(!select.value){
+        singlesBox.textContent = "Select a name to see Singles info";
+        submitBtn.disabled = true;
+        return;
+      }
+      singlesBox.textContent = singles || "—";
+      submitBtn.disabled = false;
+    });
+
+    submitBtn.addEventListener("click", async () => {
+      clearStatus();
+
+      if(APPS_SCRIPT_WEBAPP_URL === "PASTE_YOUR_WEB_APP_URL_HERE"){
+        showStatus("err", "Apps Script URL not set yet. Paste your Web App URL into APPS_SCRIPT_WEBAPP_URL in the HTML.");
+        return;
+      }
+
+      const opt = select.selectedOptions[0];
+      const firstname = opt.dataset.firstname || "";
+      const name = opt.dataset.name || "";
+      const singles = opt.dataset.singles || "";
+
+      if(!firstname || !name){
+        showStatus("err", "Please select your name.");
+        return;
+      }
+
+      // UI: spinner + disable
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner"></span>Submitting…`;
+
+      try{
+        // Optional: load existing numbers client-side as a “hint”; server will still enforce uniqueness
+        // (kept light — server is the source of truth)
+        await parseCSV(SUBMISSIONS_CSV).catch(() => []);
+
+        const resp = await fetch(APPS_SCRIPT_WEBAPP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firstname, name, singles })
+        });
+
+        const data = await resp.json().catch(() => ({}));
+
+        if(!resp.ok || !data.ok){
+          throw new Error(data.error || "Submission failed.");
+        }
+
+        showStatus("ok", `Submitted! Your entry number is ${data.number}.`);
+      }catch(e){
+        showStatus("err", e.message || "Submission failed.");
+      }finally{
+        submitBtn.innerHTML = "Submit";
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  async function init(){
+    clearStatus();
+    smallNote.textContent = "Loading…";
+    modePill.textContent = "Checking status…";
+
+    try{
+      const controlRows = await parseCSV(CONTROL_CSV);
+      const flags = getControlFlags(controlRows);
+
+      // Priority per your request:
+      // Coming Soon Y => show coming soon
+      // else if Entry Open Y => show entry form
+      if(flags["Coming Soon"]){
+        renderComingSoon();
+      }else if(flags["Entry Open"]){
+        await renderEntryOpen();
+      }else{
+        renderNotActive();
+      }
+
+      smallNote.textContent = "";
+    }catch(e){
+      modePill.textContent = "Error";
+      showStatus("err", "Could not load the control CSV.");
+      renderNotActive();
+      smallNote.textContent = "";
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
