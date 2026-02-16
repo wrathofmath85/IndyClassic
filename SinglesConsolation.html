@@ -43,7 +43,7 @@
     .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
     .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
 
-    .wrap{ max-width: 860px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
+    .wrap{ max-width: 980px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
     header{ display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; margin: 10px 0 18px; flex-wrap:wrap; }
     h1{ margin:0; font-size: 26px; font-weight: 850; letter-spacing: -0.02em; line-height: 1.15; }
     .subhead{ font-size: 12.5px; color: var(--muted); }
@@ -154,10 +154,69 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Draw */
+    .drawWrap{ display:flex; flex-direction:column; gap: 14px; }
+    .drawTop{
+      display:flex; gap:12px; align-items:flex-end; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .drawMeta{ display:flex; gap:10px; flex-wrap:wrap; }
+    .drawGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .matchCard{
+      padding: 12px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .slot{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      min-width: 260px;
+      flex: 1 1 320px;
+    }
+    .seed{
+      min-width: 34px;
+      text-align:center;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      color: rgba(255,255,255,.92);
+    }
+    .player{
+      font-weight: 750;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 520px;
+    }
+    .vsSmall{
+      font-weight: 900;
+      color: rgba(255,255,255,.65);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      flex: 0 0 auto;
+    }
+
     @media (max-width: 480px){
       body{ padding: 16px; }
       h1{ font-size: 22px; }
       .panel{ padding: 16px; }
+      .slot{ min-width: 0; flex: 1 1 auto; }
+      .player{ max-width: 100%; }
     }
   </style>
 </head>
@@ -188,12 +247,13 @@
   const ENTRY_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
 
-  // Submissions CSV (read-only; used to avoid duplicate numbers client-side)
+  // Submissions CSV (read-only; used to avoid duplicate numbers client-side AND to build draws)
   const SUBMISSIONS_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
-  // IMPORTANT: paste your deployed Apps Script Web App URL here
-  const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
+  // Apps Script Web App URL
+  const APPS_SCRIPT_WEBAPP_URL =
+    "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
 
   const mainPanel = document.getElementById("mainPanel");
   const modePill = document.getElementById("modePill");
@@ -273,7 +333,7 @@
     const rows = await parseCSV(SUBMISSIONS_CSV);
     const used = new Set();
     for(const r of rows){
-      const n = Number(tidy(r["Number"] || r["number"] || r["D"]));
+      const n = Number(tidy(r["Number"]));
       if(!Number.isNaN(n)) used.add(n);
     }
     return used;
@@ -285,7 +345,6 @@
       const candidate = Math.floor(Math.random() * 1000) + 1;
       if(!used.has(candidate)) return candidate;
     }
-    // fallback scan
     for(let i=1;i<=1000;i++) if(!used.has(i)) return i;
     return null;
   }
@@ -374,8 +433,8 @@
     submitBtn.addEventListener("click", async () => {
       clearStatus();
 
-      if(APPS_SCRIPT_WEBAPP_URL === "PASTE_YOUR_WEB_APP_URL_HERE"){
-        showStatus("err", "Apps Script URL not set yet. Paste your Web App URL into APPS_SCRIPT_WEBAPP_URL in the HTML.");
+      if(!APPS_SCRIPT_WEBAPP_URL){
+        showStatus("err", "Apps Script URL not set.");
         return;
       }
 
@@ -389,33 +448,23 @@
         return;
       }
 
-      // Spinner UI
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<span class="spinner"></span>Submitting…`;
 
       try{
-        // Pick an unused number client-side
         const used = await loadUsedNumbers().catch(() => new Set());
         const number = pickUniqueNumber(used);
-        if(number == null){
-          throw new Error("All numbers 1–1000 are already used.");
-        }
+        if(number == null) throw new Error("All numbers 1–1000 are already used.");
 
-        // CORS-safe POST: FormData + no custom headers + no-cors mode
         const fd = new FormData();
         fd.append("firstname", firstname);
         fd.append("name", name);
         fd.append("singles", singles);
         fd.append("number", String(number));
 
-        await fetch(APPS_SCRIPT_WEBAPP_URL, {
-          method: "POST",
-          mode: "no-cors",
-          body: fd
-        });
+        await fetch(APPS_SCRIPT_WEBAPP_URL, { method:"POST", mode:"no-cors", body: fd });
 
-        // With no-cors we can’t read the response, so we treat “no network error” as success.
-        showStatus("ok", `Submitted! `);
+        showStatus("ok", "Submitted!");
       }catch(e){
         showStatus("err", e.message || "Submission failed.");
       }finally{
@@ -423,6 +472,190 @@
         submitBtn.disabled = false;
       }
     });
+  }
+
+  // ===== Draws mode =====
+
+  function drawSizeFor(n){
+    if(n <= 0) return 0;
+    if(n <= 2) return 2;
+    if(n <= 4) return 4;
+    if(n <= 8) return 8;
+    if(n <= 16) return 16;
+    return 32; // 17-32
+  }
+
+  // Seeding order for standard bracket pairings.
+  // Generates a seed list (length = drawSize) in the order they appear in the bracket slots.
+  // For 4: [1,4,2,3] => matches are (1v4) and (2v3)
+  // For 8: [1,8,4,5,3,6,2,7] => matches are (1v8),(4v5),(3v6),(2v7)
+  function bracketSeedSlots(size){
+    let seeds = [1,2];
+    while(seeds.length < size){
+      const n = seeds.length * 2 + 1;
+      const next = [];
+      for(const s of seeds){
+        next.push(s);
+        next.push(n - s);
+      }
+      seeds = next;
+    }
+    return seeds;
+  }
+
+  function renderDrawUI(groups){
+    modePill.textContent = "Draws";
+    clearStatus();
+
+    const singlesValues = Array.from(groups.keys()).sort((a,b) => a.localeCompare(b));
+
+    mainPanel.innerHTML = `
+      <div class="drawWrap">
+        <div class="drawTop">
+          <div class="titleRow" style="margin:0; flex: 1 1 auto;">
+            <h2>Consolation Draws</h2>
+            <div class="drawMeta" id="drawMeta"></div>
+          </div>
+          <div style="min-width: 260px; flex: 0 0 320px;">
+            <label for="singlesGroup">Singles group</label>
+            <select id="singlesGroup">
+              <option value="">— Select Singles —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="notice" id="drawNotice">
+          Select a Singles group to view the bracket.
+        </div>
+
+        <div class="drawGrid" id="drawGrid"></div>
+      </div>
+    `;
+
+    const select = document.getElementById("singlesGroup");
+    const drawGrid = document.getElementById("drawGrid");
+    const drawMeta = document.getElementById("drawMeta");
+    const drawNotice = document.getElementById("drawNotice");
+
+    // Populate dropdown
+    for(const v of singlesValues){
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    }
+
+    select.addEventListener("change", () => {
+      const val = select.value;
+      drawGrid.innerHTML = "";
+      drawMeta.innerHTML = "";
+      if(!val){
+        drawNotice.textContent = "Select a Singles group to view the bracket.";
+        return;
+      }
+
+      const players = groups.get(val) || [];
+      // Sort by Number ascending (seed 1 = smallest number)
+      const seeded = players
+        .slice()
+        .sort((a,b) => a.number - b.number)
+        .map((p, idx) => ({ ...p, seed: idx + 1 }));
+
+      const n = seeded.length;
+      const size = drawSizeFor(n);
+
+      drawNotice.innerHTML = `
+        <div><strong>${escapeHtml(val)}</strong></div>
+        <div style="color: var(--muted); font-size: 13px;">
+          Players: ${n} • Draw: ${size}
+        </div>
+      `;
+
+      drawMeta.innerHTML = `
+        <div class="pill">Players: ${n}</div>
+        <div class="pill">Draw: ${size}</div>
+      `;
+
+      if(n === 0){
+        drawGrid.innerHTML = `<div class="notice">No entries yet.</div>`;
+        return;
+      }
+
+      const slots = bracketSeedSlots(size);
+
+      // build seed -> player map for seeds 1..n
+      const seedToPlayer = new Map();
+      for(const p of seeded){
+        seedToPlayer.set(p.seed, p);
+      }
+
+      // Create matches in order (pairs of slots)
+      for(let i=0; i<slots.length; i+=2){
+        const sA = slots[i];
+        const sB = slots[i+1];
+
+        const pA = seedToPlayer.get(sA) || null;
+        const pB = seedToPlayer.get(sB) || null;
+
+        const leftText = pA ? `${pA.firstname} ${pA.name}` : "BYE";
+        const rightText = pB ? `${pB.firstname} ${pB.name}` : "BYE";
+
+        const card = document.createElement("div");
+        card.className = "matchCard";
+        card.innerHTML = `
+          <div class="slot">
+            <div class="seed">${sA}</div>
+            <div class="player">${escapeHtml(leftText)}</div>
+          </div>
+          <div class="vsSmall">vs</div>
+          <div class="slot" style="justify-content:flex-end;">
+            <div class="seed">${sB}</div>
+            <div class="player">${escapeHtml(rightText)}</div>
+          </div>
+        `;
+        drawGrid.appendChild(card);
+      }
+    });
+  }
+
+  async function renderDraws(){
+    modePill.textContent = "Draws";
+    smallNote.textContent = "Loading draws…";
+    clearStatus();
+
+    let rows = [];
+    try{
+      rows = await parseCSV(SUBMISSIONS_CSV);
+    }catch(e){
+      showStatus("err", "Could not load the submissions CSV for draws.");
+      mainPanel.innerHTML = `
+        <div class="titleRow"><h2>Draws</h2><div class="pill">Error</div></div>
+        <div class="notice">Unable to load draw data.</div>
+      `;
+      smallNote.textContent = "";
+      return;
+    }
+
+    // Normalize submissions: Name, Firstname, Singles, Number
+    const submissions = rows
+      .map(r => ({
+        name: tidy(r["Name"]),
+        firstname: tidy(r["Firstname"]),
+        singles: tidy(r["Singles"]),
+        number: Number(tidy(r["Number"]))
+      }))
+      .filter(p => p.singles && Number.isFinite(p.number));
+
+    // Group by Singles
+    const groups = new Map();
+    for(const p of submissions){
+      const key = p.singles;
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(p);
+    }
+
+    renderDrawUI(groups);
+    smallNote.textContent = "";
   }
 
   async function init(){
@@ -434,10 +667,16 @@
       const controlRows = await parseCSV(CONTROL_CSV);
       const flags = getControlFlags(controlRows);
 
+      // Priority:
+      // Coming Soon (Y) => coming soon
+      // Entry Open (Y)  => entry form
+      // Draws (Y)       => draws view
       if(flags["Coming Soon"]){
         renderComingSoon();
       }else if(flags["Entry Open"]){
         await renderEntryOpen();
+      }else if(flags["Draws"]){
+        await renderDraws();
       }else{
         renderNotActive();
       }
