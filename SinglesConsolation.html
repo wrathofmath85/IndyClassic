@@ -415,7 +415,7 @@
         });
 
         // With no-cors we can’t read the response, so we treat “no network error” as success.
-        showStatus("ok", `Submitted! Your entry number is ${number}.`);
+        showStatus("ok", `Submitted! `);
       }catch(e){
         showStatus("err", e.message || "Submission failed.");
       }finally{
