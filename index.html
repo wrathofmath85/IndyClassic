@@ -130,14 +130,15 @@
       }
     }
 
-    .link-btn:active{ transform: scale(.99); }
+    .link-btn:active{
+      transform: scale(.99);
+    }
 
     /* Sponsors */
     .sponsors{
       margin-top: 18px;
       padding-top: 14px;
       border-top: 1px solid rgba(255,255,255,.14);
-      display:none; /* hidden until we confirm at least one loaded */
     }
     .sponsors-title{
       font-size: 12px;
@@ -233,40 +234,25 @@
         <a href="#" class="link-btn">Doubles Consolation</a>
       </div>
 
-      <!-- Sponsors -->
-      <div class="sponsors" id="sponsors">
+      <!-- Sponsors (tiles hide automatically if image missing) -->
+      <div class="sponsors">
         <div class="sponsors-title">Sponsors</div>
-        <div class="sponsor-grid" id="sponsorGrid">
-          <!-- We include all 10; missing ones auto-hide -->
-          <div class="sponsor"><img src="sponsor01.jpg" alt="Sponsor 1" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor02.jpg" alt="Sponsor 2" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor03.jpg" alt="Sponsor 3" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor04.jpg" alt="Sponsor 4" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor05.jpg" alt="Sponsor 5" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor06.jpg" alt="Sponsor 6" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor07.jpg" alt="Sponsor 7" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor08.jpg" alt="Sponsor 8" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor09.jpg" alt="Sponsor 9" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
-          <div class="sponsor"><img src="sponsor10.jpg" alt="Sponsor 10" loading="lazy" onload="markSponsorLoaded()" onerror="hideSponsor(this)"></div>
+        <div class="sponsor-grid">
+          <div class="sponsor"><img src="sponsor01.jpg" alt="Sponsor 1" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor02.jpg" alt="Sponsor 2" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor03.jpg" alt="Sponsor 3" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor04.jpg" alt="Sponsor 4" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor05.jpg" alt="Sponsor 5" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor06.jpg" alt="Sponsor 6" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor07.jpg" alt="Sponsor 7" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor08.jpg" alt="Sponsor 8" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor09.jpg" alt="Sponsor 9" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor"><img src="sponsor10.jpg" alt="Sponsor 10" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
         </div>
       </div>
 
       <footer>© 2026 Indy Classic</footer>
     </div>
   </div>
-
-  <script>
-    // Hide a tile if the image doesn't exist
-    function hideSponsor(img){
-      const tile = img.closest('.sponsor');
-      if(tile) tile.style.display = 'none';
-    }
-
-    // Show the sponsors section as soon as at least one sponsor loads
-    function markSponsorLoaded(){
-      const sponsors = document.getElementById('sponsors');
-      if(sponsors) sponsors.style.display = 'block';
-    }
-  </script>
 </body>
 </html>
