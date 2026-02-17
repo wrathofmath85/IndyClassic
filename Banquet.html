@@ -20,7 +20,9 @@
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; }
+
+    /* ✅ allow vertical scrolling */
+    html, body { height:auto; min-height:100%; }
 
     body{
       font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -31,10 +33,17 @@
         linear-gradient(135deg, var(--bg1), var(--bg2));
       min-height:100vh;
       display:flex;
-      align-items:center;
+
+      /* ✅ top-align so page can grow downward and scroll */
+      align-items:flex-start;
       justify-content:center;
+
       padding: 24px;
-      overflow:hidden;
+
+      /* ✅ prevent sideways scroll, keep vertical scroll */
+      overflow-x:hidden;
+      overflow-y:auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .blob {
