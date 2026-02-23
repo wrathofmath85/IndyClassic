@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Host Hotel – Indy Classic 2026</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#0b1224;
+      --bg2:#101b35;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --glass: rgba(255,255,255,.10);
+      --glass2: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.18);
+      --shadow: 0 18px 55px rgba(0,0,0,.45);
+      --radius: 22px;
+      --accent: #7dd3fc; /* light sky */
+      --accent2:#a78bfa; /* soft purple */
+      --danger:#fb7185;
+    }
+
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    html,body{ height:100%; }
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 650px at 15% 10%, rgba(125,211,252,.26), transparent 60%),
+        radial-gradient(900px 600px at 85% 15%, rgba(167,139,250,.22), transparent 58%),
+        radial-gradient(900px 600px at 55% 95%, rgba(251,113,133,.14), transparent 55%),
+        linear-gradient(140deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      width:min(1100px, 92vw);
+      margin: 36px auto 70px;
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 14px 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0,0,0,.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+    .brand img{
+      width:42px; height:42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 10px 26px rgba(0,0,0,.30);
+      flex: 0 0 auto;
+    }
+    .brand .title{
+      line-height: 1.1;
+      min-width: 0;
+    }
+    .brand .title .h{
+      font-weight: 800;
+      letter-spacing: .2px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand .title .sub{
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ctaRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill{
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 4px rgba(125,211,252,.15);
+    }
+
+    .btn{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      text-decoration:none;
+      color: rgba(10,12,18,.95);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      transition: transform .15s ease, filter .15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      white-space: nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    .btnSecondary{
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      font-weight: 700;
+    }
+
+    /* Hero */
+    .hero{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1.25fr .9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cardPad{ padding: 22px; }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    h1{
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.6px;
+      margin-bottom: 10px;
+    }
+    .lead{
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 62ch;
+    }
+
+    .grid{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .info{
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .info .label{
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .info .value{
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .note{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(251,113,133,.10);
+      border: 1px solid rgba(251,113,133,.22);
+      color: rgba(255,255,255,.90);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .note b{ color: rgba(255,255,255,.96); }
+
+    /* Image card */
+    .imgWrap{
+      height: 100%;
+      display:flex;
+      flex-direction: column;
+    }
+    .hotelImg{
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.04) contrast(1.02);
+      transform: scale(1.02);
+    }
+    .imgOverlay{
+      position:absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px 420px at 20% 0%, rgba(125,211,252,.18), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.55));
+      pointer-events:none;
+    }
+    .imgBottom{
+      position:absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.20);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      font-size: 12px;
+      color: rgba(255,255,255,.90);
+      white-space: nowrap;
+    }
+    .badge strong{ font-weight: 900; color: rgba(255,255,255,.96); }
+    .spark{
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 4px rgba(167,139,250,.12);
+      flex: 0 0 auto;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 16px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      text-align:center;
+    }
+    footer a{ color: rgba(255,255,255,.72); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,.32); }
+    footer a:hover{ color: rgba(255,255,255,.9); border-bottom-color: rgba(255,255,255,.55); }
+
+    /* Mobile */
+    @media (max-width: 860px){
+      .hero{ grid-template-columns: 1fr; }
+      .hotelImg{ min-height: 320px; }
+      .grid{ grid-template-columns: 1fr; }
+      .ctaRow{ justify-content: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <img src="profile.jpg" alt="Tournament" />
+        <div class="title">
+          <div class="h">Indy Classic 2026</div>
+          <div class="sub">Host Hotel Information</div>
+        </div>
+      </div>
+
+      <div class="ctaRow">
+        <div class="pill" title="Group rate details">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Group Rate: <b style="color:rgba(255,255,255,.92)">$189.00/night</b></span>
+        </div>
+        <a class="btn btnSecondary" href="#details">View Details</a>
+        <a class="btn" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
+          Book Host Hotel
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <!-- Details card -->
+      <div class="card cardPad" id="details">
+        <div class="kicker">
+          <span class="spark" aria-hidden="true"></span>
+          Official Host Hotel • Limited Group Block
+        </div>
+
+        <h1>Stay where the action is.</h1>
+        <p class="lead">
+          Use the official group link to lock in the tournament rate. Rooms are limited and the booking deadline is firm.
+        </p>
+
+        <div class="grid" style="margin-top:18px;">
+          <div class="info">
+            <div class="label">💳 Rate</div>
+            <div class="value">$189.00 / Night</div>
+          </div>
+
+          <div class="info">
+            <div class="label">🗓️ Last day to book</div>
+            <div class="value">May 14, 2026</div>
+          </div>
+
+          <div class="info">
+            <div class="label">✅ Check In</div>
+            <div class="value">Thursday, May 28, 2026</div>
+          </div>
+
+          <div class="info">
+            <div class="label">🏁 Check Out</div>
+            <div class="value">Sunday, May 31, 2026</div>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>Reminder:</b> The group rate expires after <b>May 14, 2026</b>. If the block sells out early, standard rates may apply.
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+          <a class="btn" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
+            Book Now
+            <span aria-hidden="true">↗</span>
+          </a>
+          <a class="btn btnSecondary" href="hotel.jpg" target="_blank" rel="noopener">
+            View Hotel Photo
+            <span aria-hidden="true">🖼️</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Image card -->
+      <div class="card" aria-label="Hotel photo">
+        <img class="hotelImg" src="hotel.jpg" alt="Host Hotel" />
+        <div class="imgOverlay" aria-hidden="true"></div>
+
+        <div class="imgBottom">
+          <div class="badge">
+            <span class="spark" aria-hidden="true"></span>
+            <strong>$189</strong> group rate • <span style="color:rgba(255,255,255,.82)">limited rooms</span>
+          </div>
+
+          <a class="btn" style="padding:10px 12px; font-size:12px;" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
+            Book
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Need changes? Replace <code>profile.jpg</code> and <code>hotel.jpg</code> with your images (same filenames), and GitHub Pages will update automatically.
+    </footer>
+  </div>
+</body>
+</html>
