@@ -20,8 +20,12 @@
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; }
 
+    /* Key mobile scroll fix:
+       - Don't force html/body to height:100%
+       - Avoid centering with flex on body (can lock scroll on some mobile browsers)
+    */
+    html { height: auto; }
     body{
       font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color: var(--text);
@@ -29,12 +33,12 @@
         radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
         radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+
+      min-height: 100dvh;   /* better on mobile address bar changes */
       padding: 24px;
-      overflow-x:hidden;
+
+      overflow-x: hidden;
+      overflow-y: auto;     /* ensure page scroll is allowed */
     }
 
     .blob {
@@ -54,6 +58,9 @@
       width: min(720px, 100%);
       position: relative;
       z-index: 1;
+
+      /* Center horizontally, but allow normal vertical flow (scroll) */
+      margin: 0 auto;
     }
 
     .card{
@@ -120,6 +127,7 @@
       display:flex;
       flex-direction:column;
       gap: 6px;
+      min-width: 0;
     }
 
     .title{
@@ -153,6 +161,7 @@
     }
 
     @media (max-width: 520px){
+      body{ padding: 18px; }
       .row{ flex-direction:column; }
       .date{ min-width: 0; width: fit-content; }
       h1{ font-size: 24px; }
@@ -211,8 +220,8 @@
             <div class="title">Player’s Banquet</div>
             <div class="meta">
               <span class="pill">Time: 7PM–10PM</span>
-              <span class="pill">Location: TBD</span>
-              <span class="pill">TBD</span>
+              <span class="pill">Location: VisionLoft Events</span>
+              <span class="pill">235 N Delaware St, Indianapolis, IN 46204</span>
             </div>
           </div>
         </div>
@@ -234,4 +243,3 @@
   </div>
 </body>
 </html>
-
