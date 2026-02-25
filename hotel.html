@@ -20,8 +20,8 @@
       --border: rgba(255,255,255,.18);
       --shadow: 0 18px 55px rgba(0,0,0,.45);
       --radius: 22px;
-      --accent: #7dd3fc; /* light sky */
-      --accent2:#a78bfa; /* soft purple */
+      --accent: #7dd3fc;
+      --accent2:#a78bfa;
       --danger:#fb7185;
     }
 
@@ -39,81 +39,109 @@
     }
 
     .wrap{
-      width:min(1100px, 92vw);
-      margin: 36px auto 70px;
+      width:min(980px, 92vw);
+      margin: 34px auto 70px;
     }
 
-    /* Top bar */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      padding: 14px 16px;
-      border-radius: 999px;
+    .glass{
+      border-radius: var(--radius);
       background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
       border: 1px solid var(--border);
-      box-shadow: 0 12px 40px rgba(0,0,0,.28);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow:hidden;
     }
-    .brand{
+
+    /* Top logo header (like your second pic) */
+    .logoHeader{
+      padding: 34px 18px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .logoCircle{
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.92);
       display:flex;
       align-items:center;
-      gap:12px;
-      min-width: 0;
+      justify-content:center;
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.45),
+        inset 0 0 0 3px rgba(0,0,0,.06);
     }
-    .brand img{
-      width:42px; height:42px;
+    .logoCircle img{
+      width: 86%;
+      height: 86%;
       border-radius: 50%;
       object-fit: cover;
-      border: 1px solid rgba(255,255,255,.25);
-      box-shadow: 0 10px 26px rgba(0,0,0,.30);
-      flex: 0 0 auto;
+      display:block;
     }
-    .brand .title{
-      line-height: 1.1;
-      min-width: 0;
+
+    /* Content */
+    .content{
+      margin-top: 18px;
+      padding: 22px;
     }
-    .brand .title .h{
-      font-weight: 800;
-      letter-spacing: .2px;
+
+    h1{
+      font-size: clamp(24px, 3.3vw, 34px);
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      text-align:left;
+    }
+    .sub{
+      color: var(--muted);
       font-size: 14px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .brand .title .sub{
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.6;
+      margin-bottom: 18px;
     }
 
-    .ctaRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    .pill{
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
-      color: var(--muted);
+    .info{
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .label{
       font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
       display:flex;
       align-items:center;
       gap:8px;
     }
-    .dot{
-      width:8px; height:8px; border-radius:50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 0 0 4px rgba(125,211,252,.15);
+    .value{
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .note{
+      margin: 12px 0 16px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(251,113,133,.10);
+      border: 1px solid rgba(251,113,133,.22);
+      color: rgba(255,255,255,.90);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .note b{ color: rgba(255,255,255,.96); }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom: 18px;
     }
 
     .btn{
@@ -124,7 +152,7 @@
       color: rgba(10,12,18,.95);
       font-weight: 800;
       font-size: 13px;
-      padding: 11px 14px;
+      padding: 12px 14px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       box-shadow: 0 16px 40px rgba(0,0,0,.35);
@@ -145,269 +173,97 @@
       font-weight: 700;
     }
 
-    /* Hero */
-    .hero{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: 1.25fr .9fr;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .card{
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .cardPad{ padding: 22px; }
-
-    .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-
-    h1{
-      font-size: clamp(26px, 4vw, 44px);
-      line-height: 1.05;
-      letter-spacing: -0.6px;
-      margin-bottom: 10px;
-    }
-    .lead{
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-      max-width: 62ch;
-    }
-
-    .grid{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .info{
-      padding: 14px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.14);
-    }
-    .info .label{
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .info .value{
-      font-weight: 800;
-      font-size: 15px;
-    }
-
-    .note{
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(251,113,133,.10);
-      border: 1px solid rgba(251,113,133,.22);
-      color: rgba(255,255,255,.90);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    .note b{ color: rgba(255,255,255,.96); }
-
-    /* Image card */
-    .imgWrap{
-      height: 100%;
-      display:flex;
-      flex-direction: column;
+    /* Hotel image */
+    .hotelCard{
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.05);
     }
     .hotelImg{
-      width: 100%;
-      height: 100%;
-      min-height: 360px;
-      object-fit: cover;
+      width:100%;
+      height: auto;
       display:block;
-      filter: saturate(1.04) contrast(1.02);
-      transform: scale(1.02);
-    }
-    .imgOverlay{
-      position:absolute;
-      inset: 0;
-      background:
-        radial-gradient(700px 420px at 20% 0%, rgba(125,211,252,.18), transparent 55%),
-        linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.55));
-      pointer-events:none;
-    }
-    .imgBottom{
-      position:absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.20);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-      font-size: 12px;
-      color: rgba(255,255,255,.90);
-      white-space: nowrap;
-    }
-    .badge strong{ font-weight: 900; color: rgba(255,255,255,.96); }
-    .spark{
-      width: 10px; height: 10px;
-      border-radius: 3px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 0 0 4px rgba(167,139,250,.12);
-      flex: 0 0 auto;
+      object-fit: cover;
     }
 
-    /* Footer */
     footer{
       margin-top: 16px;
       color: rgba(255,255,255,.55);
       font-size: 12px;
       text-align:center;
     }
-    footer a{ color: rgba(255,255,255,.72); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,.32); }
-    footer a:hover{ color: rgba(255,255,255,.9); border-bottom-color: rgba(255,255,255,.55); }
 
-    /* Mobile */
-    @media (max-width: 860px){
-      .hero{ grid-template-columns: 1fr; }
-      .hotelImg{ min-height: 320px; }
+    @media (max-width: 760px){
       .grid{ grid-template-columns: 1fr; }
-      .ctaRow{ justify-content: flex-start; }
+      .logoCircle{ width: 150px; height: 150px; }
+      .content{ padding: 18px; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <header class="topbar">
-      <div class="brand">
-        <img src="profile.jpg" alt="Tournament" />
-        <div class="title">
-          <div class="h">Indy Classic 2026</div>
-          <div class="sub">Host Hotel Information</div>
+
+    <!-- Simple top logo header -->
+    <div class="glass logoHeader">
+      <div class="logoCircle" aria-label="Indy Classic Logo">
+        <img src="profile.jpg" alt="Indy Classic 2026" />
+      </div>
+    </div>
+
+    <!-- Host hotel info -->
+    <div class="glass content">
+      <h1>Host Hotel Info</h1>
+      <p class="sub">
+        Book with the official group link to get the tournament rate.
+      </p>
+
+      <div class="grid">
+        <div class="info">
+          <div class="label">💳 Rate</div>
+          <div class="value">$189.00 / Night</div>
+        </div>
+
+        <div class="info">
+          <div class="label">🗓️ Last day to book</div>
+          <div class="value">May 14, 2026</div>
+        </div>
+
+        <div class="info">
+          <div class="label">✅ Check In</div>
+          <div class="value">Thursday, May 28, 2026</div>
+        </div>
+
+        <div class="info">
+          <div class="label">🏁 Check Out</div>
+          <div class="value">Sunday, May 31, 2026</div>
         </div>
       </div>
 
-      <div class="ctaRow">
-        <div class="pill" title="Group rate details">
-          <span class="dot" aria-hidden="true"></span>
-          <span>Group Rate: <b style="color:rgba(255,255,255,.92)">$189.00/night</b></span>
-        </div>
-        <a class="btn btnSecondary" href="#details">View Details</a>
+      <div class="note">
+        <b>Reminder:</b> The group rate expires after <b>May 14, 2026</b>.
+        If the block sells out early, standard rates may apply.
+      </div>
+
+      <div class="actions">
         <a class="btn" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
-          Book Host Hotel
-          <span aria-hidden="true">↗</span>
+          Book Host Hotel <span aria-hidden="true">↗</span>
+        </a>
+        <a class="btn btnSecondary" href="hotel.jpg" target="_blank" rel="noopener">
+          View Hotel Photo <span aria-hidden="true">🖼️</span>
         </a>
       </div>
-    </header>
 
-    <section class="hero">
-      <!-- Details card -->
-      <div class="card cardPad" id="details">
-        <div class="kicker">
-          <span class="spark" aria-hidden="true"></span>
-          Official Host Hotel • Limited Group Block
-        </div>
-
-        <h1>Stay where the action is.</h1>
-        <p class="lead">
-          Use the official group link to lock in the tournament rate. Rooms are limited and the booking deadline is firm.
-        </p>
-
-        <div class="grid" style="margin-top:18px;">
-          <div class="info">
-            <div class="label">💳 Rate</div>
-            <div class="value">$189.00 / Night</div>
-          </div>
-
-          <div class="info">
-            <div class="label">🗓️ Last day to book</div>
-            <div class="value">May 14, 2026</div>
-          </div>
-
-          <div class="info">
-            <div class="label">✅ Check In</div>
-            <div class="value">Thursday, May 28, 2026</div>
-          </div>
-
-          <div class="info">
-            <div class="label">🏁 Check Out</div>
-            <div class="value">Sunday, May 31, 2026</div>
-          </div>
-        </div>
-
-        <div class="note">
-          <b>Reminder:</b> The group rate expires after <b>May 14, 2026</b>. If the block sells out early, standard rates may apply.
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
-          <a class="btn" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
-            Book Now
-            <span aria-hidden="true">↗</span>
-          </a>
-          <a class="btn btnSecondary" href="hotel.jpg" target="_blank" rel="noopener">
-            View Hotel Photo
-            <span aria-hidden="true">🖼️</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Image card -->
-      <div class="card" aria-label="Hotel photo">
+      <div class="hotelCard">
         <img class="hotelImg" src="hotel.jpg" alt="Host Hotel" />
-        <div class="imgOverlay" aria-hidden="true"></div>
-
-        <div class="imgBottom">
-          <div class="badge">
-            <span class="spark" aria-hidden="true"></span>
-            <strong>$189</strong> group rate • <span style="color:rgba(255,255,255,.82)">limited rooms</span>
-          </div>
-
-          <a class="btn" style="padding:10px 12px; font-size:12px;" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
-            Book
-            <span aria-hidden="true">↗</span>
-          </a>
-        </div>
       </div>
-    </section>
+    </div>
 
     <footer>
-      
+      Put <code>profile.jpg</code> and <code>hotel.jpg</code> in the same folder as this HTML.
     </footer>
+
   </div>
 </body>
-
 </html>
