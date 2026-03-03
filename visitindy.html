@@ -29,35 +29,56 @@
 
     .wrap{ max-width: var(--max); margin: 0 auto; padding: 18px 14px 44px; }
 
-    header{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-      padding: 10px 0 6px;
-      text-align:center;
-    }
-
-    .logo{
-      width: min(520px, 92vw);
-      height:auto;
-      display:block;
-      border-radius: 14px;
-      box-shadow: 0 18px 55px rgba(0,0,0,.35);
+    /* --- TOP LOGO BANNER --- */
+    .hero{
+      border-radius: 24px;
+      padding: 22px;
+      background:
+        radial-gradient(900px 260px at 10% 0%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 60%),
+        radial-gradient(900px 260px at 90% 0%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 60%),
+        linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.06));
       border: 1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.04);
+      box-shadow: 0 22px 70px rgba(0,0,0,.40);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom: 14px;
     }
 
-    h1{
-      margin: 6px 0 0;
+    .logoCircle{
+      width: 172px;
+      height: 172px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.96);
+      border: 6px solid rgba(255,255,255,.70);
+      box-shadow:
+        0 26px 70px rgba(0,0,0,.45),
+        inset 0 0 0 2px rgba(15,23,42,.14);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .logoCircle img{
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+      display:block;
+    }
+
+    .pageTitle{
+      text-align:center;
+      margin: 10px 0 0;
       font-size: 1.55rem;
       letter-spacing:.2px;
     }
     .sub{
-      margin: 0;
+      margin: 6px 0 0;
       color: var(--muted);
       font-size: .98rem;
       line-height: 1.35;
+      text-align:center;
     }
 
     .status{
@@ -167,8 +188,23 @@
 
     .muted{ color: var(--muted); }
 
+    .visitIndy{
+      margin-top: 26px;
+      padding: 16px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      text-align:center;
+      font-size: 1rem;
+    }
+
+    .visitIndy a{
+      font-weight: 600;
+      color: #60a5fa;
+    }
+
     footer{
-      margin-top: 20px;
+      margin-top: 18px;
       color: var(--muted);
       font-size: .9rem;
       text-align:center;
@@ -177,41 +213,49 @@
 
     @media (min-width: 760px){
       .list{ grid-template-columns: 1fr 1fr; }
+      .logoCircle{ width: 190px; height: 190px; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <header>
-      <!-- Put profile.jpg in the same folder as this HTML file -->
-      <img class="logo" src="profile.jpg" alt="Indy Classic Tournament Logo" />
-      <h1>Indy Attractions</h1>
-      <p class="sub">Curated spots for Indy Classic visitors. Sponsors are highlighted within each category.</p>
-    </header>
+
+    <div class="hero">
+      <div class="logoCircle">
+        <img src="profile.jpg" alt="Indy Classic Tournament Logo" />
+      </div>
+    </div>
+
+    <h1 class="pageTitle">Indy Attractions</h1>
+    <p class="sub"></p>
 
     <div id="status" class="status">Loading attractions…</div>
     <div id="content"></div>
 
+    <!-- NEW VISIT INDY LINK SECTION -->
+    <div class="visitIndy">
+      <a href="https://www.visitindy.com" target="_blank" rel="noopener noreferrer">
+        Click here to search for events and activities happening in Indy!
+      </a>
+    </div>
+
     <footer>
-      Updated automatically from the live CSV.
+      
     </footer>
   </div>
 
   <script>
-    // Your published Google Sheet CSV:
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwtmbtFt6Gy3K8RO4hyOb5apbN9sT42_lBhk1ULoVP8JSxntpygBQ5fzAlb-RsQUn4Yi9NzdNh9xpZ/pub?gid=0&single=true&output=csv";
 
-    // Display order + labels:
     const TYPE_ORDER = [
       { key: "Gay Restaurant", title: "Gay Restaurants" },
       { key: "Gay Bar",        title: "Gay Bars" },
       { key: "Sights",         title: "Sights" },
-      { key: "Museums/Cultur", title: "Museums" }, // matches your sheet values (truncated)
+      { key: "Museums/Cultur", title: "Museums" },
       { key: "Nature",         title: "Nature" }
     ];
 
-    // --- CSV parsing (handles commas + quotes) ---
     function parseCSV(text) {
       const rows = [];
       let row = [];
@@ -223,7 +267,7 @@
         const n = text[i + 1];
 
         if (c === '"' ) {
-          if (inQuotes && n === '"') { // escaped quote
+          if (inQuotes && n === '"') {
             cur += '"';
             i++;
           } else {
@@ -242,7 +286,7 @@
           cur += c;
         }
       }
-      // last cell
+
       if (cur.length || row.length) {
         row.push(cur);
         rows.push(row);
@@ -251,19 +295,13 @@
     }
 
     function norm(s){ return (s ?? "").toString().trim(); }
-
-    function isSponsor(val){
-      return norm(val).toLowerCase() === "yes";
-    }
-
+    function isSponsor(val){ return norm(val).toLowerCase() === "yes"; }
     function sortByName(a, b){
       return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
     }
-
     function safeLink(url){
       const u = norm(url);
       if (!u) return "";
-      // If someone accidentally puts "www.site.com", add https://
       if (!/^https?:\/\//i.test(u)) return "https://" + u;
       return u;
     }
@@ -276,7 +314,6 @@
         const items = groups.get(t.key) || [];
         if (!items.length) return;
 
-        // Sponsors first (alphabetical), then others (alphabetical)
         const sponsors = items.filter(x => x.sponsor).sort(sortByName);
         const others   = items.filter(x => !x.sponsor).sort(sortByName);
         const ordered  = sponsors.concat(others);
@@ -324,8 +361,7 @@
         content.appendChild(section);
       });
 
-      const status = document.getElementById("status");
-      status.textContent = lastUpdatedText;
+      document.getElementById("status").textContent = lastUpdatedText;
     }
 
     async function load(){
@@ -333,16 +369,13 @@
       try{
         status.textContent = "Loading attractions…";
 
-        // Cache-bust so updates show quickly if you refresh
         const res = await fetch(CSV_URL + "&_ts=" + Date.now(), { cache: "no-store" });
         if (!res.ok) throw new Error("CSV fetch failed: " + res.status);
 
         const text = await res.text();
         const rows = parseCSV(text);
-
         if (rows.length < 2) throw new Error("CSV appears empty.");
 
-        // Map headers to indexes
         const headers = rows[0].map(h => norm(h));
         const idx = (name) => headers.findIndex(h => h.toLowerCase() === name.toLowerCase());
 
@@ -356,7 +389,6 @@
           throw new Error("CSV headers not found. Expected: Type, Name, Address, Sponsor, Web");
         }
 
-        // Build groups
         const groups = new Map();
         TYPE_ORDER.forEach(t => groups.set(t.key, []));
 
@@ -373,28 +405,18 @@
             web: norm(row[iWeb])
           };
 
-          // only show types we care about (in your requested order)
           if (groups.has(type)) {
             groups.get(type).push(item);
           }
         }
 
         const now = new Date();
-        const lastUpdatedText = `Loaded from Google Sheet • ${now.toLocaleString()}`;
+        const lastUpdatedText = ``;
         render(groups, lastUpdatedText);
 
       } catch (e){
         console.error(e);
         status.textContent = "Could not load attractions. Please try again later.";
-        const content = document.getElementById("content");
-        content.innerHTML = `
-          <div class="status" style="margin-top:12px;">
-            <div><strong>Error:</strong> ${String(e.message || e)}</div>
-            <div class="muted" style="margin-top:6px;">
-              Tip: Make sure the sheet is published and the CSV link is accessible publicly.
-            </div>
-          </div>
-        `;
       }
     }
 
