@@ -21,11 +21,8 @@
 
     * { margin:0; padding:0; box-sizing:border-box; }
 
-    /* Key mobile scroll fix:
-       - Don't force html/body to height:100%
-       - Avoid centering with flex on body (can lock scroll on some mobile browsers)
-    */
     html { height: auto; }
+
     body{
       font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color: var(--text);
@@ -33,12 +30,10 @@
         radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
         radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
-
-      min-height: 100dvh;   /* better on mobile address bar changes */
+      min-height: 100dvh;
       padding: 24px;
-
       overflow-x: hidden;
-      overflow-y: auto;     /* ensure page scroll is allowed */
+      overflow-y: auto;
     }
 
     .blob {
@@ -51,6 +46,7 @@
       z-index: 0;
       pointer-events: none;
     }
+
     .blob.b1 { top: -140px; left: -140px; background: rgba(56,189,248,.9); }
     .blob.b2 { bottom: -180px; right: -140px; background: rgba(168,85,247,.9); }
 
@@ -58,8 +54,6 @@
       width: min(720px, 100%);
       position: relative;
       z-index: 1;
-
-      /* Center horizontally, but allow normal vertical flow (scroll) */
       margin: 0 auto;
     }
 
@@ -126,7 +120,7 @@
       flex: 1 1 auto;
       display:flex;
       flex-direction:column;
-      gap: 6px;
+      gap: 10px;
       min-width: 0;
     }
 
@@ -181,6 +175,7 @@
       </div>
 
       <div class="schedule">
+
         <div class="row">
           <div class="date">5/28/2026</div>
           <div class="details">
@@ -188,6 +183,8 @@
             <div class="meta">
               <span class="pill">Time: TBD</span>
               <span class="pill">Location: TBD</span>
+            </div>
+
             <div class="title">Dinner</div>
             <div class="meta">
               <span class="pill">Time: On your own</span>
@@ -203,13 +200,17 @@
             <div class="meta">
               <span class="pill">Time: 8AM–10PM</span>
               <span class="pill">Location: Indianapolis Racquet Club</span>
+            </div>
+
             <div class="title">Snacks</div>
             <div class="meta">
               <span class="pill">Time: All Day</span>
               <span class="pill">Location: Upstairs Lounge</span>
+            </div>
+
             <div class="title">Lunch</div>
             <div class="meta">
-	      <span class="pill">Menu: BIBIBOP</span>
+              <span class="pill">Menu: BIBIBOP</span>
               <span class="pill">Time: Noon</span>
               <span class="pill">Location: Upstairs Lounge</span>
             </div>
@@ -223,15 +224,21 @@
             <div class="meta">
               <span class="pill">Time: 8AM–5PM</span>
               <span class="pill">Location: Indianapolis Racquet Club</span>
+            </div>
+
             <div class="title">Snacks</div>
             <div class="meta">
               <span class="pill">Time: All Day</span>
               <span class="pill">Location: Upstairs Lounge</span>
+            </div>
+
             <div class="title">Lunch</div>
             <div class="meta">
-	      <span class="pill">Menu: Jimmy John's</span>
+              <span class="pill">Menu: Jimmy John's</span>
               <span class="pill">Time: Noon</span>
               <span class="pill">Location: Upstairs Lounge</span>
+            </div>
+
             <div class="title">Player’s Banquet</div>
             <div class="meta">
               <span class="pill">Time: 7PM–10PM</span>
@@ -251,6 +258,7 @@
             </div>
           </div>
         </div>
+
       </div>
 
       <footer>© 2026 Indy Classic</footer>
