@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Indy Classic Doubles Consolation</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --bg1:#0f172a; --bg2:#1e293b;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --glass: rgba(255,255,255,.10);
+      --glassBorder: rgba(255,255,255,.18);
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+      --ok: rgba(34,197,94,.18);
+      --warn: rgba(99,102,241,.18);
+      --danger: rgba(244,63,94,.18);
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding: 22px;
+      overflow-x:hidden;
+    }
+    .blob{
+      position:fixed; width:440px; height:440px;
+      border-radius:999px; filter: blur(44px); opacity:.22;
+      z-index:0; pointer-events:none;
+    }
+    .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
+    .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
+
+    .wrap{ max-width: 980px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
+    header{ display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; margin: 10px 0 18px; flex-wrap:wrap; }
+    h1{ margin:0; font-size: 26px; font-weight: 850; letter-spacing: -0.02em; line-height: 1.15; }
+    .subhead{ font-size: 12.5px; color: var(--muted); }
+
+    .panel{
+      background: var(--glass);
+      border: 1px solid var(--glassBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 18px;
+    }
+
+    .titleRow{ display:flex; justify-content:space-between; align-items:baseline; gap: 10px; margin-bottom: 10px; flex-wrap:wrap; }
+    .titleRow h2{ margin:0; font-size: 15px; font-weight: 850; letter-spacing: -0.01em; }
+
+    .pill{
+      font-size: 12.5px;
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 8px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .notice{
+      display:flex; flex-direction:column; gap: 10px;
+      padding: 14px; border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .form{ display:flex; flex-direction:column; gap: 12px; margin-top: 8px; }
+    label{ font-size: 12.5px; color: var(--muted); font-weight: 700; }
+    select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(15,23,42,.35);
+      color: var(--text);
+      outline: none;
+    }
+
+    .infoBox{
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.85);
+      line-height: 1.45;
+      font-size: 13px;
+      min-height: 48px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+    }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.12);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media (hover:hover) and (pointer:fine){
+      .btn:hover{
+        transform: translateY(-2px);
+        background: rgba(255,255,255,.16);
+        border-color: rgba(255,255,255,.26);
+        box-shadow: 0 14px 34px rgba(0,0,0,.25);
+      }
+    }
+    .btn:active{ transform: scale(.99); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .status{
+      margin-top: 14px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      font-size: 13px;
+      color: rgba(255,255,255,.9);
+      display:none;
+    }
+    .status.ok{ background: var(--ok); display:block; }
+    .status.warn{ background: var(--warn); display:block; }
+    .status.err{ background: var(--danger); display:block; }
+
+    .spinner{
+      width: 18px; height: 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: rgba(255,255,255,.95);
+      display:inline-block;
+      vertical-align: -3px;
+      animation: spin .9s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Entries summary */
+    .summaryGrid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .divCard{
+      padding: 12px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .divTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-bottom: 8px;
+    }
+    .divName{
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+    .nameList{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+    }
+    .nameChip{
+      font-size: 12.5px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.88);
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 480px){
+      body{ padding: 16px; }
+      h1{ font-size: 22px; }
+      .panel{ padding: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Indy Classic Doubles Consolation</h1>
+        <div class="subhead" id="smallNote">Loading…</div>
+      </div>
+      <div class="pill" id="modePill">Checking status…</div>
+    </header>
+
+    <section class="panel" id="mainPanel"></section>
+    <div class="status" id="statusBox"></div>
+  </div>
+
+<script>
+  // Control CSV
+  const CONTROL_CSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=1858632554&single=true&output=csv";
+
+  // Entry list CSV
+  const ENTRY_CSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=256864083&single=true&output=csv";
+
+  // Submissions CSV (read-only; used for duplicates + counts + draws)
+  const SUBMISSIONS_CSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=256864083&single=true&output=csv";
+
+  // Apps Script Web App URL
+  const APPS_SCRIPT_WEBAPP_URL =
+    "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
+
+  const mainPanel = document.getElementById("mainPanel");
+  const modePill = document.getElementById("modePill");
+  const smallNote = document.getElementById("smallNote");
+  const statusBox = document.getElementById("statusBox");
+
+  const tidy = v => (v == null ? "" : String(v).trim());
+  const upper = v => tidy(v).toUpperCase();
+
+  function showStatus(type, msg){
+    statusBox.className = "status " + type;
+    statusBox.textContent = msg;
+    statusBox.style.display = "block";
+  }
+  function clearStatus(){
+    statusBox.className = "status";
+    statusBox.textContent = "";
+    statusBox.style.display = "none";
+  }
+
+  function parseCSV(url){
+    return new Promise((resolve, reject) => {
+      const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
+      Papa.parse(bust, {
+        download: true,
+        header: true,
+        skipEmptyLines: "greedy",
+        complete: (res) => resolve(res.data || []),
+        error: (e) => reject(e)
+      });
+    });
+  }
+
+  function getControlFlags(rows){
+    const flags = {};
+    for(const r of rows){
+      const view = tidy(r["View"]);
+      const cur = upper(r["Current"]);
+      if(view) flags[view] = (cur === "Y");
+    }
+    return flags;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function renderComingSoon(){
+    modePill.textContent = "Coming Soon";
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Status</h2>
+        <div class="pill">Not open yet</div>
+      </div>
+      <div class="notice">
+        <div><strong>Indy Classic Doubles Consolation Coming Soon</strong></div>
+      </div>
+    `;
+  }
+
+  function renderNotActive(){
+    modePill.textContent = "Not Active";
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Status</h2>
+        <div class="pill">Unavailable</div>
+      </div>
+      <div class="notice">
+        <div><strong>This page is not active right now.</strong></div>
+      </div>
+    `;
+  }
+
+  function canonicalPersonKey(firstname, name){
+    return (tidy(firstname).toLowerCase() + "|" + tidy(name).toLowerCase()).trim();
+  }
+
+  async function loadSubmissions(){
+    const rows = await parseCSV(SUBMISSIONS_CSV);
+    return rows
+      .map(r => ({
+        name: tidy(r["Name"]),
+        firstname: tidy(r["Firstname"]),
+        Doubles: tidy(r["Doubles"]),
+        number: Number(tidy(r["Number"]))
+      }))
+      .filter(p => (p.firstname || p.name) && p.Doubles);
+  }
+
+  async function loadUsedNumbers(){
+    const subs = await loadSubmissions();
+    const used = new Set();
+    for(const p of subs){
+      if(Number.isFinite(p.number)) used.add(p.number);
+    }
+    return used;
+  }
+
+  function pickUniqueNumber(used){
+    if(used.size >= 1000) return null;
+    for(let tries=0; tries<5000; tries++){
+      const candidate = Math.floor(Math.random() * 1000) + 1;
+      if(!used.has(candidate)) return candidate;
+    }
+    for(let i=1;i<=1000;i++) if(!used.has(i)) return i;
+    return null;
+  }
+
+  function buildDivisionSummary(submissions){
+    // Unique by person+division (firstname+name+Doubles)
+    const byDivision = new Map(); // doubles -> Map(personKey -> displayName)
+    for(const s of submissions){
+      const div = tidy(s.doubles);
+      if(!div) continue;
+      const pKey = canonicalPersonKey(s.firstname, s.name);
+      if(!pKey) continue;
+      const display = `${s.firstname} ${s.name}`.trim() || "—";
+      if(!byDivision.has(div)) byDivision.set(div, new Map());
+      byDivision.get(div).set(pKey, display);
+    }
+
+    const divisions = Array.from(byDivision.keys()).sort((a,b) => a.localeCompare(b));
+
+    const html = divisions.map(div => {
+      const peopleMap = byDivision.get(div);
+      const names = Array.from(peopleMap.values()).sort((a,b) => a.localeCompare(b));
+      return `
+        <div class="divCard">
+          <div class="divTop">
+            <div class="divName">${escapeHtml(div)}</div>
+            <div class="pill">${names.length}</div>
+          </div>
+          <ul class="nameList">
+            ${names.map(n => `<li class="nameChip">${escapeHtml(n)}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+    }).join("");
+
+    const totalUnique = (() => {
+      const set = new Set();
+      for(const s of submissions){
+        const k = canonicalPersonKey(s.firstname, s.name) + "|" + tidy(s.doubles).toLowerCase();
+        set.add(k);
+      }
+      return set.size;
+    })();
+
+    return `
+      <div class="titleRow" style="margin-top:14px;">
+        <h2>Current Signups</h2>
+        <div class="pill">Total entries: ${totalUnique}</div>
+      </div>
+      <div class="summaryGrid">
+        ${html || `<div class="notice">No signups yet.</div>`}
+      </div>
+    `;
+  }
+
+  async function renderEntryOpen(){
+    modePill.textContent = "Entry Open";
+    clearStatus();
+
+    // Load entry list
+    let entryRows = [];
+    try{
+      entryRows = await parseCSV(ENTRY_CSV);
+    }catch(e){
+      showStatus("err", "Could not load the entry list.");
+      mainPanel.innerHTML = `
+        <div class="titleRow"><h2>Entry</h2><div class="pill">Error</div></div>
+        <div class="notice">Unable to load the entry list CSV.</div>
+      `;
+      return;
+    }
+
+    // Load submissions so we can:
+    //  - display counts + names
+    //  - prevent duplicates
+    let submissions = [];
+    try{
+      submissions = await loadSubmissions();
+    }catch(e){
+      submissions = [];
+    }
+
+    // Build set of existing signups by person (any division) to prevent "sign up twice"
+    // If you prefer "one per division" instead, change key to include singles too.
+    const alreadySignedUp = new Set(
+      submissions.map(s => canonicalPersonKey(s.firstname, s.name)).filter(Boolean)
+    );
+
+    const players = entryRows
+      .map(r => ({
+        name: tidy(r["Name"]),
+        firstname: tidy(r["Firstname"]),
+        doubles: tidy(r["Doubles"]),
+        include: upper(r["Include"])
+      }))
+      .filter(p => p.include === "Y" && (p.name || p.firstname))
+      .sort((a,b) => (a.firstname + " " + a.name).localeCompare(b.firstname + " " + b.name));
+
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Enter Consolation Draws</h2>
+        <div class="pill">2026 Indy Classic</div>
+      </div>
+
+      <div class="notice">
+        <div><strong>Select your name from the drop down menu and SUBMIT to enter the 2026 Indy Classic consolation draws</strong></div>
+      </div>
+
+      <div class="form">
+        <div>
+          <label for="playerSelect">Your name</label>
+          <select id="playerSelect">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Doubles</label>
+          <div class="infoBox" id="DoublesBox">Select a name to see Doubles info</div>
+        </div>
+
+        <button class="btn" id="submitBtn" disabled>Submit</button>
+      </div>
+
+      <div id="summaryArea"></div>
+    `;
+
+    const select = document.getElementById("playerSelect");
+    const doublesBox = document.getElementById("doublesBox");
+    const submitBtn = document.getElementById("submitBtn");
+    const summaryArea = document.getElementById("summaryArea");
+
+    // Summary (counts + names, unique)
+    summaryArea.innerHTML = buildDivisionSummary(submissions);
+
+    // Populate dropdown (disable those already signed up)
+    for(const p of players){
+      const label = `${p.firstname} ${p.name}`.trim();
+      const pKey = canonicalPersonKey(p.firstname, p.name);
+
+      const opt = document.createElement("option");
+      opt.value = label;
+      opt.textContent = alreadySignedUp.has(pKey) ? `${label} (Already Signed Up)` : label;
+      opt.dataset.firstname = p.firstname;
+      opt.dataset.name = p.name;
+      opt.dataset.doubles = p.doubles;
+
+      if(alreadySignedUp.has(pKey)){
+        opt.disabled = true;
+      }
+      select.appendChild(opt);
+    }
+
+    select.addEventListener("change", () => {
+      clearStatus();
+      const opt = select.selectedOptions[0];
+      const doubles = opt?.dataset?.doubles || "";
+      if(!select.value){
+        doublesBox.textContent = "Select a name to see Doubles info";
+        submitBtn.disabled = true;
+        return;
+      }
+      doublesBox.textContent = doubles || "—";
+      submitBtn.disabled = false;
+    });
+
+    submitBtn.addEventListener("click", async () => {
+      clearStatus();
+
+      const opt = select.selectedOptions[0];
+      const firstname = opt?.dataset?.firstname || "";
+      const name = opt?.dataset?.name || "";
+      const doubles = opt?.dataset?.doubles || "";
+
+      if(!firstname || !name){
+        showStatus("err", "Please select your name.");
+        return;
+      }
+
+      const pKey = canonicalPersonKey(firstname, name);
+
+      // Client-side duplicate prevention (refresh submissions right before submit)
+      try{
+        const latestSubs = await loadSubmissions();
+        const latestSet = new Set(latestSubs.map(s => canonicalPersonKey(s.firstname, s.name)));
+        if(latestSet.has(pKey)){
+          showStatus("err", "You are already signed up.");
+          submitBtn.disabled = true;
+          return;
+        }
+      }catch(_){ /* ignore, server-side should also block */ }
+
+      // Spinner UI
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner"></span>Submitting…`;
+
+      try{
+        // Pick an unused number client-side
+        const used = await loadUsedNumbers().catch(() => new Set());
+        const number = pickUniqueNumber(used);
+        if(number == null) throw new Error("All numbers 1–1000 are already used.");
+
+        const fd = new FormData();
+        fd.append("firstname", firstname);
+        fd.append("name", name);
+        fd.append("doubles", doubles);
+        fd.append("number", String(number));
+
+        await fetch(APPS_SCRIPT_WEBAPP_URL, { method:"POST", mode:"no-cors", body: fd });
+
+        showStatus("ok", "Submitted!");
+
+        // Refresh summary + lock out this person
+        try{
+          const latestSubs = await loadSubmissions();
+          summaryArea.innerHTML = buildDivisionSummary(latestSubs);
+
+          // Disable this option and reset selection
+          opt.textContent = `${firstname} ${name} (Already Signed Up)`;
+          opt.disabled = true;
+          select.value = "";
+          doublesBox.textContent = "Select a name to see Doubles info";
+        }catch(_){}
+
+      }catch(e){
+        showStatus("err", e.message || "Submission failed.");
+      }finally{
+        submitBtn.innerHTML = "Submit";
+        submitBtn.disabled = true; // force re-select after submit
+      }
+    });
+  }
+
+  async function init(){
+    clearStatus();
+    smallNote.textContent = "Loading…";
+    modePill.textContent = "Checking status…";
+
+    try{
+      const controlRows = await parseCSV(CONTROL_CSV);
+      const flags = getControlFlags(controlRows);
+
+      if(flags["Coming Soon"]){
+        renderComingSoon();
+      }else if(flags["Entry Open"]){
+        await renderEntryOpen();
+      }else{
+        renderNotActive();
+      }
+
+      smallNote.textContent = "";
+    }catch(e){
+      modePill.textContent = "Error";
+      showStatus("err", "Could not load the control CSV.");
+      renderNotActive();
+      smallNote.textContent = "";
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
