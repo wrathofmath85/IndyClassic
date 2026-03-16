@@ -158,6 +158,11 @@
     }
 
     .sponsor-tier{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap: 14px;
       margin-top: 16px;
     }
 
@@ -165,88 +170,112 @@
       margin-top: 0;
     }
 
-    .sponsor-grid{
-      display:grid;
-      gap: 10px;
-      align-items:center;
-    }
-
-    .sponsor-grid.tier1{
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .sponsor-grid.tier2{
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .sponsor-grid.tier3{
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .sponsor-grid.tier4{
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-
     .sponsor{
-      border-radius: 14px;
+      border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
       display:flex;
       align-items:center;
       justify-content:center;
       overflow:hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        border-color .22s ease,
+        background .22s ease;
     }
 
+    .sponsor img{
+      max-width: 100%;
+      object-fit: contain;
+      display:block;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
+      transition: transform .22s ease, filter .22s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine) {
+      .sponsor:hover{
+        transform: translateY(-4px);
+        border-color: rgba(255,255,255,.28);
+        background: rgba(255,255,255,.09);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,.06),
+          0 0 24px rgba(255,255,255,.10),
+          0 0 48px rgba(99,102,241,.16),
+          0 18px 36px rgba(0,0,0,.26),
+          inset 0 1px 0 rgba(255,255,255,.05);
+      }
+
+      .sponsor:hover img{
+        transform: scale(1.03);
+        filter:
+          drop-shadow(0 10px 16px rgba(0,0,0,.25))
+          drop-shadow(0 0 10px rgba(255,255,255,.08));
+      }
+
+      .sponsor.tier1:hover{
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,.08),
+          0 0 30px rgba(255,255,255,.12),
+          0 0 70px rgba(99,102,241,.22),
+          0 24px 48px rgba(0,0,0,.32),
+          inset 0 1px 0 rgba(255,255,255,.06);
+      }
+    }
+
+    .sponsor:active{
+      transform: scale(.99);
+    }
+
+    /* Tier 1 — Presenting Sponsor */
     .sponsor.tier1{
-      padding: 18px;
-      min-height: 110px;
-    }
-
-    .sponsor.tier2{
-      padding: 16px;
-      min-height: 92px;
-    }
-
-    .sponsor.tier3{
-      padding: 12px;
-      min-height: 76px;
-    }
-
-    .sponsor.tier4{
-      padding: 10px;
-      min-height: 58px;
+      width: 100%;
+      min-height: 200px;
+      padding: 28px;
+      border-radius: 22px;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,.10),
+        rgba(255,255,255,.04)
+      );
     }
 
     .sponsor.tier1 img{
-      max-width: 100%;
-      max-height: 80px;
-      object-fit: contain;
-      display:block;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
+      max-height: 140px;
+    }
+
+    .sponsor.tier2{
+      width: 250px;
+      min-height: 120px;
+      padding: 18px;
     }
 
     .sponsor.tier2 img{
-      max-width: 100%;
-      max-height: 62px;
-      object-fit: contain;
-      display:block;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
+      max-height: 78px;
+    }
+
+    .sponsor.tier3{
+      width: 185px;
+      min-height: 92px;
+      padding: 14px;
     }
 
     .sponsor.tier3 img{
-      max-width: 100%;
-      max-height: 50px;
-      object-fit: contain;
-      display:block;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
+      max-height: 58px;
+    }
+
+    .sponsor.tier4{
+      width: 145px;
+      min-height: 74px;
+      padding: 12px;
     }
 
     .sponsor.tier4 img{
-      max-width: 100%;
-      max-height: 38px;
-      object-fit: contain;
-      display:block;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
+      max-height: 42px;
     }
 
     footer{
@@ -256,10 +285,39 @@
     }
 
     @media (max-width: 520px){
-      .sponsor-grid.tier1{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
-      .sponsor-grid.tier2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .sponsor-grid.tier3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .sponsor-grid.tier4{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .sponsor-tier{
+        gap: 12px;
+      }
+
+      .sponsor.tier1{
+        width: 100%;
+        min-height: 170px;
+        padding: 22px;
+      }
+
+      .sponsor.tier1 img{
+        max-height: 115px;
+      }
+
+      .sponsor.tier2{
+        width: calc(50% - 6px);
+        min-width: 140px;
+        min-height: 106px;
+      }
+
+      .sponsor.tier2 img{
+        max-height: 68px;
+      }
+
+      .sponsor.tier3{
+        width: calc(50% - 6px);
+        min-width: 130px;
+      }
+
+      .sponsor.tier4{
+        width: calc(33.333% - 8px);
+        min-width: 96px;
+      }
     }
 
     @media (max-width: 420px){
@@ -271,15 +329,48 @@
       .links{ gap: 10px; }
       .link-btn{ padding: 13px; border-radius: 13px; }
 
-      .sponsor.tier1{ min-height: 96px; padding: 16px; }
-      .sponsor.tier2{ min-height: 84px; padding: 14px; }
-      .sponsor.tier3{ min-height: 68px; padding: 11px; }
-      .sponsor.tier4{ min-height: 54px; padding: 9px; }
+      .sponsor-tier{
+        gap: 10px;
+      }
 
-      .sponsor.tier1 img{ max-height: 68px; }
-      .sponsor.tier2 img{ max-height: 56px; }
-      .sponsor.tier3 img{ max-height: 44px; }
-      .sponsor.tier4 img{ max-height: 34px; }
+      .sponsor.tier1{
+        min-height: 150px;
+        padding: 18px;
+      }
+
+      .sponsor.tier1 img{
+        max-height: 96px;
+      }
+
+      .sponsor.tier2{
+        width: 100%;
+        min-height: 96px;
+        padding: 16px;
+      }
+
+      .sponsor.tier2 img{
+        max-height: 62px;
+      }
+
+      .sponsor.tier3{
+        width: calc(50% - 5px);
+        min-height: 82px;
+        padding: 12px;
+      }
+
+      .sponsor.tier3 img{
+        max-height: 50px;
+      }
+
+      .sponsor.tier4{
+        width: calc(50% - 5px);
+        min-height: 68px;
+        padding: 10px;
+      }
+
+      .sponsor.tier4 img{
+        max-height: 38px;
+      }
     }
 
     @media (min-width: 900px){
@@ -289,8 +380,16 @@
     }
 
     @media (prefers-reduced-motion: reduce){
-      .link-btn{ transition: none; }
-      .link-btn:active{ transform:none; }
+      .link-btn,
+      .sponsor,
+      .sponsor img{
+        transition: none;
+      }
+
+      .link-btn:active,
+      .sponsor:active{
+        transform:none;
+      }
     }
   </style>
 </head>
@@ -350,64 +449,56 @@
       <div class="sponsors">
         <div class="sponsors-title">Sponsors</div>
 
+        <!-- Tier 1: single presenting sponsor -->
         <div class="sponsor-tier">
-          <div class="sponsor-grid tier1">
-            <div class="sponsor tier1"><img src="tier1sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier1"><img src="tier1sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier1">
+            <img src="tier1sponsor01.jpg"
+                 alt="Sponsor"
+                 loading="lazy"
+                 onerror="this.closest('.sponsor').style.display='none'">
           </div>
         </div>
 
+        <!-- Tier 2 -->
         <div class="sponsor-tier">
-          <div class="sponsor-grid tier2">
-            <div class="sponsor tier2"><img src="tier2sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier2"><img src="tier2sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-          </div>
+          <div class="sponsor tier2"><img src="tier2sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier2"><img src="tier2sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
         </div>
 
+        <!-- Tier 3 -->
         <div class="sponsor-tier">
-          <div class="sponsor-grid tier3">
-            <div class="sponsor tier3"><img src="tier3sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier3"><img src="tier3sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-          </div>
+          <div class="sponsor tier3"><img src="tier3sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier3"><img src="tier3sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
         </div>
 
+        <!-- Tier 4 -->
         <div class="sponsor-tier">
-          <div class="sponsor-grid tier4">
-            <div class="sponsor tier4"><img src="tier4sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-            <div class="sponsor tier4"><img src="tier4sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
-          </div>
+          <div class="sponsor tier4"><img src="tier4sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor03.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor04.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor05.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor06.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor07.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor08.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor09.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
+          <div class="sponsor tier4"><img src="tier4sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
         </div>
       </div>
 
