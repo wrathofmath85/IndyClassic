@@ -24,6 +24,7 @@
       --bye: rgba(99,102,241,.14);
       --seed: rgba(255,255,255,.62);
       --card2: rgba(255,255,255,.07);
+      --advanced: rgba(34,197,94,.14);
     }
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
@@ -158,7 +159,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Entries summary */
     .summaryGrid{
       margin-top: 14px;
       display:grid;
@@ -204,7 +204,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Draws UI */
     .drawControls{
       display:grid;
       grid-template-columns: minmax(220px, 420px) 1fr;
@@ -317,6 +316,9 @@
     .byeRow{
       background: var(--bye);
     }
+    .advancedRow{
+      background: var(--advanced);
+    }
 
     .seedList{
       margin-top: 16px;
@@ -380,19 +382,15 @@
   </div>
 
 <script>
-  // Control CSV
   const CONTROL_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=1244457974&single=true&output=csv";
 
-  // Entry list CSV
   const ENTRY_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
 
-  // Submissions CSV (read-only; used for duplicates + counts + draws)
   const SUBMISSIONS_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
-  // Apps Script Web App URL
   const APPS_SCRIPT_WEBAPP_URL =
     "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
 
@@ -766,16 +764,6 @@
     return pairs;
   }
 
-  function buildRoundsFromRound1(round1Matches){
-    const rounds = [round1Matches];
-    let currentCount = round1Matches.length;
-    while(currentCount > 1){
-      currentCount = currentCount / 2;
-      rounds.push(Array.from({ length: currentCount }, () => null));
-    }
-    return rounds;
-  }
-
   function getRoundName(index, totalRounds){
     const remaining = totalRounds - index;
     if(remaining === 1) return "Final";
@@ -808,6 +796,13 @@
       }));
   }
 
+  function determineKnownWinner(playerA, playerB){
+    if(playerA && !playerB) return playerA;
+    if(!playerA && playerB) return playerB;
+    if(!playerA && !playerB) return null;
+    return null;
+  }
+
   function buildDrawData(players){
     const count = players.length;
     const drawSize = getDrawSize(count);
@@ -817,32 +812,75 @@
     const seedOrder = generateSeedOrder(drawSize);
     const round1SeedPairs = round1PairsFromSeedOrder(seedOrder);
 
-    const round1Matches = round1SeedPairs.map(([seedA, seedB]) => ({
-      slotA: seedA,
-      slotB: seedB,
-      playerA: seedMap.get(seedA) || null,
-      playerB: seedMap.get(seedB) || null
-    }));
+    const rounds = [];
 
-    const rounds = buildRoundsFromRound1(round1Matches);
+    const round1 = round1SeedPairs.map(([seedA, seedB]) => {
+      const playerA = seedMap.get(seedA) || null;
+      const playerB = seedMap.get(seedB) || null;
+      return {
+        slotA: seedA,
+        slotB: seedB,
+        playerA,
+        playerB,
+        autoWinner: determineKnownWinner(playerA, playerB)
+      };
+    });
+
+    rounds.push(round1);
+
+    let prevRound = round1;
+
+    while(prevRound.length > 1){
+      const nextRound = [];
+      for(let i = 0; i < prevRound.length; i += 2){
+        const match1 = prevRound[i];
+        const match2 = prevRound[i + 1];
+
+        const playerA = match1 ? match1.autoWinner || null : null;
+        const playerB = match2 ? match2.autoWinner || null : null;
+
+        nextRound.push({
+          slotA: null,
+          slotB: null,
+          playerA,
+          playerB,
+          autoWinner: determineKnownWinner(playerA, playerB)
+        });
+      }
+      rounds.push(nextRound);
+      prevRound = nextRound;
+    }
 
     return {
       drawSize,
       rounds,
-      totalRounds: nextPowerRounds(drawSize),
-      round1SeedPairs
+      totalRounds: nextPowerRounds(drawSize)
     };
   }
 
-  function renderPlayerRow(player, slotSeed){
-    const isBye = !player;
+  function renderPlayerRow(player, slotSeed, isByeSlot, isAdvanced){
+    let rowClass = "";
+    if(isByeSlot) rowClass += " byeRow";
+    if(isAdvanced) rowClass += " advancedRow";
+
+    let badge = slotSeed != null ? slotSeed : "W";
+    let name = "Winner of prior match";
+    let num = "";
+
+    if(isByeSlot){
+      name = "BYE";
+    }else if(player){
+      name = escapeHtml(player.displayName);
+      num = `# ${player.number ?? '—'}`;
+    }
+
     return `
-      <div class="playerRow ${isBye ? 'byeRow' : ''}">
+      <div class="playerRow${rowClass}">
         <div class="playerLeft">
-          <div class="seedBadge">${slotSeed}</div>
-          <div class="playerName">${isBye ? 'BYE' : escapeHtml(player.displayName)}</div>
+          <div class="seedBadge">${badge}</div>
+          <div class="playerName">${name}</div>
         </div>
-        <div class="playerNum">${isBye ? '' : `# ${player.number ?? '—'}`}</div>
+        <div class="playerNum">${num}</div>
       </div>
     `;
   }
@@ -861,27 +899,25 @@
                 <div class="roundStack" style="padding-top:${spacer}px; gap:${between}px;">
                   ${round.map((match, matchIndex) => {
                     if(roundIndex === 0){
+                      const aBye = !match.playerA;
+                      const bBye = !match.playerB;
                       return `
                         <div class="matchCard" data-round="${roundIndex + 1}" data-match="${matchIndex + 1}">
-                          ${renderPlayerRow(match.playerA, match.slotA)}
-                          ${renderPlayerRow(match.playerB, match.slotB)}
+                          ${renderPlayerRow(match.playerA, match.slotA, aBye, !!(match.playerA && bBye))}
+                          ${renderPlayerRow(match.playerB, match.slotB, bBye, !!(match.playerB && aBye))}
                         </div>
                       `;
                     }
+
+                    const aKnown = !!match.playerA;
+                    const bKnown = !!match.playerB;
+                    const aAdvanced = aKnown && !bKnown;
+                    const bAdvanced = bKnown && !aKnown;
+
                     return `
                       <div class="matchCard" data-round="${roundIndex + 1}" data-match="${matchIndex + 1}">
-                        <div class="playerRow">
-                          <div class="playerLeft">
-                            <div class="seedBadge">W</div>
-                            <div class="playerName">Winner of prior match</div>
-                          </div>
-                        </div>
-                        <div class="playerRow">
-                          <div class="playerLeft">
-                            <div class="seedBadge">W</div>
-                            <div class="playerName">Winner of prior match</div>
-                          </div>
-                        </div>
+                        ${renderPlayerRow(match.playerA, null, false, aAdvanced)}
+                        ${renderPlayerRow(match.playerB, null, false, bAdvanced)}
                       </div>
                     `;
                   }).join("")}
