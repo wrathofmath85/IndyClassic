@@ -261,19 +261,28 @@
     statusBox.style.display = "none";
   }
 
-  function parseCSV(url){
-    return new Promise((resolve, reject) => {
-      const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
-      Papa.parse(bust, {
-        download: true,
-        header: true,
-        skipEmptyLines: "greedy",
-        complete: (res) => resolve(res.data || []),
-        error: (e) => reject(e)
-      });
-    });
+async function parseCSV(url){
+  const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
+
+  const response = await fetch(bust, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
   }
 
+  const text = await response.text();
+
+  return new Promise((resolve, reject) => {
+    Papa.parse(text, {
+      header: true,
+      skipEmptyLines: "greedy",
+      complete: (res) => resolve(res.data || []),
+      error: (err) => reject(err)
+    });
+  });
+}
   function getControlFlags(rows){
     const flags = {};
     for(const r of rows){
