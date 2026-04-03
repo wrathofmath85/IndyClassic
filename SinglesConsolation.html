@@ -20,6 +20,10 @@
       --ok: rgba(34,197,94,.18);
       --warn: rgba(99,102,241,.18);
       --danger: rgba(244,63,94,.18);
+      --line: rgba(255,255,255,.18);
+      --bye: rgba(99,102,241,.14);
+      --seed: rgba(255,255,255,.62);
+      --card2: rgba(255,255,255,.07);
     }
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
@@ -43,7 +47,7 @@
     .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
     .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
 
-    .wrap{ max-width: 980px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
+    .wrap{ max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
     header{ display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; margin: 10px 0 18px; flex-wrap:wrap; }
     h1{ margin:0; font-size: 26px; font-weight: 850; letter-spacing: -0.02em; line-height: 1.15; }
     .subhead{ font-size: 12.5px; color: var(--muted); }
@@ -200,10 +204,160 @@
       text-overflow: ellipsis;
     }
 
+    /* Draws UI */
+    .drawControls{
+      display:grid;
+      grid-template-columns: minmax(220px, 420px) 1fr;
+      gap: 14px;
+      align-items:end;
+      margin-top: 10px;
+    }
+    .metaGrid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+    .metaCard{
+      background: var(--card2);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .metaLabel{
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .metaValue{
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -.02em;
+    }
+
+    .drawWrap{
+      margin-top: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .bracket{
+      display:flex;
+      gap: 26px;
+      min-width: max-content;
+      align-items:flex-start;
+    }
+    .roundCol{
+      min-width: 250px;
+    }
+    .roundTitle{
+      font-weight: 900;
+      margin-bottom: 12px;
+      letter-spacing: -.01em;
+    }
+    .roundStack{
+      display:flex;
+      flex-direction:column;
+    }
+
+    .matchCard{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.14);
+      overflow:hidden;
+      min-height: 84px;
+    }
+    .playerRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 11px 12px;
+    }
+    .playerRow + .playerRow{
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+    .playerLeft{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      min-width:0;
+    }
+    .seedBadge{
+      min-width: 32px;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(255,255,255,.9);
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+      flex: 0 0 auto;
+    }
+    .playerName{
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .playerNum{
+      color: var(--seed);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    .byeRow{
+      background: var(--bye);
+    }
+
+    .seedList{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .seedItem{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .emptyDraw{
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.88);
+    }
+
+    @media (max-width: 900px){
+      .drawControls{
+        grid-template-columns: 1fr;
+      }
+      .metaGrid{
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 480px){
       body{ padding: 16px; }
       h1{ font-size: 22px; }
       .panel{ padding: 16px; }
+      .roundCol{ min-width: 220px; }
     }
   </style>
 </head>
@@ -261,28 +415,29 @@
     statusBox.style.display = "none";
   }
 
-async function parseCSV(url){
-  const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
+  async function parseCSV(url){
+    const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
 
-  const response = await fetch(bust, {
-    cache: "no-store"
-  });
+    const response = await fetch(bust, {
+      cache: "no-store"
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+    }
+
+    const text = await response.text();
+
+    return new Promise((resolve, reject) => {
+      Papa.parse(text, {
+        header: true,
+        skipEmptyLines: "greedy",
+        complete: (res) => resolve(res.data || []),
+        error: (err) => reject(err)
+      });
+    });
   }
 
-  const text = await response.text();
-
-  return new Promise((resolve, reject) => {
-    Papa.parse(text, {
-      header: true,
-      skipEmptyLines: "greedy",
-      complete: (res) => resolve(res.data || []),
-      error: (err) => reject(err)
-    });
-  });
-}
   function getControlFlags(rows){
     const flags = {};
     for(const r of rows){
@@ -361,8 +516,7 @@ async function parseCSV(url){
   }
 
   function buildDivisionSummary(submissions){
-    // Unique by person+division (firstname+name+singles)
-    const byDivision = new Map(); // singles -> Map(personKey -> displayName)
+    const byDivision = new Map();
     for(const s of submissions){
       const div = tidy(s.singles);
       if(!div) continue;
@@ -415,7 +569,6 @@ async function parseCSV(url){
     modePill.textContent = "Entry Open";
     clearStatus();
 
-    // Load entry list
     let entryRows = [];
     try{
       entryRows = await parseCSV(ENTRY_CSV);
@@ -428,9 +581,6 @@ async function parseCSV(url){
       return;
     }
 
-    // Load submissions so we can:
-    //  - display counts + names
-    //  - prevent duplicates
     let submissions = [];
     try{
       submissions = await loadSubmissions();
@@ -438,8 +588,6 @@ async function parseCSV(url){
       submissions = [];
     }
 
-    // Build set of existing signups by person (any division) to prevent "sign up twice"
-    // If you prefer "one per division" instead, change key to include singles too.
     const alreadySignedUp = new Set(
       submissions.map(s => canonicalPersonKey(s.firstname, s.name)).filter(Boolean)
     );
@@ -488,10 +636,8 @@ async function parseCSV(url){
     const submitBtn = document.getElementById("submitBtn");
     const summaryArea = document.getElementById("summaryArea");
 
-    // Summary (counts + names, unique)
     summaryArea.innerHTML = buildDivisionSummary(submissions);
 
-    // Populate dropdown (disable those already signed up)
     for(const p of players){
       const label = `${p.firstname} ${p.name}`.trim();
       const pKey = canonicalPersonKey(p.firstname, p.name);
@@ -537,7 +683,6 @@ async function parseCSV(url){
 
       const pKey = canonicalPersonKey(firstname, name);
 
-      // Client-side duplicate prevention (refresh submissions right before submit)
       try{
         const latestSubs = await loadSubmissions();
         const latestSet = new Set(latestSubs.map(s => canonicalPersonKey(s.firstname, s.name)));
@@ -546,14 +691,12 @@ async function parseCSV(url){
           submitBtn.disabled = true;
           return;
         }
-      }catch(_){ /* ignore, server-side should also block */ }
+      }catch(_){}
 
-      // Spinner UI
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<span class="spinner"></span>Submitting…`;
 
       try{
-        // Pick an unused number client-side
         const used = await loadUsedNumbers().catch(() => new Set());
         const number = pickUniqueNumber(used);
         if(number == null) throw new Error("All numbers 1–1000 are already used.");
@@ -568,12 +711,9 @@ async function parseCSV(url){
 
         showStatus("ok", "Submitted!");
 
-        // Refresh summary + lock out this person
         try{
           const latestSubs = await loadSubmissions();
           summaryArea.innerHTML = buildDivisionSummary(latestSubs);
-
-          // Disable this option and reset selection
           opt.textContent = `${firstname} ${name} (Already Signed Up)`;
           opt.disabled = true;
           select.value = "";
@@ -584,9 +724,298 @@ async function parseCSV(url){
         showStatus("err", e.message || "Submission failed.");
       }finally{
         submitBtn.innerHTML = "Submit";
-        submitBtn.disabled = true; // force re-select after submit
+        submitBtn.disabled = true;
       }
     });
+  }
+
+  function getDrawSize(count){
+    if(count <= 0) return 0;
+    if(count <= 2) return 2;
+    if(count <= 4) return 4;
+    if(count <= 8) return 8;
+    if(count <= 16) return 16;
+    if(count <= 32) return 32;
+    return 32;
+  }
+
+  function nextPowerRounds(drawSize){
+    return Math.log2(drawSize);
+  }
+
+  function generateSeedOrder(size){
+    if(size === 1) return [1];
+    let arr = [1, 2];
+    while(arr.length < size){
+      const nextSize = arr.length * 2;
+      const next = [];
+      for(const seed of arr){
+        next.push(seed);
+        next.push(nextSize + 1 - seed);
+      }
+      arr = next;
+    }
+    return arr;
+  }
+
+  function round1PairsFromSeedOrder(seedOrder){
+    const pairs = [];
+    for(let i = 0; i < seedOrder.length; i += 2){
+      pairs.push([seedOrder[i], seedOrder[i + 1]]);
+    }
+    return pairs;
+  }
+
+  function buildRoundsFromRound1(round1Matches){
+    const rounds = [round1Matches];
+    let currentCount = round1Matches.length;
+    while(currentCount > 1){
+      currentCount = currentCount / 2;
+      rounds.push(Array.from({ length: currentCount }, () => null));
+    }
+    return rounds;
+  }
+
+  function getRoundName(index, totalRounds){
+    const remaining = totalRounds - index;
+    if(remaining === 1) return "Final";
+    if(remaining === 2) return "Semifinals";
+    if(remaining === 3) return "Quarterfinals";
+    if(remaining === 4) return "Round of 16";
+    if(remaining === 5) return "Round of 32";
+    return `Round ${index + 1}`;
+  }
+
+  function buildDivisionPlayers(submissions, division){
+    return submissions
+      .filter(s => tidy(s.singles) === tidy(division))
+      .filter(s => (s.firstname || s.name))
+      .sort((a, b) => {
+        const aNum = Number.isFinite(a.number) ? a.number : -Infinity;
+        const bNum = Number.isFinite(b.number) ? b.number : -Infinity;
+        if(bNum !== aNum) return bNum - aNum;
+        const an = `${a.firstname} ${a.name}`.trim().toLowerCase();
+        const bn = `${b.firstname} ${b.name}`.trim().toLowerCase();
+        return an.localeCompare(bn);
+      })
+      .map((p, i) => ({
+        seed: i + 1,
+        firstname: p.firstname,
+        name: p.name,
+        displayName: `${p.firstname} ${p.name}`.trim() || "—",
+        singles: p.singles,
+        number: Number.isFinite(p.number) ? p.number : null
+      }));
+  }
+
+  function buildDrawData(players){
+    const count = players.length;
+    const drawSize = getDrawSize(count);
+    if(!drawSize) return null;
+
+    const seedMap = new Map(players.map(p => [p.seed, p]));
+    const seedOrder = generateSeedOrder(drawSize);
+    const round1SeedPairs = round1PairsFromSeedOrder(seedOrder);
+
+    const round1Matches = round1SeedPairs.map(([seedA, seedB]) => ({
+      slotA: seedA,
+      slotB: seedB,
+      playerA: seedMap.get(seedA) || null,
+      playerB: seedMap.get(seedB) || null
+    }));
+
+    const rounds = buildRoundsFromRound1(round1Matches);
+
+    return {
+      drawSize,
+      rounds,
+      totalRounds: nextPowerRounds(drawSize),
+      round1SeedPairs
+    };
+  }
+
+  function renderPlayerRow(player, slotSeed){
+    const isBye = !player;
+    return `
+      <div class="playerRow ${isBye ? 'byeRow' : ''}">
+        <div class="playerLeft">
+          <div class="seedBadge">${slotSeed}</div>
+          <div class="playerName">${isBye ? 'BYE' : escapeHtml(player.displayName)}</div>
+        </div>
+        <div class="playerNum">${isBye ? '' : `# ${player.number ?? '—'}`}</div>
+      </div>
+    `;
+  }
+
+  function renderBracket(rounds, totalRounds){
+    return `
+      <div class="drawWrap">
+        <div class="bracket">
+          ${rounds.map((round, roundIndex) => {
+            const spacer = roundIndex === 0 ? 0 : ((Math.pow(2, roundIndex) - 1) * 54);
+            const between = roundIndex === 0 ? 12 : ((Math.pow(2, roundIndex) * 108) - 96);
+
+            return `
+              <div class="roundCol">
+                <div class="roundTitle">${getRoundName(roundIndex, totalRounds)}</div>
+                <div class="roundStack" style="padding-top:${spacer}px; gap:${between}px;">
+                  ${round.map((match, matchIndex) => {
+                    if(roundIndex === 0){
+                      return `
+                        <div class="matchCard" data-round="${roundIndex + 1}" data-match="${matchIndex + 1}">
+                          ${renderPlayerRow(match.playerA, match.slotA)}
+                          ${renderPlayerRow(match.playerB, match.slotB)}
+                        </div>
+                      `;
+                    }
+                    return `
+                      <div class="matchCard" data-round="${roundIndex + 1}" data-match="${matchIndex + 1}">
+                        <div class="playerRow">
+                          <div class="playerLeft">
+                            <div class="seedBadge">W</div>
+                            <div class="playerName">Winner of prior match</div>
+                          </div>
+                        </div>
+                        <div class="playerRow">
+                          <div class="playerLeft">
+                            <div class="seedBadge">W</div>
+                            <div class="playerName">Winner of prior match</div>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSeedList(players){
+    if(!players.length) return "";
+    return `
+      <div class="titleRow" style="margin-top:18px;">
+        <h2>Seeds</h2>
+        <div class="pill">${players.length} players ranked by Number</div>
+      </div>
+      <div class="seedList">
+        ${players.map(p => `
+          <div class="seedItem">
+            <div><strong>${p.seed} Seed</strong> — ${escapeHtml(p.displayName)}</div>
+            <div class="pill">Number: ${p.number ?? '—'}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  async function renderDraws(){
+    modePill.textContent = "Draws";
+    clearStatus();
+
+    let submissions = [];
+    try{
+      submissions = await loadSubmissions();
+    }catch(e){
+      showStatus("err", "Could not load the submissions CSV.");
+      mainPanel.innerHTML = `
+        <div class="titleRow"><h2>Draws</h2><div class="pill">Error</div></div>
+        <div class="notice">Unable to load the submissions CSV.</div>
+      `;
+      return;
+    }
+
+    const divisions = Array.from(
+      new Set(submissions.map(s => tidy(s.singles)).filter(Boolean))
+    ).sort((a,b) => a.localeCompare(b));
+
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Consolation Draws</h2>
+        <div class="pill">2026 Indy Classic</div>
+      </div>
+
+      <div class="notice">
+        <div><strong>Select a Singles division to view the draw.</strong></div>
+        <div>Players are seeded by <strong>Number</strong> within that division, highest number = 1 seed.</div>
+      </div>
+
+      <div class="drawControls">
+        <div>
+          <label for="drawDivisionSelect">Singles Division</label>
+          <select id="drawDivisionSelect">
+            <option value="">— Select Division —</option>
+            ${divisions.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="infoBox" id="drawInfoBox">Choose a division to generate the draw</div>
+      </div>
+
+      <div id="drawOutput"></div>
+    `;
+
+    const drawDivisionSelect = document.getElementById("drawDivisionSelect");
+    const drawInfoBox = document.getElementById("drawInfoBox");
+    const drawOutput = document.getElementById("drawOutput");
+
+    function paintDivision(division){
+      if(!division){
+        drawInfoBox.textContent = "Choose a division to generate the draw";
+        drawOutput.innerHTML = "";
+        return;
+      }
+
+      const players = buildDivisionPlayers(submissions, division);
+      const count = players.length;
+      const drawSize = getDrawSize(count);
+
+      if(count === 0){
+        drawInfoBox.textContent = `${division}: no players found`;
+        drawOutput.innerHTML = `<div class="emptyDraw">No players were found for this division.</div>`;
+        return;
+      }
+
+      if(count > 32){
+        drawInfoBox.textContent = `${division}: too many players for current draw logic`;
+        drawOutput.innerHTML = `<div class="emptyDraw">This division has ${count} players. Current draw logic supports up to 32 players.</div>`;
+        return;
+      }
+
+      const drawData = buildDrawData(players);
+      drawInfoBox.textContent = `${division}: ${count} player${count === 1 ? '' : 's'} → ${drawSize}-player draw`;
+
+      drawOutput.innerHTML = `
+        <div class="metaGrid">
+          <div class="metaCard">
+            <div class="metaLabel">Division</div>
+            <div class="metaValue">${escapeHtml(division)}</div>
+          </div>
+          <div class="metaCard">
+            <div class="metaLabel">Entries</div>
+            <div class="metaValue">${count}</div>
+          </div>
+          <div class="metaCard">
+            <div class="metaLabel">Draw Size</div>
+            <div class="metaValue">${drawSize}</div>
+          </div>
+        </div>
+
+        ${renderBracket(drawData.rounds, drawData.totalRounds)}
+        ${renderSeedList(players)}
+      `;
+    }
+
+    drawDivisionSelect.addEventListener("change", () => {
+      paintDivision(drawDivisionSelect.value);
+    });
+
+    if(divisions.length === 1){
+      drawDivisionSelect.value = divisions[0];
+      paintDivision(divisions[0]);
+    }
   }
 
   async function init(){
@@ -602,6 +1031,8 @@ async function parseCSV(url){
         renderComingSoon();
       }else if(flags["Entry Open"]){
         await renderEntryOpen();
+      }else if(flags["Draws"]){
+        await renderDraws();
       }else{
         renderNotActive();
       }
