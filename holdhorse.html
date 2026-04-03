@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coming Soon</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#08121f;
+      --bg2:#10233b;
+      --bg3:#183454;
+      --text:#f7fbff;
+      --muted:rgba(247,251,255,0.78);
+      --border:rgba(255,255,255,0.16);
+      --shadow:0 24px 60px rgba(0,0,0,0.35);
+      --radius:32px;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html, body{
+      width:100%;
+      min-height:100%;
+    }
+
+    body{
+      font-family:'Inter',sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(99,196,255,0.16), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(124,255,200,0.10), transparent 24%),
+        linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 48%, var(--bg3) 100%);
+      padding:28px;
+      overflow-x:hidden;
+      overflow-y:auto;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      width:100%;
+      min-height:calc(100vh - 56px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .blur{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .blob{
+      position:absolute;
+      border-radius:999px;
+      filter:blur(90px);
+      opacity:0.24;
+    }
+
+    .blob.one{
+      width:280px;
+      height:280px;
+      background:#59c3ff;
+      top:-30px;
+      left:-70px;
+    }
+
+    .blob.two{
+      width:240px;
+      height:240px;
+      background:#7cffc8;
+      right:-60px;
+      top:35%;
+    }
+
+    .blob.three{
+      width:240px;
+      height:240px;
+      background:#6586ff;
+      bottom:-40px;
+      left:25%;
+    }
+
+    .card{
+      position:relative;
+      z-index:1;
+      width:min(100%, 980px);
+      background:linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(255,255,255,0.08), transparent 35%, transparent 65%, rgba(255,255,255,0.04));
+      pointer-events:none;
+    }
+
+    .content{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1.05fr 0.95fr;
+      align-items:center;
+      gap:0;
+    }
+
+    .image-wrap{
+      min-height:640px;
+      background:#0e1b2e;
+    }
+
+    .image-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .text-wrap{
+      padding:52px 44px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:640px;
+    }
+
+    .badge{
+      display:inline-block;
+      align-self:flex-start;
+      padding:9px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.14);
+      color:#8ff0ff;
+      font-size:0.8rem;
+      font-weight:800;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    h1{
+      font-size:clamp(2.5rem, 5vw, 4.6rem);
+      line-height:0.94;
+      letter-spacing:-0.05em;
+      font-weight:800;
+      margin-bottom:18px;
+      text-wrap:balance;
+      background:linear-gradient(90deg, #ffffff 0%, #dcf5ff 45%, #8ee8ff 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      color:transparent;
+    }
+
+    p{
+      font-size:1.05rem;
+      line-height:1.75;
+      color:var(--muted);
+      max-width:30ch;
+    }
+
+    @media (max-width: 860px){
+      .page{
+        min-height:auto;
+      }
+
+      .content{
+        grid-template-columns:1fr;
+      }
+
+      .image-wrap{
+        min-height:420px;
+      }
+
+      .text-wrap{
+        min-height:auto;
+        padding:34px 24px 38px;
+        text-align:center;
+        align-items:center;
+      }
+
+      .badge{
+        align-self:center;
+      }
+
+      p{
+        max-width:34ch;
+      }
+    }
+
+    @media (max-width: 520px){
+      body{
+        padding:16px;
+      }
+
+      .page{
+        min-height:auto;
+      }
+
+      .card{
+        border-radius:24px;
+      }
+
+      .image-wrap{
+        min-height:320px;
+      }
+
+      .text-wrap{
+        padding:26px 18px 30px;
+      }
+
+      h1{
+        font-size:2.35rem;
+      }
+
+      p{
+        font-size:0.98rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blur">
+    <div class="blob one"></div>
+    <div class="blob two"></div>
+    <div class="blob three"></div>
+  </div>
+
+  <div class="page">
+    <main class="card">
+      <section class="content">
+        <div class="image-wrap">
+          <img src="horse.jpg.png" alt="Funny tennis horse coming soon image">
+        </div>
+
+        <div class="text-wrap">
+          <div class="badge">Coming Soon</div>
+          <h1>Hold your horses!<br>This page coming soon!</h1>
+          <p>
+            We’re still getting this page ready. Check back soon for the full experience.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
