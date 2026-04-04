@@ -3,499 +3,394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indy Classic 2026 Welcome</title>
+  <title>Indy Classic 2026 Welcome Letter</title>
   <style>
     :root {
-      --bg-1: #0b1020;
-      --bg-2: #111a33;
-      --card: rgba(255, 255, 255, 0.10);
+      --bg1: #081120;
+      --bg2: #13213d;
+      --card: rgba(255, 255, 255, 0.12);
       --card-border: rgba(255, 255, 255, 0.18);
-      --text: #f5f7fb;
-      --muted: #c9d3e7;
-      --accent: #9fd3ff;
-      --accent-2: #c5a3ff;
-      --success: #b7f7d8;
-      --shadow: 0 20px 60px rgba(0,0,0,0.35);
-      --radius: 24px;
-      --max: 1120px;
+      --text: #f6f8fc;
+      --muted: #d2dbec;
+      --accent: #9fd2ff;
+      --accent2: #c5a3ff;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --paper: rgba(255,255,255,0.09);
+      --max: 980px;
     }
 
     * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(159,211,255,0.16), transparent 32%),
-        radial-gradient(circle at top right, rgba(197,163,255,0.18), transparent 30%),
-        linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, #0c1327 100%);
+        radial-gradient(circle at top left, rgba(159,210,255,0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(197,163,255,0.16), transparent 30%),
+        linear-gradient(155deg, var(--bg1), var(--bg2) 55%, #0b152a 100%);
       min-height: 100vh;
-      line-height: 1.6;
+      line-height: 1.75;
+      padding: 28px 16px 60px;
     }
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover { text-decoration: underline; }
-
-    .wrap {
-      width: min(calc(100% - 32px), var(--max));
+    .shell {
+      width: min(100%, var(--max));
       margin: 0 auto;
     }
 
     .hero {
-      padding: 64px 0 30px;
-    }
-
-    .hero-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.08));
-      border: 1px solid var(--card-border);
-      border-radius: 32px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      overflow: hidden;
-      position: relative;
-      padding: 36px;
-    }
-
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(159,211,255,0.12), transparent 40%, rgba(197,163,255,0.14));
-      pointer-events: none;
+      text-align: center;
+      margin-bottom: 22px;
     }
 
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
+      display: inline-block;
       padding: 8px 14px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.14);
-      color: var(--success);
-      font-size: 0.86rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      color: var(--accent);
+      font-size: 0.82rem;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
     }
 
     h1 {
-      margin: 18px 0 12px;
-      font-size: clamp(2.2rem, 5vw, 4.2rem);
-      line-height: 1.05;
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 1.08;
       letter-spacing: -0.04em;
-      max-width: 900px;
     }
 
     .subhead {
-      margin: 0;
-      max-width: 820px;
+      margin: 12px auto 0;
+      max-width: 760px;
       color: var(--muted);
-      font-size: 1.08rem;
+      font-size: 1.02rem;
     }
 
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 28px;
-    }
-
-    .quick-item {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 20px;
-      padding: 18px;
-    }
-
-    .quick-label {
-      display: block;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #b9c7df;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-
-    .quick-value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    main {
-      padding: 8px 0 64px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.35fr 0.9fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    .stack {
-      display: grid;
-      gap: 24px;
-    }
-
-    .card {
-      background: var(--card);
+    .letter {
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.08));
       border: 1px solid var(--card-border);
-      border-radius: var(--radius);
+      border-radius: 30px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      padding: 28px;
-    }
-
-    .card h2 {
-      margin: 0 0 16px;
-      font-size: 1.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
-    }
-
-    .intro p,
-    .card p {
-      margin: 0 0 14px;
-      color: var(--muted);
-    }
-
-    .intro p:last-child,
-    .card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .schedule-day {
-      padding: 20px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.11);
-    }
-
-    .schedule-day + .schedule-day {
-      margin-top: 16px;
-    }
-
-    .day-label {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(159,211,255,0.12);
-      border: 1px solid rgba(159,211,255,0.22);
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 12px;
-    }
-
-    ul.clean {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 10px;
-    }
-
-    ul.clean li {
-      color: var(--muted);
-      padding-left: 18px;
+      overflow: hidden;
       position: relative;
     }
 
-    ul.clean li::before {
+    .letter::before {
       content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
       position: absolute;
-      left: 0;
-      top: 0.72em;
-      transform: translateY(-50%);
-      box-shadow: 0 0 12px rgba(159,211,255,0.4);
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(159,210,255,0.08), transparent 40%, rgba(197,163,255,0.10));
     }
 
-    .detail-block + .detail-block {
-      margin-top: 22px;
-      padding-top: 22px;
-      border-top: 1px solid rgba(255,255,255,0.10);
+    .letter-top {
+      padding: 28px 30px 0;
     }
 
-    .quote {
-      margin-top: 16px;
-      padding: 18px 20px;
-      border-radius: 18px;
+    .top-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .top-item {
       background: rgba(255,255,255,0.07);
       border: 1px solid rgba(255,255,255,0.12);
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .contact-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .contact-person {
-      padding: 16px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
+      padding: 16px;
     }
 
-    .contact-person strong {
+    .top-item span {
       display: block;
-      font-size: 1rem;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #bfcce3;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .top-item strong {
+      display: block;
+      font-size: 0.98rem;
       color: #fff;
+      line-height: 1.4;
     }
 
-    .contact-person span {
-      color: var(--muted);
-      font-size: 0.95rem;
+    .paper {
+      margin: 0 18px 18px;
+      padding: 34px 34px 38px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(247,249,253,0.88));
+      color: #1a2438;
+      border-radius: 24px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
     }
 
-    .footer-note {
-      text-align: center;
-      color: #d6deee;
-      margin-top: 26px;
-      font-size: 0.95rem;
+    .paper p {
+      margin: 0 0 18px;
+      font-size: 1rem;
     }
 
-    @media (max-width: 980px) {
-      .quick-grid,
-      .grid {
-        grid-template-columns: 1fr;
+    .paper .salutation,
+    .paper .closing {
+      font-weight: 600;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(26,36,56,0.18), transparent);
+      margin: 26px 0;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #294b78;
+    }
+
+    ul {
+      margin: 0 0 18px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 10px;
+    }
+
+    li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #4f7fc4;
+      font-weight: 900;
+    }
+
+    .day {
+      margin-bottom: 22px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(79,127,196,0.06);
+      border: 1px solid rgba(79,127,196,0.12);
+    }
+
+    .day h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: #14213b;
+    }
+
+    .day p {
+      margin-bottom: 10px;
+    }
+
+    a {
+      color: #225ea8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .quote {
+      margin: 16px 0 20px;
+      padding: 18px 20px;
+      border-left: 4px solid #4f7fc4;
+      background: rgba(79,127,196,0.08);
+      border-radius: 12px;
+      font-style: italic;
+      font-weight: 700;
+      color: #16233e;
+    }
+
+    .signoff {
+      margin-top: 24px;
+    }
+
+    .names {
+      margin-top: 14px;
+      display: grid;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 860px) {
+      .top-grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
 
     @media (max-width: 640px) {
-      .hero {
-        padding-top: 28px;
+      body { padding: 18px 10px 36px; }
+
+      .letter-top {
+        padding: 20px 20px 0;
       }
 
-      .hero-card,
-      .card {
-        padding: 22px;
-        border-radius: 22px;
+      .paper {
+        margin: 0 10px 10px;
+        padding: 24px 20px 28px;
+        border-radius: 18px;
+      }
+
+      .top-grid {
+        grid-template-columns: 1fr;
       }
 
       h1 {
-        font-size: 2.3rem;
-      }
-
-      .subhead {
-        font-size: 1rem;
+        font-size: 2.15rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="hero">
-      <section class="hero-card">
-        <div class="eyebrow">Indy Classic 2026 • Player Welcome</div>
-        <h1>Welcome to Indianapolis and the 2026 Indy Classic</h1>
-        <p class="subhead">
-          Presented by CH Douglas &amp; Gray Wealth Management. We know there are many tournaments on the GLTA circuit, and we truly appreciate you spending your tennis dollars with us.
-        </p>
+  <div class="shell">
+    <div class="hero">
+      <div class="eyebrow">Indy Classic 2026</div>
+      <h1>Player Welcome Letter</h1>
+      <p class="subhead">A letter-style welcome page for players, presented in a clean modern format while keeping the full message intact.</p>
+    </div>
 
-        <div class="quick-grid">
-          <div class="quick-item">
-            <span class="quick-label">Main Venue</span>
-            <div class="quick-value">Indianapolis Racquet Club – Dean</div>
+    <section class="letter">
+      <div class="letter-top">
+        <div class="top-grid">
+          <div class="top-item">
+            <span>Tournament</span>
+            <strong>2026 Indy Classic</strong>
           </div>
-          <div class="quick-item">
-            <span class="quick-label">Draws Posted</span>
-            <div class="quick-value">Tuesday Evening</div>
+          <div class="top-item">
+            <span>Presented By</span>
+            <strong>CH Douglas &amp; Gray Wealth Management</strong>
           </div>
-          <div class="quick-item">
-            <span class="quick-label">Tournament Dates</span>
-            <div class="quick-value">May 28–31, 2026</div>
+          <div class="top-item">
+            <span>Main Venue</span>
+            <strong>Indianapolis Racquet Club – Dean</strong>
           </div>
-          <div class="quick-item">
-            <span class="quick-label">Tournament Desk</span>
-            <div class="quick-value">(708) 542-5972</div>
+          <div class="top-item">
+            <span>Key Contact</span>
+            <strong>Dan Fox, Tournament Director</strong>
           </div>
-        </div>
-      </section>
-    </header>
-
-    <main>
-      <div class="grid">
-        <div class="stack">
-          <section class="card intro">
-            <h2>A Note to Players</h2>
-            <p>
-              On behalf of the IndyTennis Board of Directors, Brady Wagenknecht, Mark Phillips, and myself—welcome to Indianapolis and the 2026 Indy Classic - Presented by CH Douglas &amp; Gray Wealth Management!
-            </p>
-            <p>
-              We want this weekend to be as enjoyable as possible, so please don’t hesitate to reach out to Brady, Mark, or me with any questions.
-            </p>
-            <p>
-              Draws and match times will be posted Tuesday evening, and I’ll send a follow-up email once they’re available. If you would like to change your division or request a doubles partner, please email me before Sunday evening.
-            </p>
-            <p>
-              If you are looking to practice before the tournament, IRC has waived their guest fee. Just mention you are playing in the GLTA tournament this weekend when booking a court. If you are very serious about your practice, we are using Wilson balls for our tournament.
-            </p>
-          </section>
-
-          <section class="card">
-            <h2>Weekend Schedule At a Glance</h2>
-
-            <div class="schedule-day">
-              <div class="day-label">Thursday, May 28</div>
-              <h3>Welcome Party @ Metroi</h3>
-              <p>707 Massachusetts Ave • 7:00 – 9:00 PM</p>
-              <ul class="clean">
-                <li>Open bar while it lasts, then cash bar</li>
-                <li>Finger foods while supplies last</li>
-                <li>Raffle for two free gift cards to local restaurants</li>
-                <li>Must be in attendance to win</li>
-                <li>
-                  Dinner idea: support sponsor <a href="https://fortyfiveindy.com/dinner">45 Degrees</a>, located just a few doors down
-                </li>
-                <li>Thursday special: ½ off cocktails</li>
-                <li>Sunday special: ½ off sushi rolls from 4 PM–10 PM</li>
-              </ul>
-            </div>
-
-            <div class="schedule-day">
-              <div class="day-label">Friday, May 29</div>
-              <h3>Singles &amp; Doubles — First &amp; Second Rounds</h3>
-              <p>Indianapolis Racquet Club – Dean • 8249 Dean Road • 8:00 AM – 10:00 PM</p>
-              <ul class="clean">
-                <li>Coffee bar @ 7:30 AM</li>
-                <li>Lunch @ noon (Bibibop)</li>
-                <li>Snacks all day</li>
-                <li>Welcome bag pickup available at the club</li>
-              </ul>
-            </div>
-
-            <div class="schedule-day">
-              <div class="day-label">Saturday, May 30</div>
-              <h3>Main Draw Matches</h3>
-              <p>IRC – Dean • 8:00 AM – 6:00 PM</p>
-              <ul class="clean">
-                <li>Coffee bar @ 7:30 AM</li>
-                <li>Lunch @ noon (Jimmy John’s)</li>
-                <li>Snacks all day</li>
-              </ul>
-              <div style="height: 12px"></div>
-              <h3>Consolation Play</h3>
-              <ul class="clean">
-                <li>Consolation Singles @ IRC – Dean • 9:00 AM – 2:00 PM</li>
-                <li>Consolation Doubles @ IRC – Dean • 2:00 PM – 6:00 PM</li>
-              </ul>
-              <div style="height: 12px"></div>
-              <h3>Indy Classic Banquet @ Radius</h3>
-              <p>734 S Capitol Ave • 7:00 – 10:00 PM</p>
-              <ul class="clean">
-                <li>Southwestern (Mexican) buffet provided</li>
-                <li>1 drink ticket per attendee, then cash bar</li>
-                <li>Raffles</li>
-                <li>After party @ Tini/Metro down the street</li>
-              </ul>
-            </div>
-
-            <div class="schedule-day">
-              <div class="day-label">Sunday, May 31</div>
-              <h3>Finals @ IRC – Dean</h3>
-              <p>9:00 AM – 4:00 PM</p>
-            </div>
-          </section>
-        </div>
-
-        <div class="stack">
-          <section class="card">
-            <h2>Tournament Details</h2>
-
-            <div class="detail-block">
-              <h3>Warm-Up</h3>
-              <p>Limited to 5 minutes—please help us stay on schedule by respecting this rule.</p>
-            </div>
-
-            <div class="detail-block">
-              <h3>Staying on Schedule</h3>
-              <p>If you see a handshake on court, text the tournament desk: <strong>(708) 542-5972</strong>.</p>
-            </div>
-
-            <div class="detail-block">
-              <h3>Raffles</h3>
-              <p>Tickets will be sold at the courts and banquet.</p>
-              <p>Prizes include free tournament entries and more.</p>
-              <p>Winners are drawn at the banquet, but most prizes can be claimed virtually or Monday at the courts.</p>
-            </div>
-
-            <div class="detail-block">
-              <h3>Match Format</h3>
-              <ul class="clean">
-                <li>Main Draw: Best 2 of 3 sets; 10-point tiebreaker in lieu of 3rd set</li>
-                <li>Consolation (except finals): One pro set; 7-point tiebreak at 7-all</li>
-              </ul>
-            </div>
-
-            <div class="detail-block">
-              <h3>Code of Conduct</h3>
-              <p>The GLTA has seen an increase in incidents lately—let’s keep this tournament fun and respectful.</p>
-              <p>Disrespect toward players, staff, or club employees will not be tolerated and will result in automatic disqualification.</p>
-              <p>Line judges are available upon request—stop the match and alert the desk if needed.</p>
-            </div>
-
-            <div class="detail-block">
-              <h3>Match Readiness</h3>
-              <p>Stay near the tournament desk as your match time approaches. It is your responsibility to be ready.</p>
-              <ul class="clean">
-                <li>Up to 5 minutes late: 1 game</li>
-                <li>5–10 minutes late: 2 games</li>
-                <li>10–15 minutes late: 3 games</li>
-                <li>Over 15 minutes late: match forfeit</li>
-              </ul>
-              <div class="quote">“Early is on time, on time is late, and late is DEAD!”</div>
-            </div>
-          </section>
-
-          <section class="card">
-            <h2>Contacts</h2>
-            <p>We’re looking forward to a weekend of tennis, fun, and friendships.</p>
-            <div class="contact-list">
-              <div class="contact-person">
-                <strong>Dan Fox</strong>
-                <span>Tournament Director</span>
-              </div>
-              <div class="contact-person">
-                <strong>Brady Wagenknecht</strong>
-                <span>Entertainment Chair</span>
-              </div>
-              <div class="contact-person">
-                <strong>Mark Phillips</strong>
-                <span>Sponsorship Guru</span>
-              </div>
-            </div>
-          </section>
         </div>
       </div>
 
-      <p class="footer-note">Best regards, Dan Fox • Brady Wagenknecht • Mark Phillips</p>
-    </main>
+      <article class="paper">
+        <p class="salutation">Dear Players,</p>
+
+        <p>On behalf of the IndyTennis Board of Directors, Brady Wagenknecht, Mark Phillips, and myself—welcome to Indianapolis and the 2026 Indy Classic - Presented by CH Douglas &amp; Gray Wealth Management! We know there are many tournaments on the GLTA circuit, and we truly appreciate you spending your tennis dollars with us.</p>
+
+        <p>We want this weekend to be as enjoyable as possible, so please don’t hesitate to reach out to Brady, Mark, or me with any questions.</p>
+
+        <p>Draws and match times will be posted Tuesday evening, and I’ll send a follow-up email once they’re available. If you would like to change your division or request a doubles partner, please email me before Sunday evening.</p>
+
+        <p>If you are looking to practice before the tournament, IRC has waived their guest fee. Just mention you are playing in the GLTA tournament this weekend when booking a court. If you are very serious about your practice, we are using Wilson balls for our tournament.</p>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title">Weekend Schedule At a Glance</h2>
+
+        <div class="day">
+          <h3>Thursday, May 28</h3>
+          <p><strong>Welcome Party @ Metroi</strong> (707 Massachusetts Ave)<br>7:00 – 9:00 PM</p>
+          <ul>
+            <li>Open bar (while it lasts), then cash bar</li>
+            <li>Finger foods while supplies last</li>
+            <li>We will be raffling off two FREE gift cards to local restaurants. Must be in attendance to win</li>
+            <li>Need a dinner idea? One of our generous sponsors, 45 Degrees, is located just a few doors down from Tini. Please show them support before/after the Welcome Party or at any point throughout the weekend</li>
+            <li>You can find their menu <a href="https://fortyfiveindy.com/dinner">here</a> along with some amazing specials:</li>
+            <li>Thursday - ½ off cocktails</li>
+            <li>Sunday - ½ off sushi rolls from 4 PM - 10 PM</li>
+          </ul>
+        </div>
+
+        <div class="day">
+          <h3>Friday, May 29</h3>
+          <p><strong>Singles &amp; Doubles (First &amp; Second Rounds)</strong><br>Location: Indianapolis Racquet Club – Dean (8249 Dean Road)<br>8:00 AM – 10:00 PM</p>
+          <ul>
+            <li>Coffee Bar @ 7:30 AM</li>
+            <li>Lunch @ Noon (Bibibop)</li>
+            <li>Snacks All Day</li>
+            <li>Welcome bag pickup (not available at the Welcome Party)</li>
+          </ul>
+        </div>
+
+        <div class="day">
+          <h3>Saturday, May 30</h3>
+          <p><strong>Main Draw Matches @ IRC – Dean</strong><br>8:00 AM – 6:00 PM</p>
+          <ul>
+            <li>Coffee Bar @ 7:30 AM</li>
+            <li>Lunch @ Noon (Jimmy John’s)</li>
+            <li>Snacks All Day</li>
+          </ul>
+
+          <p><strong>Consolation Singles @ IRC – Dean</strong><br>9:00 AM – 2:00 PM</p>
+          <p><strong>Consolation Doubles @ IRC – Dean</strong><br>2:00 PM – 6:00 PM</p>
+
+          <p><strong>Indy Classic Banquet @ Radius</strong> (734 S Capitol Ave)<br>7:00 – 10:00 PM</p>
+          <ul>
+            <li>Southwestern (Mexican) buffet provided</li>
+            <li>1 drink ticket per attendee, then cash bar</li>
+            <li>Raffles!</li>
+            <li>After Party @ Tini/Metro down the street</li>
+          </ul>
+        </div>
+
+        <div class="day">
+          <h3>Sunday, May 31</h3>
+          <p><strong>Finals @ IRC – Dean</strong><br>9:00 AM – 4:00 PM</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title">Tournament Details</h2>
+
+        <p><strong>WARM-UP</strong><br>Limited to 5 minutes—please help us stay on schedule by respecting this rule.</p>
+
+        <p><strong>STAYING ON SCHEDULE</strong><br>If you see a handshake on court, text the tournament desk: (708) 542-5972.</p>
+
+        <p><strong>RAFFLES</strong><br>Tickets will be sold at the courts and banquet.<br>Prizes include free tournament entries and more!<br>Winners drawn at the banquet, but most prizes can be claimed virtually or Monday at the courts.</p>
+
+        <p><strong>MATCH FORMAT</strong><br>Main Draw: Best 2 of 3 sets; 10-point tiebreaker in lieu of 3rd set.<br>Consolation (except finals): One pro set; 7-point tiebreak at 7-all.</p>
+
+        <p><strong>CODE OF CONDUCT</strong><br>The GLTA has seen an increase in incidents lately—let’s keep this tournament fun and respectful.<br>Disrespect toward players, staff, or club employees will not be tolerated and will result in automatic disqualification.<br>Line judges are available upon request—stop the match and alert the desk if needed.</p>
+
+        <p><strong>MATCH READINESS</strong><br>Stay near the tournament desk as your match time approaches.<br>It is your responsibility to be ready.<br>GLTA lateness penalties:</p>
+
+        <ul>
+          <li>Up to 5 minutes: 1 game</li>
+          <li>5–10 minutes: 2 games</li>
+          <li>10–15 minutes: 3 games</li>
+          <li>Over 15 minutes: match forfeit</li>
+        </ul>
+
+        <div class="quote">“Early is on time, on time is late, and late is DEAD!”</div>
+
+        <p>We’re looking forward to a weekend of tennis, fun, and friendships!</p>
+
+        <div class="signoff">
+          <p class="closing">Best regards,</p>
+          <div class="names">
+            <div>Dan Fox, Tournament Director</div>
+            <div>Brady Wagenknecht, Entertainment Chair</div>
+            <div>Mark Phillips, Sponsorship Guru</div>
+          </div>
+        </div>
+      </article>
+    </section>
   </div>
 </body>
 </html>
