@@ -29,7 +29,7 @@
 
     .wrap{ max-width: var(--max); margin: 0 auto; padding: 18px 14px 44px; }
 
-    /* UPDATED HERO */
+    /* --- TOP LOGO BANNER --- */
     .hero{
       border-radius: 24px;
       padding: 22px;
@@ -71,7 +71,6 @@
       font-size: 1.55rem;
       letter-spacing:.2px;
     }
-
     .sub{
       margin: 6px 0 0;
       color: var(--muted);
@@ -111,6 +110,7 @@
     .sectionHeader h2{
       margin:0;
       font-size: 1.15rem;
+      letter-spacing:.2px;
     }
 
     .count{
@@ -120,6 +120,7 @@
       border-radius: 999px;
       background: var(--chipBg);
       border: 1px solid var(--border);
+      white-space:nowrap;
     }
 
     .list{
@@ -133,7 +134,7 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       background: var(--card);
-      padding: 12px;
+      padding: 12px 12px;
       box-shadow: 0 10px 28px rgba(0,0,0,.22);
     }
 
@@ -144,6 +145,7 @@
 
     .topRow{
       display:flex;
+      align-items:flex-start;
       justify-content:space-between;
       gap:10px;
     }
@@ -152,27 +154,37 @@
       margin:0;
       font-weight: 800;
       font-size: 1.05rem;
+      line-height:1.2;
     }
 
     .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       font-size: .82rem;
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--sponsorBorder);
       background: rgba(34,197,94,.16);
+      color: rgba(220,255,235,.95);
+      white-space:nowrap;
+      flex: 0 0 auto;
     }
 
     .meta{
       margin-top: 6px;
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
+      gap:10px 14px;
       color: var(--muted);
       font-size: .93rem;
+      line-height:1.35;
     }
 
     a{ color: #93c5fd; text-decoration: none; }
     a:hover{ text-decoration: underline; }
+
+    .muted{ color: var(--muted); }
 
     .visitIndy{
       margin-top: 26px;
@@ -181,6 +193,12 @@
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.18);
       text-align:center;
+      font-size: 1rem;
+    }
+
+    .visitIndy a{
+      font-weight: 600;
+      color: #60a5fa;
     }
 
     footer{
@@ -188,13 +206,17 @@
       color: var(--muted);
       font-size: .9rem;
       text-align:center;
+      padding-top: 10px;
     }
 
     @media (min-width: 760px){
       .list{ grid-template-columns: 1fr 1fr; }
+    }
 
+    @media (max-width: 480px){
       .logoBox{
         width:min(100%,200px);
+        padding:8px;
       }
 
       .logoBox img{
@@ -214,19 +236,198 @@
     </div>
 
     <h1 class="pageTitle">Indy Attractions</h1>
+    <p class="sub"></p>
 
     <div id="status" class="status">Loading attractions…</div>
     <div id="content"></div>
 
     <div class="visitIndy">
-      <a href="https://www.visitindy.com" target="_blank">
+      <a href="https://www.visitindy.com" target="_blank" rel="noopener noreferrer">
         Click here to search for events and activities happening in Indy!
       </a>
     </div>
 
-    <footer></footer>
+    <footer>
+      
+    </footer>
   </div>
 
-  <!-- script unchanged -->
+  <script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwtmbtFt6Gy3K8RO4hyOb5apbN9sT42_lBhk1ULoVP8JSxntpygBQ5fzAlb-RsQUn4Yi9NzdNh9xpZ/pub?gid=0&single=true&output=csv";
+
+    const TYPE_ORDER = [
+      { key: "LGBT Restaurant", title: "LGBT Restaurants" },
+      { key: "LGBT Bar",        title: "LGBT Bars" },
+      { key: "Sights",         title: "Sights" },
+      { key: "Museums/Cultur", title: "Museums" },
+      { key: "Nature",         title: "Nature" }
+    ];
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const n = text[i + 1];
+
+        if (c === '"' ) {
+          if (inQuotes && n === '"') {
+            cur += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (c === "," && !inQuotes) {
+          row.push(cur);
+          cur = "";
+        } else if ((c === "\n" || c === "\r") && !inQuotes) {
+          if (c === "\r" && n === "\n") i++;
+          row.push(cur);
+          rows.push(row);
+          row = [];
+          cur = "";
+        } else {
+          cur += c;
+        }
+      }
+
+      if (cur.length || row.length) {
+        row.push(cur);
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function norm(s){ return (s ?? "").toString().trim(); }
+    function isSponsor(val){ return norm(val).toLowerCase() === "yes"; }
+    function sortByName(a, b){
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+    }
+    function safeLink(url){
+      const u = norm(url);
+      if (!u) return "";
+      if (!/^https?:\/\//i.test(u)) return "https://" + u;
+      return u;
+    }
+
+    function render(groups, lastUpdatedText){
+      const content = document.getElementById("content");
+      content.innerHTML = "";
+
+      TYPE_ORDER.forEach(t => {
+        const items = groups.get(t.key) || [];
+        if (!items.length) return;
+
+        const sponsors = items.filter(x => x.sponsor).sort(sortByName);
+        const others   = items.filter(x => !x.sponsor).sort(sortByName);
+        const ordered  = sponsors.concat(others);
+
+        const section = document.createElement("section");
+        section.className = "section";
+
+        const header = document.createElement("div");
+        header.className = "sectionHeader";
+        header.innerHTML = `
+          <h2>${t.title}</h2>
+          <div class="count">${items.length} place${items.length === 1 ? "" : "s"}</div>
+        `;
+
+        const list = document.createElement("div");
+        list.className = "list";
+
+        ordered.forEach(x => {
+          const card = document.createElement("div");
+          card.className = "card" + (x.sponsor ? " sponsor" : "");
+
+          const web = safeLink(x.web);
+          const webHtml = web
+            ? `<span><a href="${web}" target="_blank" rel="noopener noreferrer">Website</a></span>`
+            : `<span class="muted">No website listed</span>`;
+
+          const addr = x.address ? `<span>${x.address}</span>` : `<span class="muted">Address not listed</span>`;
+
+          card.innerHTML = `
+            <div class="topRow">
+              <p class="name">${x.name || "Unnamed"}</p>
+              ${x.sponsor ? `<span class="chip">🏆 Indy Classic Sponsor!</span>` : ``}
+            </div>
+            <div class="meta">
+              ${addr}
+              ${webHtml}
+            </div>
+          `;
+
+          list.appendChild(card);
+        });
+
+        section.appendChild(header);
+        section.appendChild(list);
+        content.appendChild(section);
+      });
+
+      document.getElementById("status").textContent = lastUpdatedText;
+    }
+
+    async function load(){
+      const status = document.getElementById("status");
+      try{
+        status.textContent = "Loading attractions…";
+
+        const res = await fetch(CSV_URL + "&_ts=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("CSV fetch failed: " + res.status);
+
+        const text = await res.text();
+        const rows = parseCSV(text);
+        if (rows.length < 2) throw new Error("CSV appears empty.");
+
+        const headers = rows[0].map(h => norm(h));
+        const idx = (name) => headers.findIndex(h => h.toLowerCase() === name.toLowerCase());
+
+        const iType    = idx("Type");
+        const iName    = idx("Name");
+        const iAddress = idx("Address");
+        const iSponsor = idx("Sponsor");
+        const iWeb     = idx("Web");
+
+        if ([iType,iName,iAddress,iSponsor,iWeb].some(i => i === -1)) {
+          throw new Error("CSV headers not found. Expected: Type, Name, Address, Sponsor, Web");
+        }
+
+        const groups = new Map();
+        TYPE_ORDER.forEach(t => groups.set(t.key, []));
+
+        for (let r = 1; r < rows.length; r++){
+          const row = rows[r] || [];
+          const type = norm(row[iType]);
+          if (!type) continue;
+
+          const item = {
+            type,
+            name: norm(row[iName]),
+            address: norm(row[iAddress]),
+            sponsor: isSponsor(row[iSponsor]),
+            web: norm(row[iWeb])
+          };
+
+          if (groups.has(type)) {
+            groups.get(type).push(item);
+          }
+        }
+
+        const now = new Date();
+        const lastUpdatedText = ``;
+        render(groups, lastUpdatedText);
+
+      } catch (e){
+        console.error(e);
+        status.textContent = "Could not load attractions. Please try again later.";
+      }
+    }
+
+    load();
+  </script>
 </body>
 </html>
