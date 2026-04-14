@@ -761,7 +761,92 @@
     latestDataTimestamp = batchMax;
   }
 
-  // ...rest of your existing render logic...
+  const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
+  let lastPlaced = null;
+  for(const r of placedCandidates){
+    const key = (r.time ?? r.startTime);
+    const bestKey = lastPlaced ? (lastPlaced.time ?? lastPlaced.startTime) : null;
+    if(!lastPlaced || key.getTime() > bestKey.getTime()) lastPlaced = r;
+  }
+  setLastPlaced(lastPlaced);
+
+  const latestByCourt = new Map();
+  for(const r of normalized){
+    if(r.court==null) continue;
+    const key = r.time ?? r.startTime ?? null;
+    if(!key) continue;
+    const prev = latestByCourt.get(r.court);
+    const prevKey = prev ? (prev.time ?? prev.startTime) : null;
+    if(!prev || key.getTime() > prevKey.getTime()){
+      latestByCourt.set(r.court, r);
+    }
+  }
+
+  for(const [num,row] of latestByCourt.entries()){
+    const card = document.querySelector(`.court[data-court="${num}"]`);
+    if(!card) continue;
+
+    const sub = card.querySelector('[data-sub]');
+    const t1 = card.querySelector('[data-team1]');
+    const t2 = card.querySelector('[data-team2]');
+    const times = card.querySelector('[data-times]');
+
+    const subTxt = (row.event && row.round) ? `${row.event} — ${row.round}` : (row.event || row.round || '—');
+    sub.textContent = subTxt;
+    t1.textContent = row.team1 || '—';
+    t2.textContent = row.team2 || '—';
+
+    const sched = formatTime(row.startTime);
+    const start = formatTime(row.time);
+    const dur = formatDuration(row.time);
+
+    times.innerHTML = `
+      <span class="fitline">Scheduled: ${sched || '—'}</span>
+      <span class="fitline">Started: ${start || '—'}</span>
+      <span class="fitline">Duration: ${row.time ? (dur || '—') : '—'}</span>
+    `;
+
+    card.classList.remove('empty');
+    setBadge(card, 'Live', 'live');
+  }
+
+  const upcoming = normalized
+    .filter(r => r.court==null)
+    .sort((a,b) => {
+      const aKey = a.startTime ?? a.time ?? new Date(8640000000000000);
+      const bKey = b.startTime ?? b.time ?? new Date(8640000000000000);
+      return aKey - bKey;
+    })
+    .slice(0, UPCOMING_COUNT);
+
+  upList.innerHTML = '';
+  if(upcoming.length===0){
+    const li=document.createElement('li');
+    li.innerHTML = `
+      <div class="up-left">
+        <div class="up-match fit">No upcoming matches listed.</div>
+      </div>
+      <div class="pill up-time"><span class="fit">—</span></div>
+    `;
+    upList.appendChild(li);
+  }else{
+    for(const r of upcoming){
+      const when = formatTime(r.startTime ?? r.time);
+      const li=document.createElement('li');
+      const matchText = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
+      li.innerHTML = `
+        <div class="up-left">
+          <div class="up-match fit">${escapeHtml(matchText)}</div>
+        </div>
+        <div class="pill up-time"><span class="fit">${when || 'Time TBD'}</span></div>
+      `;
+      upList.appendChild(li);
+    }
+  }
+
+  requestAnimationFrame(() => {
+    fitDynamicText();
+  });
 }
 
     const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
