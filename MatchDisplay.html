@@ -763,13 +763,7 @@
       return t > max ? t : max;
     }, 0);
 
-    if(batchMax > 0 && batchMax < latestDataTimestamp){
-      return false;
-    }
 
-    if(batchMax > 0){
-      latestDataTimestamp = batchMax;
-    }
 
     const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
     let lastPlaced = null;
