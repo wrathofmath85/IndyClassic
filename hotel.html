@@ -53,30 +53,31 @@
       overflow:hidden;
     }
 
-    /* Top logo header (like your second pic) */
+    /* UPDATED LOGO HEADER */
     .logoHeader{
-      padding: 34px 18px;
+      padding: 28px 18px;
       display:flex;
       justify-content:center;
       align-items:center;
     }
-    .logoCircle{
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.92);
+
+    .logoBox{
+      width:min(100%,240px);
+      padding:10px;
+      border-radius:18px;
+      background:rgba(255,255,255,.96);
+      border:1px solid rgba(255,255,255,.35);
+      box-shadow:0 14px 30px rgba(0,0,0,.30);
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow:
-        0 18px 60px rgba(0,0,0,.45),
-        inset 0 0 0 3px rgba(0,0,0,.06);
     }
-    .logoCircle img{
-      width: 86%;
-      height: 86%;
-      border-radius: 50%;
-      object-fit: cover;
+
+    .logoBox img{
+      width:100%;
+      max-width:220px;
+      height:auto;
+      object-fit:contain;
       display:block;
     }
 
@@ -173,7 +174,6 @@
       font-weight: 700;
     }
 
-    /* Hotel image */
     .hotelCard{
       border-radius: 18px;
       overflow:hidden;
@@ -196,7 +196,13 @@
 
     @media (max-width: 760px){
       .grid{ grid-template-columns: 1fr; }
-      .logoCircle{ width: 150px; height: 150px; }
+      .logoBox{
+        width:min(100%,200px);
+        padding:8px;
+      }
+      .logoBox img{
+        max-width:184px;
+      }
       .content{ padding: 18px; }
     }
   </style>
@@ -205,10 +211,10 @@
 <body>
   <div class="wrap">
 
-    <!-- Simple top logo header -->
+    <!-- UPDATED LOGO HEADER -->
     <div class="glass logoHeader">
-      <div class="logoCircle" aria-label="Indy Classic Logo">
-        <img src="profile.jpg" alt="Indy Classic 2026" />
+      <div class="logoBox">
+        <img src="profile.jpg.png" alt="Indy Classic 2026" />
       </div>
     </div>
 
@@ -248,10 +254,10 @@
 
       <div class="actions">
         <a class="btn" href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink" target="_blank" rel="noopener">
-          Book Host Hotel <span aria-hidden="true">↗</span>
+          Book Host Hotel ↗
         </a>
         <a class="btn btnSecondary" href="hotel.jpg" target="_blank" rel="noopener">
-          View Hotel Photo <span aria-hidden="true">🖼️</span>
+          View Hotel Photo 🖼️
         </a>
       </div>
 
