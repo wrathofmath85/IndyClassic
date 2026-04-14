@@ -35,15 +35,16 @@
       radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
       linear-gradient(135deg, var(--bg1), var(--bg2));
     min-height:100vh;
-    padding: 18px;
+    padding:18px;
     overflow-x:hidden;
   }
 
   .blob{
     position:fixed;
-    width:440px; height:440px;
+    width:440px;
+    height:440px;
     border-radius:999px;
-    filter: blur(44px);
+    filter:blur(44px);
     opacity:.22;
     z-index:0;
     pointer-events:none;
@@ -63,7 +64,7 @@
     align-items:flex-end;
     justify-content:space-between;
     gap:14px;
-    margin: 4px 0 14px;
+    margin:4px 0 14px;
   }
 
   .titleblock{
@@ -75,18 +76,18 @@
 
   h1{
     margin:0;
-    font-size: clamp(24px, 2vw, 32px);
+    font-size:clamp(24px, 2vw, 32px);
     font-weight:850;
     letter-spacing:-0.02em;
     line-height:1.1;
   }
 
   .ts{
-    font-size: 12.5px;
-    color: var(--muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size:12.5px;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .statusline{
@@ -99,12 +100,12 @@
   }
 
   .panel{
-    background: var(--glass);
-    border: 1px solid var(--glassBorder);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background:var(--glass);
+    border:1px solid var(--glassBorder);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
   }
 
   .panel-head{
@@ -112,7 +113,7 @@
     align-items:baseline;
     justify-content:space-between;
     gap:10px;
-    padding: 2px 2px 10px;
+    padding:2px 2px 10px;
   }
 
   .panel-head h2{
@@ -124,35 +125,36 @@
 
   .dashboard{
     display:grid;
-    grid-template-columns: 440px minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns:440px minmax(0, 1fr);
+    gap:16px;
     align-items:start;
   }
 
   .sidebar{
     display:flex;
     flex-direction:column;
-    gap: 16px;
+    gap:16px;
   }
 
-  .lastmatch{
-    padding: 12px 12px 10px;
+  .lastmatch,
+  .upcoming{
+    padding:12px 12px 10px;
   }
 
   .pillrow{
     display:flex;
     flex-direction:column;
-    gap: 8px;
-    padding: 4px 2px 2px;
+    gap:8px;
+    padding:4px 2px 2px;
   }
 
   .pill{
-    font-size: 12.5px;
-    color: rgba(255,255,255,.85);
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
-    padding: 8px 10px;
-    border-radius: 999px;
+    font-size:12.5px;
+    color:rgba(255,255,255,.85);
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    padding:8px 10px;
+    border-radius:999px;
     display:flex;
     align-items:center;
     min-width:0;
@@ -160,8 +162,8 @@
   }
 
   .pill b{
-    color: rgba(255,255,255,.92);
-    font-weight: 850;
+    color:rgba(255,255,255,.92);
+    font-weight:850;
   }
 
   .fit{
@@ -172,11 +174,7 @@
     overflow:hidden;
     text-overflow:clip;
     line-height:1.15;
-    transform: translateZ(0);
-  }
-
-  .upcoming{
-    padding: 12px 12px 10px;
+    transform:translateZ(0);
   }
 
   .up-list{
@@ -185,18 +183,18 @@
     list-style:none;
     display:flex;
     flex-direction:column;
-    gap: 10px;
+    gap:10px;
   }
 
   .up-list li{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap: 10px;
-    padding: 9px 10px;
-    border-radius: 14px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
+    gap:10px;
+    padding:9px 10px;
+    border-radius:14px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
     min-width:0;
   }
 
@@ -208,15 +206,15 @@
   }
 
   .up-match{
-    font-size: 13px;
-    font-weight: 700;
+    font-size:13px;
+    font-weight:700;
   }
 
   .up-time{
-    flex: 0 0 116px;
+    flex:0 0 106px;
     justify-content:center;
     text-align:center;
-    padding: 8px 8px;
+    padding:8px 8px;
   }
 
   .up-time .fit{
@@ -225,25 +223,25 @@
   }
 
   .err{
-    margin: 10px 2px 2px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: var(--danger);
-    border: 1px solid rgba(255,255,255,.18);
-    color: rgba(255,255,255,.92);
-    font-weight: 750;
+    margin:10px 2px 2px;
+    padding:10px 12px;
+    border-radius:14px;
+    background:var(--danger);
+    border:1px solid rgba(255,255,255,.18);
+    color:rgba(255,255,255,.92);
+    font-weight:750;
   }
 
   .courts-grid{
     display:grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns:repeat(8, minmax(0, 1fr));
+    gap:12px;
     align-content:start;
   }
 
   .court{
-    padding: 10px 10px 9px;
-    min-height: 175px;
+    padding:10px 10px 9px;
+    min-height:175px;
     position:relative;
     overflow:hidden;
   }
@@ -255,8 +253,8 @@
     left:-20%;
     width:60%;
     height:120%;
-    transform: rotate(18deg);
-    background: radial-gradient(circle at 30% 40%, rgba(255,255,255,.18), transparent 55%);
+    transform:rotate(18deg);
+    background:radial-gradient(circle at 30% 40%, rgba(255,255,255,.18), transparent 55%);
     opacity:.30;
     pointer-events:none;
   }
@@ -273,7 +271,7 @@
   .court-title{
     display:flex;
     flex-direction:column;
-    gap: 3px;
+    gap:3px;
     min-width:0;
     flex:1 1 auto;
   }
@@ -288,28 +286,27 @@
   .court-title .sub{
     font-weight:700;
     font-size:11.5px;
-    color: rgba(255,255,255,.80);
+    color:rgba(255,255,255,.80);
   }
 
   .badge{
-    font-size: 10.5px;
-    font-weight: 800;
-    padding: 5px 8px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.18);
-    background: rgba(255,255,255,.10);
-    color: rgba(255,255,255,.90);
-    flex: 0 0 auto;
+    font-size:10.5px;
+    font-weight:800;
+    padding:5px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.10);
+    color:rgba(255,255,255,.90);
+    flex:0 0 auto;
     white-space:nowrap;
   }
-
-  .badge.live{ background: var(--ok); }
-  .badge.empty{ opacity: .65; }
+  .badge.live{ background:var(--ok); }
+  .badge.empty{ opacity:.65; }
 
   .line{
     height:1px;
-    background: rgba(255,255,255,.16);
-    margin: 8px 0;
+    background:rgba(255,255,255,.16);
+    margin:8px 0;
     position:relative;
     z-index:1;
   }
@@ -317,7 +314,7 @@
   .match{
     display:flex;
     flex-direction:column;
-    gap: 6px;
+    gap:6px;
     position:relative;
     z-index:1;
   }
@@ -326,41 +323,41 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    gap: 8px;
-    padding: 8px 9px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
+    gap:8px;
+    padding:8px 9px;
+    border-radius:12px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
     text-align:center;
     min-width:0;
     overflow:hidden;
   }
 
   .team{
-    font-size: 12.25px;
-    font-weight: 750;
-    min-width: 0;
+    font-size:12.25px;
+    font-weight:750;
+    min-width:0;
     width:100%;
-    line-height: 1.15;
+    line-height:1.15;
     text-align:center;
   }
 
   .vs{
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 800;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:800;
     text-align:center;
   }
 
   .timeinfo{
-    margin-top: 8px;
-    padding: 8px 9px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
-    font-size: 11.25px;
-    color: rgba(255,255,255,.78);
-    line-height: 1.45;
+    margin-top:8px;
+    padding:8px 9px;
+    border-radius:12px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    font-size:11.25px;
+    color:rgba(255,255,255,.78);
+    line-height:1.45;
     text-align:center;
     position:relative;
     z-index:1;
@@ -377,37 +374,37 @@
 
   .empty .team,
   .empty .court-title .sub{
-    color: rgba(255,255,255,.55);
-    font-weight: 650;
+    color:rgba(255,255,255,.55);
+    font-weight:650;
   }
 
   @media (max-width: 1399px){
     .dashboard{
-      grid-template-columns: 380px minmax(0, 1fr);
+      grid-template-columns:380px minmax(0, 1fr);
     }
     .courts-grid{
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns:repeat(4, minmax(0, 1fr));
     }
     .court{
-      min-height: 185px;
+      min-height:185px;
     }
   }
 
   @media (max-width: 1050px){
     .dashboard{
-      grid-template-columns: 1fr;
+      grid-template-columns:1fr;
     }
     .sidebar{
       order:1;
     }
     .courts-grid{
       order:2;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns:repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 640px){
-    body{ padding: 14px; }
+    body{ padding:14px; }
 
     header{
       align-items:flex-start;
@@ -421,28 +418,28 @@
       gap:6px;
     }
 
-    h1{ font-size: 24px; }
+    h1{ font-size:24px; }
 
     .courts-grid{
-      grid-template-columns: 1fr;
-      gap: 10px;
+      grid-template-columns:1fr;
+      gap:10px;
     }
 
     .court{
-      min-height: 150px;
-      padding: 12px;
+      min-height:150px;
+      padding:12px;
     }
 
     .team{
-      font-size: 13px;
+      font-size:13px;
     }
 
     .timeinfo{
-      font-size: 12px;
+      font-size:12px;
     }
 
     .up-time{
-      flex:0 0 98px;
+      flex:0 0 94px;
     }
   }
 </style>
@@ -493,7 +490,6 @@
 
 <script>
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrbxnR_sR21PWkZNhsqpzlnaQJ7AXhWmUN0aA_r9nXIxsdfQ6OnFsBEf9_aeVCIpZPIjhBAA5KraS_/pub?gid=0&single=true&output=csv";
-
   const NUM_COURTS = 16;
   const UPCOMING_COUNT = 5;
   const REFRESH_MS = 15000;
@@ -507,11 +503,14 @@
 
   let loading = false;
   let latestDataTimestamp = 0;
+  let resizeTimer = null;
+
+  const tidy = v => (v == null ? '' : String(v).trim());
 
   function buildCourtShells(){
     courtsGrid.innerHTML = '';
 
-    for(let i=1;i<=NUM_COURTS;i++){
+    for(let i = 1; i <= NUM_COURTS; i++){
       const card = document.createElement('article');
       card.className = 'panel court empty';
       card.dataset.court = i;
@@ -533,16 +532,14 @@
         </div>
 
         <div class="timeinfo" data-times>
-          <span class="fitline">Scheduled Time: —</span>
-          <span class="fitline">Start Time: —</span>
+          <span class="fitline">Scheduled: —</span>
+          <span class="fitline">Started: —</span>
           <span class="fitline">Duration: —</span>
         </div>
       `;
       courtsGrid.appendChild(card);
     }
   }
-
-  const tidy = v => (v==null ? '' : String(v).trim());
 
   function isCourtEmpty(v){
     const t = tidy(v).toLowerCase();
@@ -556,9 +553,9 @@
     let m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]m)$/i);
     if(m){
       let [, hh, mm, ss, ap] = m;
-      let h = parseInt(hh,10);
-      const min = parseInt(mm,10);
-      const sec = ss ? parseInt(ss,10) : 0;
+      let h = parseInt(hh, 10);
+      const min = parseInt(mm, 10);
+      const sec = ss ? parseInt(ss, 10) : 0;
       ap = ap.toLowerCase();
       if(h === 12) h = 0;
       if(ap === 'pm') h += 12;
@@ -569,10 +566,10 @@
     m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))$/);
     if(m || (m = str.match(/^(\d{1,2}):(\d{2})$/))){
       let [, hh, mm, ss] = m;
-      const h = parseInt(hh,10);
-      const min = parseInt(mm,10);
-      const sec = ss ? parseInt(ss,10) : 0;
-      if(h>=0 && h<24 && min>=0 && min<60 && sec>=0 && sec<60){
+      const h = parseInt(hh, 10);
+      const min = parseInt(mm, 10);
+      const sec = ss ? parseInt(ss, 10) : 0;
+      if(h >= 0 && h < 24 && min >= 0 && min < 60 && sec >= 0 && sec < 60){
         const now = new Date();
         return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min, sec, 0);
       }
@@ -592,11 +589,14 @@
 
   function formatTime(dt){
     if(!dt) return '';
-    let h = dt.getHours(), m = dt.getMinutes(), s = dt.getSeconds();
+    let h = dt.getHours();
+    const m = dt.getMinutes();
+    const s = dt.getSeconds();
     const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12; if(h === 0) h = 12;
-    const mm = m.toString().padStart(2,'0');
-    const ss = s ? (':' + s.toString().padStart(2,'0')) : '';
+    h = h % 12;
+    if(h === 0) h = 12;
+    const mm = String(m).padStart(2, '0');
+    const ss = s ? ':' + String(s).padStart(2, '0') : '';
     return `${h}:${mm}${ss} ${ampm}`;
   }
 
@@ -613,24 +613,28 @@
   function formatDuration(since){
     if(!since) return '';
     const now = new Date();
-    let diff = (now - since)/60000;
+    const diff = (now - since) / 60000;
     if(diff < 1) return 'Just started';
-    const hrs = Math.floor(diff/60);
+    const hrs = Math.floor(diff / 60);
     const mins = Math.floor(diff % 60);
-    if(hrs > 0) return `${hrs} hr${hrs>1?'s':''} ${mins} min${mins!==1?'s':''}`;
-    return `${mins} min${mins!==1?'s':''}`;
+    if(hrs > 0) return `${hrs} hr${hrs > 1 ? 's' : ''} ${mins} min${mins !== 1 ? 's' : ''}`;
+    return `${mins} min${mins !== 1 ? 's' : ''}`;
   }
 
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
     }[c]));
   }
 
   function setBadge(card, label, kind){
     const badge = card.querySelector('[data-badge]');
     badge.textContent = label;
-    badge.classList.remove('live','empty');
+    badge.classList.remove('live', 'empty');
     if(kind === 'live') badge.classList.add('live');
     if(kind === 'empty') badge.classList.add('empty');
   }
@@ -639,7 +643,7 @@
     const matchText = latestRow ? `${latestRow.team1 || '—'} vs ${latestRow.team2 || '—'}` : '—';
     const scheduled = formatTime(latestRow?.startTime) || '—';
     const actual = formatTime(latestRow?.time) || '—';
-    const court = (latestRow?.court ?? '—');
+    const court = latestRow?.court ?? '—';
 
     lastPlacedRow.innerHTML = `
       <div class="pill"><span class="fit"><b>Match:</b> ${escapeHtml(matchText)}</span></div>
@@ -670,7 +674,7 @@
 
     el.style.fontSize = startSize + 'px';
 
-    if (measureTextWidth(el) <= targetWidth) return;
+    if(measureTextWidth(el) <= targetWidth) return;
 
     let low = minSize;
     let high = startSize;
@@ -680,7 +684,7 @@
       const mid = (low + high) / 2;
       el.style.fontSize = mid + 'px';
 
-      if (measureTextWidth(el) <= targetWidth){
+      if(measureTextWidth(el) <= targetWidth){
         best = mid;
         low = mid;
       } else {
@@ -690,7 +694,7 @@
 
     el.style.fontSize = best + 'px';
 
-    while (measureTextWidth(el) > targetWidth && parseFloat(el.style.fontSize) > minSize){
+    while(measureTextWidth(el) > targetWidth && parseFloat(el.style.fontSize) > minSize){
       el.style.fontSize = (parseFloat(el.style.fontSize) - 0.25) + 'px';
     }
   }
@@ -700,8 +704,8 @@
       shrinkTextToFit(el, 8.5, 12.5, 10);
     });
 
-    document.querySelectorAll('.up-match').forEach(el => {
-      shrinkTextToFit(el, 8.25, 13, 10);
+    document.querySelectorAll('.up-match.fit').forEach(el => {
+      shrinkTextToFit(el, 8.1, 13, 14);
     });
 
     document.querySelectorAll('.up-time .fit').forEach(el => {
@@ -709,11 +713,11 @@
     });
 
     document.querySelectorAll('.court .sub.fit').forEach(el => {
-      shrinkTextToFit(el, 8.25, 11.5, 12);
+      shrinkTextToFit(el, 8.1, 11.5, 14);
     });
 
     document.querySelectorAll('.court .team.fit').forEach(el => {
-      shrinkTextToFit(el, 8.25, 12.25, 12);
+      shrinkTextToFit(el, 8.1, 12.25, 14);
     });
 
     document.querySelectorAll('.timeinfo .fitline').forEach(el => {
@@ -722,155 +726,79 @@
   }
 
   function renderFromRows(rows){
-  buildCourtShells();
+    buildCourtShells();
 
-  const normalized = rows.map((r, idx) => {
-    const startRaw = tidy(r['Start Time']);
-    const timeRaw  = tidy(r['Time']);
-    const courtRaw = tidy(r['Court']) || tidy(r['Court #']);
-    const team1    = tidy(r['Team 1']) || tidy(r['Team1']);
-    const team2    = tidy(r['Team 2']) || tidy(r['Team2']);
-    const event    = tidy(r['Event']);
-    const round    = tidy(r['Round']);
+    const normalized = rows.map((r, idx) => {
+      const startRaw = tidy(r['Start Time']);
+      const timeRaw = tidy(r['Time']);
+      const courtRaw = tidy(r['Court']) || tidy(r['Court #']);
+      const team1 = tidy(r['Team 1']) || tidy(r['Team1']);
+      const team2 = tidy(r['Team 2']) || tidy(r['Team2']);
+      const event = tidy(r['Event']);
+      const round = tidy(r['Round']);
 
-    const num = parseInt(courtRaw, 10);
-    const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
+      const num = parseInt(courtRaw, 10);
+      const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
 
-    const startTime = toDateOrNullFlexible(startRaw);
-    const time = parseTimeToday(timeRaw) ?? null;
+      const startTime = toDateOrNullFlexible(startRaw);
+      const time = parseTimeToday(timeRaw) ?? null;
 
-    return {
-      _row: idx,
-      startRaw, startTime,
-      timeRaw, time,
-      event, round, team1, team2,
-      courtRaw, court
-    };
-  });
+      return {
+        _row: idx,
+        startRaw,
+        startTime,
+        timeRaw,
+        time,
+        event,
+        round,
+        team1,
+        team2,
+        courtRaw,
+        court
+      };
+    });
 
-  const batchMax = normalized.reduce((max, r) => {
-    const t = (r.time ?? r.startTime)?.getTime() ?? 0;
-    return t > max ? t : max;
-  }, 0);
+    const batchMax = normalized.reduce((max, r) => {
+      const t = (r.time ?? r.startTime)?.getTime() ?? 0;
+      return t > max ? t : max;
+    }, 0);
 
-  if (batchMax > 0 && batchMax < latestDataTimestamp) {
-    return;
-  }
-
-  if (batchMax > 0) {
-    latestDataTimestamp = batchMax;
-  }
-
-  const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
-  let lastPlaced = null;
-  for(const r of placedCandidates){
-    const key = (r.time ?? r.startTime);
-    const bestKey = lastPlaced ? (lastPlaced.time ?? lastPlaced.startTime) : null;
-    if(!lastPlaced || key.getTime() > bestKey.getTime()) lastPlaced = r;
-  }
-  setLastPlaced(lastPlaced);
-
-  const latestByCourt = new Map();
-  for(const r of normalized){
-    if(r.court==null) continue;
-    const key = r.time ?? r.startTime ?? null;
-    if(!key) continue;
-    const prev = latestByCourt.get(r.court);
-    const prevKey = prev ? (prev.time ?? prev.startTime) : null;
-    if(!prev || key.getTime() > prevKey.getTime()){
-      latestByCourt.set(r.court, r);
+    if(batchMax > 0 && batchMax < latestDataTimestamp){
+      return false;
     }
-  }
 
-  for(const [num,row] of latestByCourt.entries()){
-    const card = document.querySelector(`.court[data-court="${num}"]`);
-    if(!card) continue;
-
-    const sub = card.querySelector('[data-sub]');
-    const t1 = card.querySelector('[data-team1]');
-    const t2 = card.querySelector('[data-team2]');
-    const times = card.querySelector('[data-times]');
-
-    const subTxt = (row.event && row.round) ? `${row.event} — ${row.round}` : (row.event || row.round || '—');
-    sub.textContent = subTxt;
-    t1.textContent = row.team1 || '—';
-    t2.textContent = row.team2 || '—';
-
-    const sched = formatTime(row.startTime);
-    const start = formatTime(row.time);
-    const dur = formatDuration(row.time);
-
-    times.innerHTML = `
-      <span class="fitline">Scheduled: ${sched || '—'}</span>
-      <span class="fitline">Started: ${start || '—'}</span>
-      <span class="fitline">Duration: ${row.time ? (dur || '—') : '—'}</span>
-    `;
-
-    card.classList.remove('empty');
-    setBadge(card, 'Live', 'live');
-  }
-
-  const upcoming = normalized
-    .filter(r => r.court==null)
-    .sort((a,b) => {
-      const aKey = a.startTime ?? a.time ?? new Date(8640000000000000);
-      const bKey = b.startTime ?? b.time ?? new Date(8640000000000000);
-      return aKey - bKey;
-    })
-    .slice(0, UPCOMING_COUNT);
-
-  upList.innerHTML = '';
-  if(upcoming.length===0){
-    const li=document.createElement('li');
-    li.innerHTML = `
-      <div class="up-left">
-        <div class="up-match fit">No upcoming matches listed.</div>
-      </div>
-      <div class="pill up-time"><span class="fit">—</span></div>
-    `;
-    upList.appendChild(li);
-  }else{
-    for(const r of upcoming){
-      const when = formatTime(r.startTime ?? r.time);
-      const li=document.createElement('li');
-      const matchText = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
-      li.innerHTML = `
-        <div class="up-left">
-          <div class="up-match fit">${escapeHtml(matchText)}</div>
-        </div>
-        <div class="pill up-time"><span class="fit">${when || 'Time TBD'}</span></div>
-      `;
-      upList.appendChild(li);
+    if(batchMax > 0){
+      latestDataTimestamp = batchMax;
     }
-  }
-
-  requestAnimationFrame(() => {
-    fitDynamicText();
-  });
-}
 
     const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
     let lastPlaced = null;
+
     for(const r of placedCandidates){
-      const key = (r.time ?? r.startTime);
+      const key = r.time ?? r.startTime;
       const bestKey = lastPlaced ? (lastPlaced.time ?? lastPlaced.startTime) : null;
-      if(!lastPlaced || key.getTime() > bestKey.getTime()) lastPlaced = r;
+      if(!lastPlaced || key.getTime() > bestKey.getTime()){
+        lastPlaced = r;
+      }
     }
+
     setLastPlaced(lastPlaced);
 
     const latestByCourt = new Map();
     for(const r of normalized){
-      if(r.court==null) continue;
+      if(r.court == null) continue;
       const key = r.time ?? r.startTime ?? null;
       if(!key) continue;
+
       const prev = latestByCourt.get(r.court);
       const prevKey = prev ? (prev.time ?? prev.startTime) : null;
+
       if(!prev || key.getTime() > prevKey.getTime()){
         latestByCourt.set(r.court, r);
       }
     }
 
-    for(const [num,row] of latestByCourt.entries()){
+    for(const [num, row] of latestByCourt.entries()){
       const card = document.querySelector(`.court[data-court="${num}"]`);
       if(!card) continue;
 
@@ -899,8 +827,8 @@
     }
 
     const upcoming = normalized
-      .filter(r => r.court==null)
-      .sort((a,b) => {
+      .filter(r => r.court == null)
+      .sort((a, b) => {
         const aKey = a.startTime ?? a.time ?? new Date(8640000000000000);
         const bKey = b.startTime ?? b.time ?? new Date(8640000000000000);
         return aKey - bKey;
@@ -908,8 +836,9 @@
       .slice(0, UPCOMING_COUNT);
 
     upList.innerHTML = '';
-    if(upcoming.length===0){
-      const li=document.createElement('li');
+
+    if(upcoming.length === 0){
+      const li = document.createElement('li');
       li.innerHTML = `
         <div class="up-left">
           <div class="up-match fit">No upcoming matches listed.</div>
@@ -917,10 +846,10 @@
         <div class="pill up-time"><span class="fit">—</span></div>
       `;
       upList.appendChild(li);
-    }else{
+    } else {
       for(const r of upcoming){
         const when = formatTime(r.startTime ?? r.time);
-        const li=document.createElement('li');
+        const li = document.createElement('li');
         const matchText = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
         li.innerHTML = `
           <div class="up-left">
@@ -935,6 +864,8 @@
     requestAnimationFrame(() => {
       fitDynamicText();
     });
+
+    return true;
   }
 
   function loadCSV(){
@@ -952,13 +883,16 @@
       skipEmptyLines: 'greedy',
       complete: (res) => {
         try{
-          renderFromRows(res.data);
-          updateRefreshStamp(new Date());
+          const rendered = renderFromRows(res.data);
+          if(rendered){
+            updateRefreshStamp(new Date());
+          }
           sourceNote.textContent = '';
-        }catch(e){
+        } catch(e){
           errMsg.hidden = false;
           errMsg.textContent = 'Error rendering data: ' + e.message;
           sourceNote.textContent = '';
+          console.error(e);
         } finally {
           loading = false;
         }
@@ -968,11 +902,11 @@
         errMsg.textContent = 'CSV load failed: ' + e.message;
         sourceNote.textContent = '';
         loading = false;
+        console.error(e);
       }
     });
   }
 
-  let resizeTimer = null;
   function refitSoon(){
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
@@ -988,7 +922,7 @@
   window.addEventListener('resize', refitSoon);
   window.addEventListener('load', refitSoon);
 
-  if (document.fonts && document.fonts.ready) {
+  if(document.fonts && document.fonts.ready){
     document.fonts.ready.then(() => {
       refitSoon();
     });
