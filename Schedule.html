@@ -72,6 +72,36 @@
       margin-bottom: 14px;
     }
 
+    .logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin-bottom: 18px;
+    }
+
+    .logo-box{
+      width: min(100%, 240px);
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 14px 30px rgba(0,0,0,.30);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logo{
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      display:block;
+      object-fit: contain;
+      border-radius: 0;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+
     h1{
       font-size: 28px;
       font-weight: 800;
@@ -160,6 +190,15 @@
       .date{ min-width: 0; width: fit-content; }
       h1{ font-size: 24px; }
       .card{ padding: 22px 16px; border-radius: 18px; }
+
+      .logo-box{
+        width: min(100%, 200px);
+        padding: 8px;
+      }
+
+      .logo{
+        max-width: 184px;
+      }
     }
   </style>
 </head>
@@ -170,6 +209,12 @@
   <div class="container">
     <div class="card">
       <div class="header">
+        <div class="logo-wrap">
+          <div class="logo-box">
+            <img src="profile.jpg.png" alt="Indy Classic Logo" class="logo">
+          </div>
+        </div>
+
         <h1>Indy Classic 2026 Schedule</h1>
         <div class="subtitle">Times and locations subject to change</div>
       </div>
@@ -196,7 +241,7 @@
         <div class="row">
           <div class="date">5/29/2026</div>
           <div class="details">
-	    <div class="title">Coffee Bar</div>
+            <div class="title">Coffee Bar</div>
             <div class="meta">
               <span class="pill">Time: 7:30AM-GONE</span>
               <span class="pill">Location: Upstairs Lounge</span>
@@ -226,7 +271,7 @@
         <div class="row">
           <div class="date">5/30/2026</div>
           <div class="details">
-	    <div class="title">Coffee Bar</div>
+            <div class="title">Coffee Bar</div>
             <div class="meta">
               <span class="pill">Time: 7:30AM-GONE</span>
               <span class="pill">Location: Upstairs Lounge</span>
