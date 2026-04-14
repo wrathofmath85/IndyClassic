@@ -6,7 +6,7 @@
 <title>Indy Classic — Courts</title>
 
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 
 <style>
   :root{
@@ -489,7 +489,7 @@
   </div>
 
 <script>
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrbxnR_sR21PWkZNhsqpzlnaQJ7AXhWmUN0aA_r9nXIxsdfQ6OnFsBEf9_aeVCIpZPIjhBAA5KraS_/pub?gid=0&single=true&output=csv";
+  const JSON_URL = "https://script.google.com/macros/s/AKfycbwv9yiFvW1VBrY_iL9T5ZvhUH_2ygptxukgt8dj5ZaEFSw63fQopzcAfIwETaTx5WJ7/exec";
   const NUM_COURTS = 16;
   const UPCOMING_COUNT = 5;
   const REFRESH_MS = 15000;
@@ -863,43 +863,36 @@
   }
 
   function loadCSV(){
-    if(loading) return;
-    loading = true;
+  if(loading) return;
+  loading = true;
 
-    errMsg.hidden = true;
-    sourceNote.textContent = 'Loading…';
+  errMsg.hidden = true;
+  sourceNote.textContent = 'Loading…';
 
-    const url = CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
-
-    Papa.parse(url, {
-      download: true,
-      header: true,
-      skipEmptyLines: 'greedy',
-      complete: (res) => {
-        try{
-          const rendered = renderFromRows(res.data);
-          if(rendered){
-            updateRefreshStamp(new Date());
-          }
-          sourceNote.textContent = '';
-        } catch(e){
-          errMsg.hidden = false;
-          errMsg.textContent = 'Error rendering data: ' + e.message;
-          sourceNote.textContent = '';
-          console.error(e);
-        } finally {
-          loading = false;
-        }
-      },
-      error: (e) => {
-        errMsg.hidden = false;
-        errMsg.textContent = 'CSV load failed: ' + e.message;
+  fetch(JSON_URL + '?t=' + Date.now())
+    .then(r => r.json())
+    .then(rows => {
+      try{
+        renderFromRows(rows);
+        updateRefreshStamp(new Date());
         sourceNote.textContent = '';
-        loading = false;
+      } catch(e){
+        errMsg.hidden = false;
+        errMsg.textContent = 'Error rendering data: ' + e.message;
+        sourceNote.textContent = '';
         console.error(e);
+      } finally {
+        loading = false;
       }
+    })
+    .catch(e => {
+      errMsg.hidden = false;
+      errMsg.textContent = 'Data load failed: ' + e.message;
+      sourceNote.textContent = '';
+      loading = false;
+      console.error(e);
     });
-  }
+}
 
   function refitSoon(){
     clearTimeout(resizeTimer);
