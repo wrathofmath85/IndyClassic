@@ -154,12 +154,25 @@
     padding: 8px 10px;
     border-radius: 999px;
     white-space: nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    overflow: hidden;
+    text-overflow: clip;
+    display:flex;
+    align-items:center;
+    min-width:0;
   }
   .pill b{
     color: rgba(255,255,255,.92);
     font-weight: 850;
+  }
+
+  .pill-fit{
+    display:block;
+    width:100%;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:clip;
+    line-height:1.2;
   }
 
   .upcoming{
@@ -185,10 +198,12 @@
     border-radius: 14px;
     background: rgba(255,255,255,.08);
     border: 1px solid rgba(255,255,255,.12);
+    min-width:0;
   }
 
   .up-left{
     min-width:0;
+    flex:1 1 auto;
     display:flex;
     flex-direction:column;
     gap:4px;
@@ -199,7 +214,17 @@
     font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: clip;
+    min-width:0;
+    line-height:1.2;
+    display:block;
+    width:100%;
+  }
+
+  .up-time{
+    flex:0 0 136px;
+    justify-content:center;
+    text-align:center;
   }
 
   .err{
@@ -401,6 +426,9 @@
     .timeinfo{
       font-size: 12px;
     }
+    .up-time{
+      flex:0 0 108px;
+    }
   }
 </style>
 </head>
@@ -428,10 +456,10 @@
             <h2>Last Match Placed</h2>
           </div>
           <div class="pillrow" id="lastPlacedRow">
-            <div class="pill"><b>Match:</b> —</div>
-            <div class="pill"><b>Scheduled:</b> —</div>
-            <div class="pill"><b>Actual:</b> —</div>
-            <div class="pill"><b>Court:</b> —</div>
+            <div class="pill"><span class="pill-fit"><b>Match:</b> —</span></div>
+            <div class="pill"><span class="pill-fit"><b>Scheduled:</b> —</span></div>
+            <div class="pill"><span class="pill-fit"><b>Actual:</b> —</span></div>
+            <div class="pill"><span class="pill-fit"><b>Court:</b> —</span></div>
           </div>
           <div class="err" id="errorMsg" hidden></div>
         </section>
@@ -450,6 +478,7 @@
 
 <script>
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrbxnR_sR21PWkZNhsqpzlnaQJ7AXhWmUN0aA_r9nXIxsdfQ6OnFsBEf9_aeVCIpZPIjhBAA5KraS_/pub?gid=0&single=true&output=csv";
+
   const NUM_COURTS = 16;
   const UPCOMING_COUNT = 5;
   const REFRESH_MS = 15000;
@@ -597,15 +626,50 @@
     const court = (latestRow?.court ?? '—');
 
     lastPlacedRow.innerHTML = `
-      <div class="pill"><b>Match:</b> ${escapeHtml(matchText)}</div>
-      <div class="pill"><b>Scheduled:</b> ${scheduled}</div>
-      <div class="pill"><b>Actual:</b> ${actual}</div>
-      <div class="pill"><b>Court:</b> ${court}</div>
+      <div class="pill"><span class="pill-fit"><b>Match:</b> ${escapeHtml(matchText)}</span></div>
+      <div class="pill"><span class="pill-fit"><b>Scheduled:</b> ${scheduled}</span></div>
+      <div class="pill"><span class="pill-fit"><b>Actual:</b> ${actual}</span></div>
+      <div class="pill"><span class="pill-fit"><b>Court:</b> ${court}</span></div>
     `;
   }
 
   function updateRefreshStamp(dt = new Date()){
     lastRefreshStamp.textContent = `Last refreshed: ${formatDateTime(dt)}`;
+  }
+
+  function shrinkTextToFit(el, minSize = 9, maxSize = null){
+    if(!el) return;
+
+    const computed = window.getComputedStyle(el);
+    const startingSize = maxSize || parseFloat(computed.fontSize) || 13;
+
+    el.style.fontSize = startingSize + 'px';
+
+    if(el.scrollWidth <= el.clientWidth) return;
+
+    let low = minSize;
+    let high = startingSize;
+    let best = minSize;
+
+    while ((high - low) > 0.25) {
+      const mid = (low + high) / 2;
+      el.style.fontSize = mid + 'px';
+
+      if (el.scrollWidth <= el.clientWidth) {
+        best = mid;
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+
+    el.style.fontSize = best + 'px';
+  }
+
+  function fitDynamicText(){
+    document.querySelectorAll('.up-match').forEach(el => shrinkTextToFit(el, 9, 13));
+    document.querySelectorAll('.up-time .pill-fit').forEach(el => shrinkTextToFit(el, 9, 12.5));
+    document.querySelectorAll('#lastPlacedRow .pill-fit').forEach(el => shrinkTextToFit(el, 9, 12.5));
   }
 
   function renderFromRows(rows){
@@ -696,7 +760,12 @@
     upList.innerHTML = '';
     if(upcoming.length===0){
       const li=document.createElement('li');
-      li.innerHTML = `<div class="up-left"><div class="up-match">No upcoming matches listed.</div></div><div class="pill">—</div>`;
+      li.innerHTML = `
+        <div class="up-left">
+          <div class="up-match">No upcoming matches listed.</div>
+        </div>
+        <div class="pill up-time"><span class="pill-fit">—</span></div>
+      `;
       upList.appendChild(li);
     }else{
       for(const r of upcoming){
@@ -707,11 +776,15 @@
           <div class="up-left">
             <div class="up-match">${escapeHtml(matchText)}</div>
           </div>
-          <div class="pill">${when || 'Time TBD'}</div>
+          <div class="pill up-time"><span class="pill-fit">${when || 'Time TBD'}</span></div>
         `;
         upList.appendChild(li);
       }
     }
+
+    requestAnimationFrame(() => {
+      fitDynamicText();
+    });
   }
 
   function loadCSV(){
@@ -753,6 +826,12 @@
   updateRefreshStamp(null);
   loadCSV();
   setInterval(loadCSV, REFRESH_MS);
+
+  window.addEventListener('resize', () => {
+    requestAnimationFrame(() => {
+      fitDynamicText();
+    });
+  });
 </script>
 </body>
 </html>
