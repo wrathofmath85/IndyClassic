@@ -722,44 +722,47 @@
   }
 
   function renderFromRows(rows){
-    buildCourtShells();
+  buildCourtShells();
 
-    const normalized = rows.map((r, idx) => {
-      // Determine the most recent timestamp in this batch
-      const batchMax = normalized.reduce((max, r) => {
-      const t = (r.time ?? r.startTime)?.getTime() ?? 0;
-      return t > max ? t : max;
-      }, 0);
+  const normalized = rows.map((r, idx) => {
+    const startRaw = tidy(r['Start Time']);
+    const timeRaw  = tidy(r['Time']);
+    const courtRaw = tidy(r['Court']) || tidy(r['Court #']);
+    const team1    = tidy(r['Team 1']) || tidy(r['Team1']);
+    const team2    = tidy(r['Team 2']) || tidy(r['Team2']);
+    const event    = tidy(r['Event']);
+    const round    = tidy(r['Round']);
 
-      // If this batch is older than what we already have, discard it
-      if (batchMax > 0 && batchMax < latestDataTimestamp) {
-      loading = false;
-      return;
-      }
-      // Otherwise, accept it and update our watermark
-      if (batchMax > 0) latestDataTimestamp = batchMax;
-      const startRaw = tidy(r['Start Time']);
-      const timeRaw  = tidy(r['Time']);
-      const courtRaw = tidy(r['Court']) || tidy(r['Court #']);
-      const team1    = tidy(r['Team 1']) || tidy(r['Team1']);
-      const team2    = tidy(r['Team 2']) || tidy(r['Team2']);
-      const event    = tidy(r['Event']);
-      const round    = tidy(r['Round']);
+    const num = parseInt(courtRaw, 10);
+    const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
 
-      const num = parseInt(courtRaw, 10);
-      const court = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
+    const startTime = toDateOrNullFlexible(startRaw);
+    const time = parseTimeToday(timeRaw) ?? null;
 
-      const startTime = toDateOrNullFlexible(startRaw);
-      const time = parseTimeToday(timeRaw) ?? null;
+    return {
+      _row: idx,
+      startRaw, startTime,
+      timeRaw, time,
+      event, round, team1, team2,
+      courtRaw, court
+    };
+  });
 
-      return {
-        _row: idx,
-        startRaw, startTime,
-        timeRaw, time,
-        event, round, team1, team2,
-        courtRaw, court
-      };
-    });
+  const batchMax = normalized.reduce((max, r) => {
+    const t = (r.time ?? r.startTime)?.getTime() ?? 0;
+    return t > max ? t : max;
+  }, 0);
+
+  if (batchMax > 0 && batchMax < latestDataTimestamp) {
+    return;
+  }
+
+  if (batchMax > 0) {
+    latestDataTimestamp = batchMax;
+  }
+
+  // ...rest of your existing render logic...
+}
 
     const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
     let lastPlaced = null;
