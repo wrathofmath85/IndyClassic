@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2026 Indy Classic</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -79,14 +79,29 @@
       margin-bottom: 18px;
     }
 
+    /* Updated for full logo display */
+    .logo-box{
+      width: min(100%, 470px);
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 14px 30px rgba(0,0,0,.30);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
     .profile-img{
-      width: 140px;
-      height: 140px;
-      border-radius: 999px;
-      object-fit: cover;
-      border: 3px solid rgba(255,255,255,.55);
-      box-shadow: 0 14px 30px rgba(0,0,0,.35);
-      background: rgba(255,255,255,.08);
+      width: 100%;
+      max-width: 440px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
     }
 
     h1{
@@ -142,7 +157,6 @@
       transform: scale(.99);
     }
 
-    /* Sponsors */
     .sponsors{
       margin-top: 18px;
       padding-top: 14px;
@@ -228,7 +242,6 @@
       transform: scale(.99);
     }
 
-    /* Tier 1 — Presenting Sponsor */
     .sponsor.tier1{
       width: 100%;
       min-height: 200px;
@@ -285,6 +298,15 @@
     }
 
     @media (max-width: 520px){
+      .logo-box{
+        padding: 12px;
+        border-radius: 20px;
+      }
+
+      .profile-img{
+        max-width: 100%;
+      }
+
       .sponsor-tier{
         gap: 12px;
       }
@@ -323,11 +345,15 @@
     @media (max-width: 420px){
       body{ padding: 18px; }
       .card{ padding: 22px 16px; border-radius: 18px; }
-      .profile-img{ width: 120px; height: 120px; }
       h1{ font-size: 24px; margin-bottom: 10px; }
       .subtitle{ font-size: 13px; margin-bottom: 16px; }
       .links{ gap: 10px; }
       .link-btn{ padding: 13px; border-radius: 13px; }
+
+      .logo-box{
+        padding: 10px;
+        border-radius: 18px;
+      }
 
       .sponsor-tier{
         gap: 10px;
@@ -375,8 +401,13 @@
 
     @media (min-width: 900px){
       .card{ padding: 30px 28px; }
-      .profile-img{ width: 150px; height: 150px; }
       h1{ font-size: 30px; }
+      .logo-box{
+        width: min(100%, 500px);
+      }
+      .profile-img{
+        max-width: 470px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -400,11 +431,13 @@
   <div class="container">
     <div class="card">
       <div class="profile-wrap">
-        <img src="profile.jpg.png" alt="Profile Picture" class="profile-img">
+        <div class="logo-box">
+          <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="profile-img">
+        </div>
       </div>
 
       <h1>2026 Indy Classic</h1>
-      <div class="subtitle">Presented by C.H. Douglas & Gray Wealth Management</div>
+      <div class="subtitle">Presented by C.H. Douglas &amp; Gray Wealth Management</div>
 
       <div class="links">
         <a href="https://glta.tournamentsoftware.com/tournament/0CAB8D49-7782-4492-89AD-12582D67ED9E"
@@ -452,7 +485,6 @@
       <div class="sponsors">
         <div class="sponsors-title">Sponsors</div>
 
-        <!-- Tier 1: single presenting sponsor -->
         <div class="sponsor-tier">
           <div class="sponsor tier1">
             <img src="tier1sponsor01.jpg"
@@ -462,7 +494,6 @@
           </div>
         </div>
 
-        <!-- Tier 2 -->
         <div class="sponsor-tier">
           <div class="sponsor tier2"><img src="tier2sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
           <div class="sponsor tier2"><img src="tier2sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
@@ -476,7 +507,6 @@
           <div class="sponsor tier2"><img src="tier2sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
         </div>
 
-        <!-- Tier 3 -->
         <div class="sponsor-tier">
           <div class="sponsor tier3"><img src="tier3sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
           <div class="sponsor tier3"><img src="tier3sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
@@ -490,7 +520,6 @@
           <div class="sponsor tier3"><img src="tier3sponsor10.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
         </div>
 
-        <!-- Tier 4 -->
         <div class="sponsor-tier">
           <div class="sponsor tier4"><img src="tier4sponsor01.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
           <div class="sponsor tier4"><img src="tier4sponsor02.jpg" alt="Sponsor" loading="lazy" onerror="this.closest('.sponsor').style.display='none'"></div>
