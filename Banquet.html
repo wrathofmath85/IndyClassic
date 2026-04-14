@@ -69,15 +69,34 @@ text-align:center;
 overflow:hidden;
 }
 
-.logo{
-width:140px;
-height:140px;
-border-radius:50%;
-object-fit:cover;
+.logo-wrap{
+display:flex;
+justify-content:center;
 margin-bottom:18px;
-border:3px solid rgba(255,255,255,.6);
-box-shadow:0 14px 30px rgba(0,0,0,.35);
-background:rgba(255,255,255,.08);
+}
+
+.logo-box{
+width:min(100%,240px);
+padding:10px;
+border-radius:18px;
+background:rgba(255,255,255,.96);
+border:1px solid rgba(255,255,255,.35);
+box-shadow:0 14px 30px rgba(0,0,0,.30);
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo{
+width:100%;
+max-width:220px;
+height:auto;
+display:block;
+object-fit:contain;
+border-radius:0;
+border:0;
+box-shadow:none;
+background:transparent;
 }
 
 h1{
@@ -169,7 +188,6 @@ color:rgba(255,255,255,.88);
 font-size:14px;
 }
 
-/* FULL BLEED IMAGE */
 .banquet-image{
 width:100%;
 display:block;
@@ -183,7 +201,16 @@ border-radius:0 0 var(--radius) var(--radius);
 
 @media(max-width:480px){
 .card{padding:32px 22px 0 22px;}
-.logo{width:110px;height:110px;}
+
+.logo-box{
+width:min(100%,200px);
+padding:8px;
+}
+
+.logo{
+max-width:184px;
+}
+
 h1{font-size:24px;}
 .subtitle{font-size:13px;}
 }
@@ -197,7 +224,11 @@ h1{font-size:24px;}
 
 <div class="card">
 
-<img src="profile.jpg" alt="Indy Classic Logo" class="logo">
+<div class="logo-wrap">
+  <div class="logo-box">
+    <img src="profile.jpg.png" alt="Indy Classic Logo" class="logo">
+  </div>
+</div>
 
 <h1>Banquet Info</h1>
 <div class="subtitle">Indy Classic 2026 • Player’s Banquet</div>
