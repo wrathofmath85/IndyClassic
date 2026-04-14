@@ -155,24 +155,24 @@
     border-radius: 999px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: clip;
     display:flex;
     align-items:center;
     min-width:0;
   }
+
   .pill b{
     color: rgba(255,255,255,.92);
     font-weight: 850;
   }
 
-  .pill-fit{
+  .fit{
     display:block;
     width:100%;
     min-width:0;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:clip;
-    line-height:1.2;
+    line-height:1.15;
   }
 
   .upcoming{
@@ -212,19 +212,13 @@
   .up-match{
     font-size: 13px;
     font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
-    min-width:0;
-    line-height:1.2;
-    display:block;
-    width:100%;
   }
 
   .up-time{
-    flex:0 0 136px;
+    flex: 0 0 96px;
     justify-content:center;
     text-align:center;
+    padding: 8px 8px;
   }
 
   .err{
@@ -278,6 +272,7 @@
     flex-direction:column;
     gap: 3px;
     min-width:0;
+    flex:1 1 auto;
   }
 
   .court-title .title{
@@ -291,9 +286,6 @@
     font-weight:700;
     font-size:11.5px;
     color: rgba(255,255,255,.80);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .badge{
@@ -305,6 +297,7 @@
     background: rgba(255,255,255,.10);
     color: rgba(255,255,255,.90);
     flex: 0 0 auto;
+    white-space:nowrap;
   }
   .badge.live{ background: var(--ok); }
   .badge.empty{ opacity: .65; }
@@ -335,6 +328,7 @@
     background: rgba(255,255,255,.08);
     border: 1px solid rgba(255,255,255,.12);
     text-align:center;
+    min-width:0;
   }
 
   .team{
@@ -342,9 +336,7 @@
     font-weight: 750;
     line-height: 1.15;
     min-width: 0;
-    overflow:hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    width:100%;
   }
 
   .vs{
@@ -366,6 +358,15 @@
     text-align:center;
     position:relative;
     z-index:1;
+    overflow:hidden;
+  }
+
+  .timeinfo .fitline{
+    display:block;
+    width:100%;
+    white-space:nowrap;
+    overflow:hidden;
+    line-height:1.35;
   }
 
   .empty .team,
@@ -427,7 +428,8 @@
       font-size: 12px;
     }
     .up-time{
-      flex:0 0 108px;
+      flex: 0 0 82px;
+      padding: 8px 6px;
     }
   }
 </style>
@@ -456,10 +458,10 @@
             <h2>Last Match Placed</h2>
           </div>
           <div class="pillrow" id="lastPlacedRow">
-            <div class="pill"><span class="pill-fit"><b>Match:</b> —</span></div>
-            <div class="pill"><span class="pill-fit"><b>Scheduled:</b> —</span></div>
-            <div class="pill"><span class="pill-fit"><b>Actual:</b> —</span></div>
-            <div class="pill"><span class="pill-fit"><b>Court:</b> —</span></div>
+            <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Match:</b> —</span></div>
+            <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Scheduled:</b> —</span></div>
+            <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Actual:</b> —</span></div>
+            <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Court:</b> —</span></div>
           </div>
           <div class="err" id="errorMsg" hidden></div>
         </section>
@@ -503,23 +505,27 @@
         <div class="court-top">
           <div class="court-title">
             <div class="title">Court ${i}</div>
-            <div class="sub" data-sub>—</div>
+            <div class="sub fit js-fit" data-sub data-fit-max="11.5" data-fit-min="7.5">—</div>
           </div>
-          <div class="badge empty" data-badge>Empty</div>
+          <div class="badge empty">Empty</div>
         </div>
 
         <div class="line"></div>
 
         <div class="match">
-          <div class="teamrow"><div class="team" data-team1>—</div></div>
+          <div class="teamrow">
+            <div class="team fit js-fit" data-team1 data-fit-max="12.25" data-fit-min="7.5">—</div>
+          </div>
           <div class="vs">vs</div>
-          <div class="teamrow"><div class="team" data-team2>—</div></div>
+          <div class="teamrow">
+            <div class="team fit js-fit" data-team2 data-fit-max="12.25" data-fit-min="7.5">—</div>
+          </div>
         </div>
 
         <div class="timeinfo" data-times>
-          <div>Scheduled Time: —</div>
-          <div>Start Time: —</div>
-          <div>Duration: —</div>
+          <span class="fitline js-fit" data-fit-max="11.25" data-fit-min="8">Scheduled Time: —</span>
+          <span class="fitline js-fit" data-fit-max="11.25" data-fit-min="8">Start Time: —</span>
+          <span class="fitline js-fit" data-fit-max="11.25" data-fit-min="8">Duration: —</span>
         </div>
       `;
       courtsGrid.appendChild(card);
@@ -611,14 +617,6 @@
     }[c]));
   }
 
-  function setBadge(card, label, kind){
-    const badge = card.querySelector('[data-badge]');
-    badge.textContent = label;
-    badge.classList.remove('live','empty');
-    if(kind === 'live') badge.classList.add('live');
-    if(kind === 'empty') badge.classList.add('empty');
-  }
-
   function setLastPlaced(latestRow){
     const matchText = latestRow ? `${latestRow.team1 || '—'} vs ${latestRow.team2 || '—'}` : '—';
     const scheduled = formatTime(latestRow?.startTime) || '—';
@@ -626,10 +624,10 @@
     const court = (latestRow?.court ?? '—');
 
     lastPlacedRow.innerHTML = `
-      <div class="pill"><span class="pill-fit"><b>Match:</b> ${escapeHtml(matchText)}</span></div>
-      <div class="pill"><span class="pill-fit"><b>Scheduled:</b> ${scheduled}</span></div>
-      <div class="pill"><span class="pill-fit"><b>Actual:</b> ${actual}</span></div>
-      <div class="pill"><span class="pill-fit"><b>Court:</b> ${court}</span></div>
+      <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Match:</b> ${escapeHtml(matchText)}</span></div>
+      <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Scheduled:</b> ${scheduled}</span></div>
+      <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Actual:</b> ${actual}</span></div>
+      <div class="pill"><span class="fit js-fit" data-fit-max="12.5" data-fit-min="8"><b>Court:</b> ${court}</span></div>
     `;
   }
 
@@ -637,28 +635,31 @@
     lastRefreshStamp.textContent = `Last refreshed: ${formatDateTime(dt)}`;
   }
 
-  function shrinkTextToFit(el, minSize = 9, maxSize = null){
+  function fitOne(el){
     if(!el) return;
 
-    const computed = window.getComputedStyle(el);
-    const startingSize = maxSize || parseFloat(computed.fontSize) || 13;
+    const max = parseFloat(el.dataset.fitMax || getComputedStyle(el).fontSize);
+    const min = parseFloat(el.dataset.fitMin || 8);
 
-    el.style.fontSize = startingSize + 'px';
+    el.style.fontSize = max + 'px';
 
-    if(el.scrollWidth <= el.clientWidth) return;
+    const parent = el.parentElement;
+    if(!parent) return;
 
-    let low = minSize;
-    let high = startingSize;
-    let best = minSize;
+    if(el.scrollWidth <= el.clientWidth + 1) return;
 
-    while ((high - low) > 0.25) {
+    let low = min;
+    let high = max;
+    let best = min;
+
+    for(let i=0;i<18;i++){
       const mid = (low + high) / 2;
       el.style.fontSize = mid + 'px';
 
-      if (el.scrollWidth <= el.clientWidth) {
+      if(el.scrollWidth <= el.clientWidth + 1){
         best = mid;
         low = mid;
-      } else {
+      }else{
         high = mid;
       }
     }
@@ -666,10 +667,8 @@
     el.style.fontSize = best + 'px';
   }
 
-  function fitDynamicText(){
-    document.querySelectorAll('.up-match').forEach(el => shrinkTextToFit(el, 9, 13));
-    document.querySelectorAll('.up-time .pill-fit').forEach(el => shrinkTextToFit(el, 9, 12.5));
-    document.querySelectorAll('#lastPlacedRow .pill-fit').forEach(el => shrinkTextToFit(el, 9, 12.5));
+  function fitAllDynamicText(){
+    document.querySelectorAll('.js-fit').forEach(fitOne);
   }
 
   function renderFromRows(rows){
@@ -728,6 +727,7 @@
       const t1 = card.querySelector('[data-team1]');
       const t2 = card.querySelector('[data-team2]');
       const times = card.querySelector('[data-times]');
+      const badge = card.querySelector('.badge');
 
       const subTxt = (row.event && row.round) ? `${row.event} — ${row.round}` : (row.event || row.round || '—');
       sub.textContent = subTxt;
@@ -739,13 +739,15 @@
       const dur = formatDuration(row.time);
 
       times.innerHTML = `
-        <div>Scheduled: ${sched || '—'}</div>
-        <div>Started: ${start || '—'}</div>
-        <div>Duration: ${row.time ? (dur || '—') : '—'}</div>
+        <span class="fitline js-fit" data-fit-max="11.25" data-fit-min="8">Scheduled: ${sched || '—'}</span>
+        <span class="fitline js-fit" data-fit-max="11.25" data-fit-min="8">Started: ${start || '—'}</span>
+        <span class="fitline js-fit" data-fit-max="11.25" data-fit-min="8">Duration: ${row.time ? (dur || '—') : '—'}</span>
       `;
 
       card.classList.remove('empty');
-      setBadge(card, 'Live', 'live');
+      badge.textContent = 'Live';
+      badge.classList.remove('empty');
+      badge.classList.add('live');
     }
 
     const upcoming = normalized
@@ -762,9 +764,11 @@
       const li=document.createElement('li');
       li.innerHTML = `
         <div class="up-left">
-          <div class="up-match">No upcoming matches listed.</div>
+          <div class="up-match fit js-fit" data-fit-max="13" data-fit-min="7.5">No upcoming matches listed.</div>
         </div>
-        <div class="pill up-time"><span class="pill-fit">—</span></div>
+        <div class="pill up-time">
+          <span class="fit js-fit" data-fit-max="12.5" data-fit-min="8">—</span>
+        </div>
       `;
       upList.appendChild(li);
     }else{
@@ -774,16 +778,18 @@
         const matchText = `${r.team1 || '—'} vs ${r.team2 || '—'}`;
         li.innerHTML = `
           <div class="up-left">
-            <div class="up-match">${escapeHtml(matchText)}</div>
+            <div class="up-match fit js-fit" data-fit-max="13" data-fit-min="7.5">${escapeHtml(matchText)}</div>
           </div>
-          <div class="pill up-time"><span class="pill-fit">${when || 'Time TBD'}</span></div>
+          <div class="pill up-time">
+            <span class="fit js-fit" data-fit-max="12.5" data-fit-min="8">${when || 'Time TBD'}</span>
+          </div>
         `;
         upList.appendChild(li);
       }
     }
 
     requestAnimationFrame(() => {
-      fitDynamicText();
+      fitAllDynamicText();
     });
   }
 
@@ -827,10 +833,12 @@
   loadCSV();
   setInterval(loadCSV, REFRESH_MS);
 
+  let resizeTimer = null;
   window.addEventListener('resize', () => {
-    requestAnimationFrame(() => {
-      fitDynamicText();
-    });
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      fitAllDynamicText();
+    }, 60);
   });
 </script>
 </body>
