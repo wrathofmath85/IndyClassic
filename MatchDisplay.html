@@ -89,6 +89,15 @@
     text-overflow: ellipsis;
   }
 
+  .statusline{
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    text-align:right;
+  }
+
   .panel{
     background: var(--glass);
     border: 1px solid var(--glassBorder);
@@ -372,6 +381,11 @@
       flex-direction:column;
       gap:6px;
     }
+    .statusline{
+      justify-content:flex-start;
+      text-align:left;
+      gap:6px;
+    }
     h1{ font-size: 24px; }
     .courts-grid{
       grid-template-columns: 1fr;
@@ -401,7 +415,10 @@
         <h1>Indy Classic Court Assignments</h1>
         <div class="ts" id="sourceNote">Loading…</div>
       </div>
-      <div class="ts">Auto-refresh: every 15 seconds</div>
+      <div class="statusline">
+        <div class="ts">Auto-refresh: every 15 seconds</div>
+        <div class="ts" id="lastRefreshStamp">Last refreshed: —</div>
+      </div>
     </header>
 
     <section class="dashboard">
@@ -442,6 +459,7 @@
   const errMsg = document.getElementById('errorMsg');
   const sourceNote = document.getElementById('sourceNote');
   const lastPlacedRow = document.getElementById('lastPlacedRow');
+  const lastRefreshStamp = document.getElementById('lastRefreshStamp');
 
   let loading = false;
 
@@ -537,6 +555,16 @@
     return `${h}:${mm}${ss} ${ampm}`;
   }
 
+  function formatDateTime(dt){
+    if(!dt) return '—';
+    const date = dt.toLocaleDateString(undefined, {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    return `${date} ${formatTime(dt)}`;
+  }
+
   function formatDuration(since){
     if(!since) return '';
     const now = new Date();
@@ -574,6 +602,10 @@
       <div class="pill"><b>Actual:</b> ${actual}</div>
       <div class="pill"><b>Court:</b> ${court}</div>
     `;
+  }
+
+  function updateRefreshStamp(dt = new Date()){
+    lastRefreshStamp.textContent = `Last refreshed: ${formatDateTime(dt)}`;
   }
 
   function renderFromRows(rows){
@@ -698,6 +730,7 @@
       complete: (res) => {
         try{
           renderFromRows(res.data);
+          updateRefreshStamp(new Date());
           sourceNote.textContent = '';
         }catch(e){
           errMsg.hidden = false;
@@ -716,6 +749,8 @@
     });
   }
 
+  buildCourtShells();
+  updateRefreshStamp(null);
   loadCSV();
   setInterval(loadCSV, REFRESH_MS);
 </script>
