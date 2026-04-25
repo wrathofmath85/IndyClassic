@@ -3,10 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Indy Classic Singles Consolation</title>
+  <title>Singles Consolation – 2026 Indy Classic</title>
+
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -26,33 +31,130 @@
       --card2: rgba(255,255,255,.07);
       --advanced: rgba(34,197,94,.14);
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
       background:
         radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
         radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
-      min-height:100vh;
+      min-height: 100vh;
       padding: 22px;
-      overflow-x:hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
+
     .blob{
-      position:fixed; width:440px; height:440px;
-      border-radius:999px; filter: blur(44px); opacity:.22;
-      z-index:0; pointer-events:none;
+      position: fixed; width: 440px; height: 440px;
+      border-radius: 999px; filter: blur(44px); opacity: .22;
+      z-index: 0; pointer-events: none;
     }
-    .blob.b1{ top:-160px; left:-160px; background: rgba(56,189,248,.95); }
-    .blob.b2{ bottom:-200px; right:-170px; background: rgba(168,85,247,.95); }
+    .blob.b1 { top: -160px; left: -160px; background: rgba(56,189,248,.95); }
+    .blob.b2 { bottom: -200px; right: -170px; background: rgba(168,85,247,.95); }
 
-    .wrap{ max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 42px; }
-    header{ display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; margin: 10px 0 18px; flex-wrap:wrap; }
-    h1{ margin:0; font-size: 26px; font-weight: 850; letter-spacing: -0.02em; line-height: 1.15; }
-    .subhead{ font-size: 12.5px; color: var(--muted); }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      padding-bottom: 48px;
+    }
 
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: color .18s ease, background .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back-link:hover {
+      color: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.12);
+    }
+
+    /* ── LOGO HEADER ── */
+    .logo-card {
+      background: var(--glass);
+      border: 1px solid var(--glassBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 24px 22px 20px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .logo-box {
+      width: min(100%, 240px);
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 14px 30px rgba(0,0,0,.30);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+
+    .page-sub {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      color: rgba(255,255,255,.80);
+    }
+
+    /* ── MAIN PANEL ── */
     .panel{
       background: var(--glass);
       border: 1px solid var(--glassBorder);
@@ -60,43 +162,94 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      padding: 18px;
+      padding: 20px;
     }
 
-    .titleRow{ display:flex; justify-content:space-between; align-items:baseline; gap: 10px; margin-bottom: 10px; flex-wrap:wrap; }
-    .titleRow h2{ margin:0; font-size: 15px; font-weight: 850; letter-spacing: -0.01em; }
+    .titleRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .titleRow h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
 
     .pill{
       font-size: 12.5px;
       color: rgba(255,255,255,.85);
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 999px;
       white-space: nowrap;
     }
 
     .notice{
-      display:flex; flex-direction:column; gap: 10px;
-      padding: 14px; border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 16px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
+      font-size: 13.5px;
+      line-height: 1.5;
     }
 
-    .form{ display:flex; flex-direction:column; gap: 12px; margin-top: 8px; }
-    label{ font-size: 12.5px; color: var(--muted); font-weight: 700; }
+    /* ── SKELETON LOADER ── */
+    .skeleton {
+      border-radius: 12px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.06) 25%,
+        rgba(255,255,255,.11) 50%,
+        rgba(255,255,255,.06) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skel-line {
+      height: 16px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .skel-line.short { width: 40%; }
+    .skel-line.med   { width: 65%; }
+    .skel-line.full  { width: 100%; }
+    .skel-block {
+      height: 80px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* ── FORM ── */
+    .form { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+    label { font-size: 12.5px; color: var(--muted); font-weight: 700; display: block; margin-bottom: 5px; }
+
     select{
-      width:100%;
-      padding: 12px 12px;
+      width: 100%;
+      padding: 12px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.18);
-      background: rgba(15,23,42,.35);
+      background: rgba(15,23,42,.45);
       color: var(--text);
       outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      appearance: auto;
     }
 
     .infoBox{
-      padding: 12px 12px;
+      padding: 12px;
       border-radius: 14px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
@@ -104,20 +257,22 @@
       line-height: 1.45;
       font-size: 13px;
       min-height: 48px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
 
     .btn{
       border: 1px solid rgba(255,255,255,.18);
       background: rgba(255,255,255,.12);
       color: var(--text);
-      padding: 12px 14px;
+      padding: 13px 14px;
       border-radius: 14px;
-      cursor:pointer;
+      cursor: pointer;
       font-weight: 800;
+      font-size: 14px;
+      font-family: inherit;
       box-shadow: 0 10px 24px rgba(0,0,0,.18);
       transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
       -webkit-tap-highlight-color: transparent;
@@ -125,95 +280,91 @@
     @media (hover:hover) and (pointer:fine){
       .btn:hover{
         transform: translateY(-2px);
-        background: rgba(255,255,255,.16);
-        border-color: rgba(255,255,255,.26);
+        background: rgba(255,255,255,.18);
+        border-color: rgba(255,255,255,.28);
         box-shadow: 0 14px 34px rgba(0,0,0,.25);
       }
     }
-    .btn:active{ transform: scale(.99); }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+    .btn:active { transform: scale(.99); }
+    .btn:disabled { opacity: .50; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .status{
-      margin-top: 14px;
-      padding: 12px 12px;
+    /* ── INLINE STATUS (near submit button) ── */
+    .inline-status {
+      padding: 12px 14px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
       font-size: 13px;
-      color: rgba(255,255,255,.9);
-      display:none;
+      font-weight: 600;
+      display: none;
+      border: 1px solid transparent;
     }
-    .status.ok{ background: var(--ok); display:block; }
-    .status.warn{ background: var(--warn); display:block; }
-    .status.err{ background: var(--danger); display:block; }
+    .inline-status.ok   { display: block; background: var(--ok);     border-color: rgba(34,197,94,.30);  color: rgba(187,247,208,.95); }
+    .inline-status.warn { display: block; background: var(--warn);   border-color: rgba(99,102,241,.30); color: rgba(199,210,254,.95); }
+    .inline-status.err  { display: block; background: var(--danger); border-color: rgba(244,63,94,.30);  color: rgba(255,205,213,.95); }
 
+    /* ── SPINNER ── */
     .spinner{
-      width: 18px; height: 18px;
+      width: 16px; height: 16px;
       border-radius: 999px;
-      border: 2px solid rgba(255,255,255,.35);
+      border: 2px solid rgba(255,255,255,.30);
       border-top-color: rgba(255,255,255,.95);
-      display:inline-block;
+      display: inline-block;
       vertical-align: -3px;
-      animation: spin .9s linear infinite;
-      margin-right: 8px;
+      animation: spin .85s linear infinite;
+      margin-right: 7px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── SUMMARY GRID ── */
     .summaryGrid{
       margin-top: 14px;
-      display:grid;
+      display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
     }
     .divCard{
-      padding: 12px 12px;
+      padding: 12px;
       border-radius: 16px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
     }
     .divTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
-      flex-wrap:wrap;
+      flex-wrap: wrap;
       margin-bottom: 8px;
     }
-    .divName{
-      font-weight: 900;
-      letter-spacing: -0.01em;
-    }
+    .divName { font-weight: 800; letter-spacing: -0.01em; }
     .nameList{
-      margin:0;
-      padding:0;
-      list-style:none;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 8px;
+      margin: 0; padding: 0; list-style: none;
+      display: flex; flex-wrap: wrap; gap: 8px;
     }
     .nameChip{
       font-size: 12.5px;
-      padding: 7px 10px;
+      padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       color: rgba(255,255,255,.88);
-      max-width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 100%;
     }
 
+    /* ── DRAW CONTROLS ── */
     .drawControls{
-      display:grid;
+      display: grid;
       grid-template-columns: minmax(220px, 420px) 1fr;
       gap: 14px;
-      align-items:end;
-      margin-top: 10px;
+      align-items: end;
+      margin-top: 12px;
     }
+
     .metaGrid{
       margin-top: 14px;
-      display:grid;
+      display: grid;
       grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 12px;
     }
@@ -225,86 +376,108 @@
     }
     .metaLabel{
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11.5px;
       margin-bottom: 6px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      letter-spacing: .05em;
     }
     .metaValue{
-      font-weight: 900;
+      font-weight: 800;
       font-size: 20px;
       letter-spacing: -.02em;
     }
 
+    /* ── BRACKET ── */
     .drawWrap{
       margin-top: 16px;
       overflow-x: auto;
-      padding-bottom: 8px;
+      padding-bottom: 12px;
+      /* Hint on mobile that there's horizontal scroll */
+      -webkit-overflow-scrolling: touch;
     }
+
+    /* Scroll hint shown only when bracket overflows */
+    .scroll-hint {
+      display: none;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      text-align: center;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
     .bracket{
-      display:flex;
+      display: flex;
       gap: 26px;
       min-width: max-content;
-      align-items:flex-start;
+      align-items: flex-start;
     }
-    .roundCol{
-      min-width: 250px;
-    }
-    .roundTitle{
-      font-weight: 900;
+    .roundCol { min-width: 250px; }
+    .roundTitle {
+      font-weight: 800;
       margin-bottom: 12px;
       letter-spacing: -.01em;
+      font-size: 13.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.65);
     }
-    .roundStack{
-      display:flex;
-      flex-direction:column;
-    }
+    .roundStack { display: flex; flex-direction: column; }
 
     .matchCard{
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.14);
-      overflow:hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,.14);
+      overflow: hidden;
       min-height: 84px;
     }
     .playerRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
       padding: 11px 12px;
     }
-    .playerRow + .playerRow{
+    .playerRow + .playerRow {
       border-top: 1px solid rgba(255,255,255,.10);
     }
-    .playerLeft{
-      display:flex;
-      align-items:center;
+    .playerLeft {
+      display: flex;
+      align-items: center;
       gap: 8px;
-      min-width:0;
+      min-width: 0;
     }
     .seedBadge{
-      min-width: 32px;
+      min-width: 30px;
       height: 24px;
-      padding: 0 8px;
+      padding: 0 7px;
       border-radius: 999px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: 11px;
-      font-weight: 900;
-      color: rgba(255,255,255,.9);
+      font-weight: 800;
+      color: rgba(255,255,255,.88);
       background: rgba(255,255,255,.10);
       border: 1px solid rgba(255,255,255,.12);
       flex: 0 0 auto;
     }
     .playerName{
       font-weight: 700;
+      font-size: 13.5px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    /* Pending / "Winner of prior match" placeholder style */
+    .playerName.pending {
+      font-style: italic;
+      color: rgba(255,255,255,.40);
+      font-weight: 400;
     }
     .playerNum{
       color: var(--seed);
@@ -313,28 +486,26 @@
       white-space: nowrap;
       flex: 0 0 auto;
     }
-    .byeRow{
-      background: var(--bye);
-    }
-    .advancedRow{
-      background: var(--advanced);
-    }
+    .byeRow    { background: var(--bye); }
+    .advancedRow { background: var(--advanced); }
 
+    /* ── SEED LIST ── */
     .seedList{
       margin-top: 16px;
-      display:grid;
+      display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
+      gap: 10px;
     }
     .seedItem{
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 14px;
       padding: 10px 12px;
-      display:flex;
-      justify-content:space-between;
+      display: flex;
+      justify-content: space-between;
       gap: 10px;
-      align-items:center;
+      align-items: center;
+      font-size: 13px;
     }
 
     .emptyDraw{
@@ -343,23 +514,28 @@
       border-radius: 16px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
-      color: rgba(255,255,255,.88);
+      color: rgba(255,255,255,.80);
+      font-size: 13.5px;
     }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 900px){
-      .drawControls{
-        grid-template-columns: 1fr;
-      }
-      .metaGrid{
-        grid-template-columns: 1fr;
-      }
+      .drawControls  { grid-template-columns: 1fr; }
+      .metaGrid      { grid-template-columns: 1fr 1fr; }
+      .scroll-hint   { display: block; }
     }
 
     @media (max-width: 480px){
-      body{ padding: 16px; }
-      h1{ font-size: 22px; }
-      .panel{ padding: 16px; }
-      .roundCol{ min-width: 220px; }
+      body        { padding: 16px; }
+      .page-title { font-size: 22px; }
+      .panel      { padding: 16px; }
+      .roundCol   { min-width: 210px; }
+      .metaGrid   { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .skeleton, .spinner { animation: none; }
+      .btn, .back-link    { transition: none; }
     }
   </style>
 </head>
@@ -369,19 +545,40 @@
   <div class="blob b2"></div>
 
   <div class="wrap">
-    <header>
-      <div>
-        <h1>Indy Classic Singles Consolation</h1>
-        <div class="subhead" id="smallNote">Loading…</div>
-      </div>
-      <div class="pill" id="modePill">Checking status…</div>
-    </header>
 
-    <section class="panel" id="mainPanel"></section>
-    <div class="status" id="statusBox"></div>
-  </div>
+    <a href="index.html" class="back-link">← Home</a>
+
+    <!-- Logo / title header -->
+    <div class="logo-card">
+      <div class="logo-wrap">
+        <div class="logo-box">
+          <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="logo">
+        </div>
+      </div>
+      <div class="page-title">Singles Consolation</div>
+      <div class="page-sub">
+        2026 Indy Classic
+        <span class="mode-pill" id="modePill">Loading…</span>
+      </div>
+    </div>
+
+    <!-- Main dynamic panel -->
+    <div class="panel" id="mainPanel">
+      <!-- Skeleton loader shown while init() runs -->
+      <div id="skeletonLoader">
+        <div class="skel-line short skeleton"></div>
+        <div class="skel-line med   skeleton"></div>
+        <div class="skel-block      skeleton"></div>
+        <div class="skel-block      skeleton"></div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
 
 <script>
+  /* ─────────────────────────────────────────────
+     CONFIG
+  ───────────────────────────────────────────── */
   const CONTROL_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=1244457974&single=true&output=csv";
 
@@ -394,34 +591,46 @@
   const APPS_SCRIPT_WEBAPP_URL =
     "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
 
-  const mainPanel = document.getElementById("mainPanel");
-  const modePill = document.getElementById("modePill");
-  const smallNote = document.getElementById("smallNote");
-  const statusBox = document.getElementById("statusBox");
+  /* ─────────────────────────────────────────────
+     DOM REFS
+  ───────────────────────────────────────────── */
+  const mainPanel  = document.getElementById("mainPanel");
+  const modePill   = document.getElementById("modePill");
 
-  const tidy = v => (v == null ? "" : String(v).trim());
+  /* ─────────────────────────────────────────────
+     HELPERS
+  ───────────────────────────────────────────── */
+  const tidy  = v => (v == null ? "" : String(v).trim());
   const upper = v => tidy(v).toUpperCase();
 
-  function showStatus(type, msg){
-    statusBox.className = "status " + type;
-    statusBox.textContent = msg;
-    statusBox.style.display = "block";
-  }
-  function clearStatus(){
-    statusBox.className = "status";
-    statusBox.textContent = "";
-    statusBox.style.display = "none";
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => (
+      {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+    ));
   }
 
+  /**
+   * Fetch a CSV with aggressive cache-busting:
+   *  - unique timestamp + random nonce in query string
+   *  - cache: "no-store" fetch option
+   *  - Pragma / Cache-Control request headers
+   */
   async function parseCSV(url){
-    const bust = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
+    const bust = url
+      + (url.includes("?") ? "&" : "?")
+      + "t=" + Date.now()
+      + "&r=" + Math.random().toString(36).slice(2);
 
     const response = await fetch(bust, {
-      cache: "no-store"
+      cache: "no-store",
+      headers: {
+        "Pragma":        "no-cache",
+        "Cache-Control": "no-cache"
+      }
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+    if (!response.ok){
+      throw new Error(`CSV fetch failed: ${response.status} ${response.statusText}`);
     }
 
     const text = await response.text();
@@ -430,8 +639,8 @@
       Papa.parse(text, {
         header: true,
         skipEmptyLines: "greedy",
-        complete: (res) => resolve(res.data || []),
-        error: (err) => reject(err)
+        complete: res  => resolve(res.data || []),
+        error:    err  => reject(err)
       });
     });
   }
@@ -440,42 +649,10 @@
     const flags = {};
     for(const r of rows){
       const view = tidy(r["View"]);
-      const cur = upper(r["Current"]);
+      const cur  = upper(r["Current"]);
       if(view) flags[view] = (cur === "Y");
     }
     return flags;
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
-  }
-
-  function renderComingSoon(){
-    modePill.textContent = "Coming Soon";
-    mainPanel.innerHTML = `
-      <div class="titleRow">
-        <h2>Status</h2>
-        <div class="pill">Not open yet</div>
-      </div>
-      <div class="notice">
-        <div><strong>Indy Classic Singles Consolation Coming Soon</strong></div>
-      </div>
-    `;
-  }
-
-  function renderNotActive(){
-    modePill.textContent = "Not Active";
-    mainPanel.innerHTML = `
-      <div class="titleRow">
-        <h2>Status</h2>
-        <div class="pill">Unavailable</div>
-      </div>
-      <div class="notice">
-        <div><strong>This page is not active right now.</strong></div>
-      </div>
-    `;
   }
 
   function canonicalPersonKey(firstname, name){
@@ -486,37 +663,43 @@
     const rows = await parseCSV(SUBMISSIONS_CSV);
     return rows
       .map(r => ({
-        name: tidy(r["Name"]),
+        name:      tidy(r["Name"]),
         firstname: tidy(r["Firstname"]),
-        singles: tidy(r["Singles"]),
-        number: Number(tidy(r["Number"]))
+        singles:   tidy(r["Singles"]),
+        number:    Number(tidy(r["Number"]))
       }))
       .filter(p => (p.firstname || p.name) && p.singles);
   }
 
-  async function loadUsedNumbers(){
-    const subs = await loadSubmissions();
-    const used = new Set();
-    for(const p of subs){
-      if(Number.isFinite(p.number)) used.add(p.number);
-    }
-    return used;
-  }
-
   function pickUniqueNumber(used){
     if(used.size >= 1000) return null;
-    for(let tries=0; tries<5000; tries++){
+    for(let tries = 0; tries < 5000; tries++){
       const candidate = Math.floor(Math.random() * 1000) + 1;
       if(!used.has(candidate)) return candidate;
     }
-    for(let i=1;i<=1000;i++) if(!used.has(i)) return i;
+    for(let i = 1; i <= 1000; i++) if(!used.has(i)) return i;
     return null;
   }
 
+  /* ─────────────────────────────────────────────
+     INLINE STATUS (rendered inside panel)
+  ───────────────────────────────────────────── */
+  function showInlineStatus(el, type, msg){
+    el.className = "inline-status " + type;
+    el.textContent = msg;
+  }
+  function clearInlineStatus(el){
+    el.className = "inline-status";
+    el.textContent = "";
+  }
+
+  /* ─────────────────────────────────────────────
+     DIVISION SUMMARY HTML
+  ───────────────────────────────────────────── */
   function buildDivisionSummary(submissions){
     const byDivision = new Map();
     for(const s of submissions){
-      const div = tidy(s.singles);
+      const div  = tidy(s.singles);
       if(!div) continue;
       const pKey = canonicalPersonKey(s.firstname, s.name);
       if(!pKey) continue;
@@ -528,8 +711,7 @@
     const divisions = Array.from(byDivision.keys()).sort((a,b) => a.localeCompare(b));
 
     const html = divisions.map(div => {
-      const peopleMap = byDivision.get(div);
-      const names = Array.from(peopleMap.values()).sort((a,b) => a.localeCompare(b));
+      const names = Array.from(byDivision.get(div).values()).sort((a,b) => a.localeCompare(b));
       return `
         <div class="divCard">
           <div class="divTop">
@@ -539,52 +721,70 @@
           <ul class="nameList">
             ${names.map(n => `<li class="nameChip">${escapeHtml(n)}</li>`).join("")}
           </ul>
-        </div>
-      `;
+        </div>`;
     }).join("");
 
     const totalUnique = (() => {
       const set = new Set();
       for(const s of submissions){
-        const k = canonicalPersonKey(s.firstname, s.name) + "|" + tidy(s.singles).toLowerCase();
-        set.add(k);
+        set.add(canonicalPersonKey(s.firstname, s.name) + "|" + tidy(s.singles).toLowerCase());
       }
       return set.size;
     })();
 
     return `
-      <div class="titleRow" style="margin-top:14px;">
+      <div class="titleRow" style="margin-top:18px;">
         <h2>Current Signups</h2>
         <div class="pill">Total entries: ${totalUnique}</div>
       </div>
       <div class="summaryGrid">
         ${html || `<div class="notice">No signups yet.</div>`}
+      </div>`;
+  }
+
+  /* ─────────────────────────────────────────────
+     RENDER MODES
+  ───────────────────────────────────────────── */
+  function renderComingSoon(){
+    modePill.textContent = "Coming Soon";
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Status</h2>
+        <div class="pill">Not open yet</div>
       </div>
-    `;
+      <div class="notice">
+        <strong>Singles Consolation sign-ups are coming soon.</strong>
+        <div>Check back after your first-round matches are complete.</div>
+      </div>`;
+  }
+
+  function renderNotActive(){
+    modePill.textContent = "Not Active";
+    mainPanel.innerHTML = `
+      <div class="titleRow">
+        <h2>Status</h2>
+        <div class="pill">Unavailable</div>
+      </div>
+      <div class="notice">
+        <strong>This page is not active right now.</strong>
+      </div>`;
   }
 
   async function renderEntryOpen(){
     modePill.textContent = "Entry Open";
-    clearStatus();
 
     let entryRows = [];
     try{
       entryRows = await parseCSV(ENTRY_CSV);
     }catch(e){
-      showStatus("err", "Could not load the entry list.");
       mainPanel.innerHTML = `
         <div class="titleRow"><h2>Entry</h2><div class="pill">Error</div></div>
-        <div class="notice">Unable to load the entry list CSV.</div>
-      `;
+        <div class="notice">Unable to load the entry list. Please refresh and try again.</div>`;
       return;
     }
 
     let submissions = [];
-    try{
-      submissions = await loadSubmissions();
-    }catch(e){
-      submissions = [];
-    }
+    try{ submissions = await loadSubmissions(); }catch(_){ submissions = []; }
 
     const alreadySignedUp = new Set(
       submissions.map(s => canonicalPersonKey(s.firstname, s.name)).filter(Boolean)
@@ -592,10 +792,10 @@
 
     const players = entryRows
       .map(r => ({
-        name: tidy(r["Name"]),
+        name:      tidy(r["Name"]),
         firstname: tidy(r["Firstname"]),
-        singles: tidy(r["Singles"]),
-        include: upper(r["Include"])
+        singles:   tidy(r["Singles"]),
+        include:   upper(r["Include"])
       }))
       .filter(p => p.include === "Y" && (p.name || p.firstname))
       .sort((a,b) => (a.firstname + " " + a.name).localeCompare(b.firstname + " " + b.name));
@@ -607,139 +807,146 @@
       </div>
 
       <div class="notice">
-        <div><strong>Select your name from the drop down menu and SUBMIT to enter the 2026 Indy Classic consolation draws</strong></div>
+        <strong>Select your name and click Submit to enter the 2026 Indy Classic consolation draws.</strong>
       </div>
 
       <div class="form">
         <div>
           <label for="playerSelect">Your name</label>
           <select id="playerSelect">
-            <option value="">— Select —</option>
+            <option value="">— Select your name —</option>
           </select>
         </div>
 
         <div>
-          <label>Singles</label>
-          <div class="infoBox" id="singlesBox">Select a name to see Singles info</div>
+          <label>Singles Division</label>
+          <div class="infoBox" id="singlesBox">Select your name above to see your Singles division</div>
         </div>
 
         <button class="btn" id="submitBtn" disabled>Submit</button>
+        <div class="inline-status" id="inlineStatus"></div>
       </div>
 
-      <div id="summaryArea"></div>
-    `;
+      <div id="summaryArea"></div>`;
 
-    const select = document.getElementById("playerSelect");
-    const singlesBox = document.getElementById("singlesBox");
-    const submitBtn = document.getElementById("submitBtn");
-    const summaryArea = document.getElementById("summaryArea");
+    const selectEl      = document.getElementById("playerSelect");
+    const singlesBox    = document.getElementById("singlesBox");
+    const submitBtn     = document.getElementById("submitBtn");
+    const inlineStatus  = document.getElementById("inlineStatus");
+    const summaryArea   = document.getElementById("summaryArea");
 
     summaryArea.innerHTML = buildDivisionSummary(submissions);
 
     for(const p of players){
       const label = `${p.firstname} ${p.name}`.trim();
-      const pKey = canonicalPersonKey(p.firstname, p.name);
-
-      const opt = document.createElement("option");
-      opt.value = label;
-      opt.textContent = alreadySignedUp.has(pKey) ? `${label} (Already Signed Up)` : label;
+      const pKey  = canonicalPersonKey(p.firstname, p.name);
+      const opt   = document.createElement("option");
+      opt.value            = label;
       opt.dataset.firstname = p.firstname;
-      opt.dataset.name = p.name;
-      opt.dataset.singles = p.singles;
+      opt.dataset.name     = p.name;
+      opt.dataset.singles  = p.singles;
 
       if(alreadySignedUp.has(pKey)){
-        opt.disabled = true;
+        opt.textContent = `${label} ✓ Already signed up`;
+        opt.disabled    = true;
+      } else {
+        opt.textContent = label;
       }
-      select.appendChild(opt);
+      selectEl.appendChild(opt);
     }
 
-    select.addEventListener("change", () => {
-      clearStatus();
-      const opt = select.selectedOptions[0];
-      const singles = opt?.dataset?.singles || "";
-      if(!select.value){
-        singlesBox.textContent = "Select a name to see Singles info";
+    selectEl.addEventListener("change", () => {
+      clearInlineStatus(inlineStatus);
+      const opt = selectEl.selectedOptions[0];
+      if(!selectEl.value){
+        singlesBox.textContent = "Select your name above to see your Singles division";
         submitBtn.disabled = true;
         return;
       }
-      singlesBox.textContent = singles || "—";
+      singlesBox.textContent = opt?.dataset?.singles || "—";
       submitBtn.disabled = false;
     });
 
     submitBtn.addEventListener("click", async () => {
-      clearStatus();
+      clearInlineStatus(inlineStatus);
 
-      const opt = select.selectedOptions[0];
+      const opt       = selectEl.selectedOptions[0];
       const firstname = opt?.dataset?.firstname || "";
-      const name = opt?.dataset?.name || "";
-      const singles = opt?.dataset?.singles || "";
+      const name      = opt?.dataset?.name      || "";
+      const singles   = opt?.dataset?.singles   || "";
 
       if(!firstname || !name){
-        showStatus("err", "Please select your name.");
+        showInlineStatus(inlineStatus, "err", "Please select your name.");
         return;
       }
-
-      const pKey = canonicalPersonKey(firstname, name);
-
-      try{
-        const latestSubs = await loadSubmissions();
-        const latestSet = new Set(latestSubs.map(s => canonicalPersonKey(s.firstname, s.name)));
-        if(latestSet.has(pKey)){
-          showStatus("err", "You are already signed up.");
-          submitBtn.disabled = true;
-          return;
-        }
-      }catch(_){}
 
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<span class="spinner"></span>Submitting…`;
 
       try{
-        const used = await loadUsedNumbers().catch(() => new Set());
-        const number = pickUniqueNumber(used);
-        if(number == null) throw new Error("All numbers 1–1000 are already used.");
+        // Single fresh fetch — used for both duplicate check and number uniqueness
+        const latestSubs = await loadSubmissions();
+        const latestKeys = new Set(latestSubs.map(s => canonicalPersonKey(s.firstname, s.name)));
+
+        if(latestKeys.has(canonicalPersonKey(firstname, name))){
+          showInlineStatus(inlineStatus, "warn", "You are already signed up for the consolation draw.");
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = "Submit";
+          return;
+        }
+
+        const usedNumbers = new Set(
+          latestSubs.map(s => s.number).filter(n => Number.isFinite(n))
+        );
+        const number = pickUniqueNumber(usedNumbers);
+        if(number == null) throw new Error("Could not assign a unique number. Please contact the tournament director.");
 
         const fd = new FormData();
         fd.append("firstname", firstname);
-        fd.append("name", name);
-        fd.append("singles", singles);
-        fd.append("number", String(number));
+        fd.append("name",      name);
+        fd.append("singles",   singles);
+        fd.append("number",    String(number));
 
-        await fetch(APPS_SCRIPT_WEBAPP_URL, { method:"POST", mode:"no-cors", body: fd });
+        // Note: mode:"no-cors" means server errors are invisible to JS — this is
+        // a limitation of cross-origin Apps Script and cannot be worked around.
+        await fetch(APPS_SCRIPT_WEBAPP_URL, { method: "POST", mode: "no-cors", body: fd });
 
-        showStatus("ok", "Submitted!");
+        showInlineStatus(inlineStatus, "ok", `✓ Submitted! You're entered in the ${singles} draw.`);
 
+        // Refresh summary with a fresh fetch
         try{
-          const latestSubs = await loadSubmissions();
-          summaryArea.innerHTML = buildDivisionSummary(latestSubs);
-          opt.textContent = `${firstname} ${name} (Already Signed Up)`;
-          opt.disabled = true;
-          select.value = "";
-          singlesBox.textContent = "Select a name to see Singles info";
+          const refreshed = await loadSubmissions();
+          summaryArea.innerHTML = buildDivisionSummary(refreshed);
+          // Mark option as already signed up
+          opt.textContent = `${firstname} ${name} ✓ Already signed up`;
+          opt.disabled    = true;
+          selectEl.value  = "";
+          singlesBox.textContent = "Select your name above to see your Singles division";
         }catch(_){}
 
       }catch(e){
-        showStatus("err", e.message || "Submission failed.");
+        showInlineStatus(inlineStatus, "err", e.message || "Submission failed. Please try again.");
       }finally{
         submitBtn.innerHTML = "Submit";
-        submitBtn.disabled = true;
+        submitBtn.disabled  = true;
       }
     });
   }
 
+  /* ─────────────────────────────────────────────
+     BRACKET LOGIC
+  ───────────────────────────────────────────── */
   function getDrawSize(count){
-    if(count <= 0) return 0;
-    if(count <= 2) return 2;
-    if(count <= 4) return 4;
-    if(count <= 8) return 8;
+    if(count <= 0)  return 0;
+    if(count <= 2)  return 2;
+    if(count <= 4)  return 4;
+    if(count <= 8)  return 8;
     if(count <= 16) return 16;
     if(count <= 32) return 32;
     return 32;
   }
 
-  function nextPowerRounds(drawSize){
-    return Math.log2(drawSize);
-  }
+  function nextPowerRounds(drawSize){ return Math.log2(drawSize); }
 
   function generateSeedOrder(size){
     if(size === 1) return [1];
@@ -758,9 +965,7 @@
 
   function round1PairsFromSeedOrder(seedOrder){
     const pairs = [];
-    for(let i = 0; i < seedOrder.length; i += 2){
-      pairs.push([seedOrder[i], seedOrder[i + 1]]);
-    }
+    for(let i = 0; i < seedOrder.length; i += 2) pairs.push([seedOrder[i], seedOrder[i+1]]);
     return pairs;
   }
 
@@ -776,123 +981,99 @@
 
   function buildDivisionPlayers(submissions, division){
     return submissions
-      .filter(s => tidy(s.singles) === tidy(division))
-      .filter(s => (s.firstname || s.name))
+      .filter(s => tidy(s.singles) === tidy(division) && (s.firstname || s.name))
       .sort((a, b) => {
-        const aNum = Number.isFinite(a.number) ? a.number : -Infinity;
-        const bNum = Number.isFinite(b.number) ? b.number : -Infinity;
-        if(bNum !== aNum) return bNum - aNum;
-        const an = `${a.firstname} ${a.name}`.trim().toLowerCase();
-        const bn = `${b.firstname} ${b.name}`.trim().toLowerCase();
-        return an.localeCompare(bn);
+        const an = Number.isFinite(a.number) ? a.number : -Infinity;
+        const bn = Number.isFinite(b.number) ? b.number : -Infinity;
+        if(bn !== an) return bn - an;
+        return `${a.firstname} ${a.name}`.toLowerCase().localeCompare(`${b.firstname} ${b.name}`.toLowerCase());
       })
       .map((p, i) => ({
-        seed: i + 1,
-        firstname: p.firstname,
-        name: p.name,
+        seed:        i + 1,
+        firstname:   p.firstname,
+        name:        p.name,
         displayName: `${p.firstname} ${p.name}`.trim() || "—",
-        singles: p.singles,
-        number: Number.isFinite(p.number) ? p.number : null
+        singles:     p.singles,
+        number:      Number.isFinite(p.number) ? p.number : null
       }));
   }
 
   function determineKnownWinner(playerA, playerB){
     if(playerA && !playerB) return playerA;
     if(!playerA && playerB) return playerB;
-    if(!playerA && !playerB) return null;
     return null;
   }
 
   function buildDrawData(players){
-    const count = players.length;
+    const count    = players.length;
     const drawSize = getDrawSize(count);
     if(!drawSize) return null;
 
-    const seedMap = new Map(players.map(p => [p.seed, p]));
-    const seedOrder = generateSeedOrder(drawSize);
-    const round1SeedPairs = round1PairsFromSeedOrder(seedOrder);
-
-    const rounds = [];
+    const seedMap           = new Map(players.map(p => [p.seed, p]));
+    const seedOrder         = generateSeedOrder(drawSize);
+    const round1SeedPairs   = round1PairsFromSeedOrder(seedOrder);
+    const rounds            = [];
 
     const round1 = round1SeedPairs.map(([seedA, seedB]) => {
       const playerA = seedMap.get(seedA) || null;
       const playerB = seedMap.get(seedB) || null;
-      return {
-        slotA: seedA,
-        slotB: seedB,
-        playerA,
-        playerB,
-        autoWinner: determineKnownWinner(playerA, playerB)
-      };
+      return { slotA: seedA, slotB: seedB, playerA, playerB, autoWinner: determineKnownWinner(playerA, playerB) };
     });
-
     rounds.push(round1);
 
     let prevRound = round1;
-
     while(prevRound.length > 1){
       const nextRound = [];
       for(let i = 0; i < prevRound.length; i += 2){
-        const match1 = prevRound[i];
-        const match2 = prevRound[i + 1];
-
-        const playerA = match1 ? match1.autoWinner || null : null;
-        const playerB = match2 ? match2.autoWinner || null : null;
-
-        nextRound.push({
-          slotA: null,
-          slotB: null,
-          playerA,
-          playerB,
-          autoWinner: determineKnownWinner(playerA, playerB)
-        });
+        const m1 = prevRound[i], m2 = prevRound[i+1];
+        const pA = m1?.autoWinner || null;
+        const pB = m2?.autoWinner || null;
+        nextRound.push({ slotA: null, slotB: null, playerA: pA, playerB: pB, autoWinner: determineKnownWinner(pA, pB) });
       }
       rounds.push(nextRound);
       prevRound = nextRound;
     }
 
-    return {
-      drawSize,
-      rounds,
-      totalRounds: nextPowerRounds(drawSize)
-    };
+    return { drawSize, rounds, totalRounds: nextPowerRounds(drawSize) };
   }
 
   function renderPlayerRow(player, slotSeed, isByeSlot, isAdvanced){
     let rowClass = "";
-    if(isByeSlot) rowClass += " byeRow";
-    if(isAdvanced) rowClass += " advancedRow";
+    if(isByeSlot)   rowClass += " byeRow";
+    if(isAdvanced)  rowClass += " advancedRow";
 
-    let badge = slotSeed != null ? slotSeed : "W";
-    let name = "Winner of prior match";
-    let num = "";
+    const badge = slotSeed != null ? slotSeed : "W";
+    let name, nameClass = "playerName", num = "";
 
     if(isByeSlot){
       name = "BYE";
+      nameClass += " pending";
     }else if(player){
       name = escapeHtml(player.displayName);
-      num = `# ${player.number ?? '—'}`;
+      num  = `#${player.number ?? '—'}`;
+    }else{
+      name = "Winner of prior match";
+      nameClass += " pending";
     }
 
     return `
       <div class="playerRow${rowClass}">
         <div class="playerLeft">
           <div class="seedBadge">${badge}</div>
-          <div class="playerName">${name}</div>
+          <div class="${nameClass}">${name}</div>
         </div>
         <div class="playerNum">${num}</div>
-      </div>
-    `;
+      </div>`;
   }
 
   function renderBracket(rounds, totalRounds){
     return `
+      <div class="scroll-hint">← Scroll to see full bracket →</div>
       <div class="drawWrap">
         <div class="bracket">
           ${rounds.map((round, roundIndex) => {
-            const spacer = roundIndex === 0 ? 0 : ((Math.pow(2, roundIndex) - 1) * 54);
+            const spacer  = roundIndex === 0 ? 0 : ((Math.pow(2, roundIndex) - 1) * 54);
             const between = roundIndex === 0 ? 12 : ((Math.pow(2, roundIndex) * 108) - 96);
-
             return `
               <div class="roundCol">
                 <div class="roundTitle">${getRoundName(roundIndex, totalRounds)}</div>
@@ -902,32 +1083,24 @@
                       const aBye = !match.playerA;
                       const bBye = !match.playerB;
                       return `
-                        <div class="matchCard" data-round="${roundIndex + 1}" data-match="${matchIndex + 1}">
+                        <div class="matchCard" data-round="${roundIndex+1}" data-match="${matchIndex+1}">
                           ${renderPlayerRow(match.playerA, match.slotA, aBye, !!(match.playerA && bBye))}
                           ${renderPlayerRow(match.playerB, match.slotB, bBye, !!(match.playerB && aBye))}
-                        </div>
-                      `;
+                        </div>`;
                     }
-
-                    const aKnown = !!match.playerA;
-                    const bKnown = !!match.playerB;
-                    const aAdvanced = aKnown && !bKnown;
-                    const bAdvanced = bKnown && !aKnown;
-
+                    const aAdv = !!match.playerA && !match.playerB;
+                    const bAdv = !!match.playerB && !match.playerA;
                     return `
-                      <div class="matchCard" data-round="${roundIndex + 1}" data-match="${matchIndex + 1}">
-                        ${renderPlayerRow(match.playerA, null, false, aAdvanced)}
-                        ${renderPlayerRow(match.playerB, null, false, bAdvanced)}
-                      </div>
-                    `;
+                      <div class="matchCard" data-round="${roundIndex+1}" data-match="${matchIndex+1}">
+                        ${renderPlayerRow(match.playerA, null, false, aAdv)}
+                        ${renderPlayerRow(match.playerB, null, false, bAdv)}
+                      </div>`;
                   }).join("")}
                 </div>
-              </div>
-            `;
+              </div>`;
           }).join("")}
         </div>
-      </div>
-    `;
+      </div>`;
   }
 
   function renderSeedList(players){
@@ -935,32 +1108,27 @@
     return `
       <div class="titleRow" style="margin-top:18px;">
         <h2>Seeds</h2>
-        <div class="pill">${players.length} players ranked by Number</div>
+        <div class="pill">${players.length} players · ranked by Number</div>
       </div>
       <div class="seedList">
         ${players.map(p => `
           <div class="seedItem">
-            <div><strong>${p.seed} Seed</strong> — ${escapeHtml(p.displayName)}</div>
-            <div class="pill">Number: ${p.number ?? '—'}</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
+            <div><strong>#${p.seed} Seed</strong> — ${escapeHtml(p.displayName)}</div>
+            <div class="pill">No. ${p.number ?? '—'}</div>
+          </div>`).join("")}
+      </div>`;
   }
 
   async function renderDraws(){
     modePill.textContent = "Draws";
-    clearStatus();
 
     let submissions = [];
     try{
       submissions = await loadSubmissions();
     }catch(e){
-      showStatus("err", "Could not load the submissions CSV.");
       mainPanel.innerHTML = `
         <div class="titleRow"><h2>Draws</h2><div class="pill">Error</div></div>
-        <div class="notice">Unable to load the submissions CSV.</div>
-      `;
+        <div class="notice">Unable to load the submissions. Please refresh and try again.</div>`;
       return;
     }
 
@@ -975,8 +1143,8 @@
       </div>
 
       <div class="notice">
-        <div><strong>Select a Singles division to view the draw.</strong></div>
-        <div>Players are seeded by <strong>Number</strong> within that division, highest number = 1 seed.</div>
+        <strong>Select a Singles division to view the draw.</strong>
+        <div>Players are seeded by their Number within the division — highest number = 1 seed.</div>
       </div>
 
       <div class="drawControls">
@@ -990,33 +1158,31 @@
         <div class="infoBox" id="drawInfoBox">Choose a division to generate the draw</div>
       </div>
 
-      <div id="drawOutput"></div>
-    `;
+      <div id="drawOutput"></div>`;
 
     const drawDivisionSelect = document.getElementById("drawDivisionSelect");
-    const drawInfoBox = document.getElementById("drawInfoBox");
-    const drawOutput = document.getElementById("drawOutput");
+    const drawInfoBox        = document.getElementById("drawInfoBox");
+    const drawOutput         = document.getElementById("drawOutput");
 
     function paintDivision(division){
       if(!division){
         drawInfoBox.textContent = "Choose a division to generate the draw";
-        drawOutput.innerHTML = "";
+        drawOutput.innerHTML    = "";
         return;
       }
 
-      const players = buildDivisionPlayers(submissions, division);
-      const count = players.length;
+      const players  = buildDivisionPlayers(submissions, division);
+      const count    = players.length;
       const drawSize = getDrawSize(count);
 
       if(count === 0){
         drawInfoBox.textContent = `${division}: no players found`;
-        drawOutput.innerHTML = `<div class="emptyDraw">No players were found for this division.</div>`;
+        drawOutput.innerHTML    = `<div class="emptyDraw">No players were found for this division.</div>`;
         return;
       }
-
       if(count > 32){
-        drawInfoBox.textContent = `${division}: too many players for current draw logic`;
-        drawOutput.innerHTML = `<div class="emptyDraw">This division has ${count} players. Current draw logic supports up to 32 players.</div>`;
+        drawInfoBox.textContent = `${division}: ${count} players (exceeds 32-player limit)`;
+        drawOutput.innerHTML    = `<div class="emptyDraw">This division has ${count} players. Current draw logic supports up to 32. Please contact the tournament director.</div>`;
         return;
       }
 
@@ -1038,15 +1204,11 @@
             <div class="metaValue">${drawSize}</div>
           </div>
         </div>
-
         ${renderBracket(drawData.rounds, drawData.totalRounds)}
-        ${renderSeedList(players)}
-      `;
+        ${renderSeedList(players)}`;
     }
 
-    drawDivisionSelect.addEventListener("change", () => {
-      paintDivision(drawDivisionSelect.value);
-    });
+    drawDivisionSelect.addEventListener("change", () => paintDivision(drawDivisionSelect.value));
 
     if(divisions.length === 1){
       drawDivisionSelect.value = divisions[0];
@@ -1054,31 +1216,23 @@
     }
   }
 
+  /* ─────────────────────────────────────────────
+     INIT
+  ───────────────────────────────────────────── */
   async function init(){
-    clearStatus();
-    smallNote.textContent = "Loading…";
-    modePill.textContent = "Checking status…";
-
     try{
       const controlRows = await parseCSV(CONTROL_CSV);
-      const flags = getControlFlags(controlRows);
+      const flags       = getControlFlags(controlRows);
 
-      if(flags["Coming Soon"]){
-        renderComingSoon();
-      }else if(flags["Entry Open"]){
-        await renderEntryOpen();
-      }else if(flags["Draws"]){
-        await renderDraws();
-      }else{
-        renderNotActive();
-      }
-
-      smallNote.textContent = "";
+      if(flags["Coming Soon"])       { renderComingSoon(); }
+      else if(flags["Entry Open"])   { await renderEntryOpen(); }
+      else if(flags["Draws"])        { await renderDraws(); }
+      else                           { renderNotActive(); }
     }catch(e){
       modePill.textContent = "Error";
-      showStatus("err", "Could not load the control CSV.");
-      renderNotActive();
-      smallNote.textContent = "";
+      mainPanel.innerHTML = `
+        <div class="titleRow"><h2>Error</h2></div>
+        <div class="notice">Could not load page data. Please check your connection and refresh.</div>`;
     }
   }
 
