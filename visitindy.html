@@ -3,359 +3,619 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indy Attractions | Indy Classic 2026</title>
+  <title>Around Indy – 2026 Indy Classic</title>
+
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#0f172a;
-      --card:#111c33;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.72);
-      --border:rgba(255,255,255,.12);
-      --sponsorBg:rgba(34,197,94,.12);
-      --sponsorBorder:rgba(34,197,94,.35);
-      --chipBg:rgba(255,255,255,.10);
-      --radius:18px;
-      --max: 980px;
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --glass: rgba(255,255,255,.10);
+      --glassBorder: rgba(255,255,255,.18);
+      --cardBg: rgba(255,255,255,.07);
+      --cardBorder: rgba(255,255,255,.12);
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 20px;
+      --sponsorBg: rgba(34,197,94,.12);
+      --sponsorBorder: rgba(34,197,94,.32);
     }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 20% 0%, #1e2a5a 0%, var(--bg) 55%) fixed;
-      color:var(--text);
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .wrap{ max-width: var(--max); margin: 0 auto; padding: 18px 14px 44px; }
+    html, body { min-height: 100%; }
 
-    /* --- TOP LOGO BANNER --- */
-    .hero{
-      border-radius: 24px;
-      padding: 22px;
+    body {
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(900px 260px at 10% 0%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 60%),
-        radial-gradient(900px 260px at 90% 0%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.06));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 22px 70px rgba(0,0,0,.40);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+        radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      padding: 24px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .blob {
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 999px;
+      filter: blur(45px);
+      opacity: .22;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .blob.b1 { top: -140px; left: -140px; background: rgba(56,189,248,.9); }
+    .blob.b2 { bottom: -180px; right: -140px; background: rgba(168,85,247,.9); }
+
+    /* ── OUTER WRAP ── */
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      padding-bottom: 32px;
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: color .18s ease, background .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back-link:hover {
+      color: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.12);
+    }
+
+    /* ── HEADER CARD ── */
+    .header-card {
+      background: var(--glass);
+      border: 1px solid var(--glassBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 28px 22px 22px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .logo-box {
+      width: min(100%, 240px);
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 14px 30px rgba(0,0,0,.30);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-box img {
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .page-sub {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* ── STATUS / SKELETON ── */
+    .status-wrap {
       margin-bottom: 14px;
     }
 
-    .logoBox{
-      width:min(100%,240px);
-      padding:10px;
-      border-radius:18px;
-      background:rgba(255,255,255,.96);
-      border:1px solid rgba(255,255,255,.35);
-      box-shadow:0 14px 30px rgba(0,0,0,.30);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .logoBox img{
-      width:100%;
-      max-width:220px;
-      height:auto;
-      object-fit:contain;
-      display:block;
-    }
-
-    .pageTitle{
-      text-align:center;
-      margin: 10px 0 0;
-      font-size: 1.55rem;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: .98rem;
-      line-height: 1.35;
-      text-align:center;
-    }
-
-    .status{
-      margin: 16px 0 10px;
+    .status-msg {
       padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.06);
+      border-radius: 14px;
+      background: var(--cardBg);
+      border: 1px solid var(--cardBorder);
       color: var(--muted);
-      font-size: .95rem;
+      font-size: 13.5px;
     }
 
-    .section{
-      margin-top: 16px;
-      border: 1px solid var(--border);
+    .status-msg.err {
+      background: rgba(244,63,94,.12);
+      border-color: rgba(244,63,94,.28);
+      color: rgba(255,210,215,.90);
+    }
+
+    /* Skeleton shimmer */
+    .skeleton {
+      border-radius: 12px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.06) 25%,
+        rgba(255,255,255,.11) 50%,
+        rgba(255,255,255,.06) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skel-section {
+      margin-bottom: 16px;
       border-radius: var(--radius);
-      background: rgba(255,255,255,.06);
-      overflow:hidden;
+      overflow: hidden;
+      border: 1px solid var(--cardBorder);
+    }
+    .skel-header {
+      height: 52px;
+      border-radius: 0;
+    }
+    .skel-body {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .skel-card {
+      height: 72px;
+      border-radius: 12px;
     }
 
-    .sectionHeader{
-      padding: 14px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-    }
-
-    .sectionHeader h2{
-      margin:0;
-      font-size: 1.15rem;
-      letter-spacing:.2px;
-    }
-
-    .count{
-      font-size: .9rem;
-      color: var(--muted);
-      padding: 6px 10px;
+    /* ── RETRY BUTTON ── */
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px 16px;
       border-radius: 999px;
-      background: var(--chipBg);
-      border: 1px solid var(--border);
-      white-space:nowrap;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .retry-btn:hover { background: rgba(255,255,255,.16); }
+
+    /* ── SECTION ── */
+    .section {
+      margin-bottom: 16px;
+      border: 1px solid var(--cardBorder);
+      border-radius: var(--radius);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+      box-shadow: var(--shadow);
     }
 
-    .list{
-      padding: 10px 12px 12px;
-      display:grid;
+    .section-header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--cardBorder);
+      background: rgba(255,255,255,.05);
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .count-pill {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--cardBorder);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    /* ── ATTRACTION GRID ── */
+    .attr-list {
+      padding: 12px;
+      display: grid;
       grid-template-columns: 1fr;
       gap: 10px;
     }
 
-    .card{
-      border: 1px solid var(--border);
+    @media (min-width: 600px) {
+      .attr-list { grid-template-columns: 1fr 1fr; }
+      .skel-body  { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── ATTRACTION CARD ── */
+    .attr-card {
+      border: 1px solid var(--cardBorder);
       border-radius: 14px;
-      background: var(--card);
-      padding: 12px 12px;
-      box-shadow: 0 10px 28px rgba(0,0,0,.22);
+      background: var(--cardBg);
+      padding: 13px 14px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+      transition: background .18s ease, border-color .18s ease;
     }
 
-    .card.sponsor{
+    .attr-card.sponsor {
       border-color: var(--sponsorBorder);
-      background: linear-gradient(0deg, var(--sponsorBg), var(--card));
+      background: linear-gradient(160deg, var(--sponsorBg), var(--cardBg));
     }
 
-    .topRow{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
+    @media (hover:hover) and (pointer:fine) {
+      .attr-card:hover {
+        background: rgba(255,255,255,.10);
+        border-color: rgba(255,255,255,.20);
+      }
+      .attr-card.sponsor:hover {
+        background: linear-gradient(160deg, rgba(34,197,94,.18), rgba(255,255,255,.08));
+        border-color: rgba(34,197,94,.48);
+      }
     }
 
-    .name{
-      margin:0;
+    .attr-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .attr-name {
+      margin: 0;
       font-weight: 800;
-      font-size: 1.05rem;
-      line-height:1.2;
+      font-size: 14.5px;
+      line-height: 1.25;
     }
 
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size: .82rem;
-      padding: 6px 10px;
+    .sponsor-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 9px;
       border-radius: 999px;
       border: 1px solid var(--sponsorBorder);
-      background: rgba(34,197,94,.16);
-      color: rgba(220,255,235,.95);
-      white-space:nowrap;
-      flex: 0 0 auto;
+      background: rgba(34,197,94,.15);
+      color: rgba(210,255,230,.95);
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    .meta{
-      margin-top: 6px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px 14px;
+    .attr-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      font-size: 13px;
       color: var(--muted);
-      font-size: .93rem;
-      line-height:1.35;
+      line-height: 1.35;
     }
 
-    a{ color: #93c5fd; text-decoration: none; }
-    a:hover{ text-decoration: underline; }
-
-    .muted{ color: var(--muted); }
-
-    .visitIndy{
-      margin-top: 26px;
-      padding: 16px;
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.18);
-      text-align:center;
-      font-size: 1rem;
-    }
-
-    .visitIndy a{
+    .attr-meta a {
+      color: #7dd3fc;
+      text-decoration: none;
       font-weight: 600;
-      color: #60a5fa;
+    }
+    .attr-meta a:hover { text-decoration: underline; }
+
+    .attr-meta .map-link {
+      color: #86efac;
     }
 
-    footer{
-      margin-top: 18px;
+    .attr-meta .no-info {
+      color: rgba(255,255,255,.35);
+      font-style: italic;
+    }
+
+    /* ── VISIT INDY CALLOUT ── */
+    .visit-indy {
+      margin-top: 6px;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      background: var(--glass);
+      border: 1px solid var(--glassBorder);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      transition: background .18s ease, border-color .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @media (hover:hover) and (pointer:fine) {
+      .visit-indy:hover {
+        background: rgba(255,255,255,.14);
+        border-color: rgba(255,255,255,.26);
+      }
+    }
+
+    .visit-indy-icon {
+      font-size: 30px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .visit-indy-text {
+      flex: 1;
+    }
+
+    .visit-indy-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 3px;
+      letter-spacing: -0.01em;
+    }
+
+    .visit-indy-sub {
+      font-size: 13px;
       color: var(--muted);
-      font-size: .9rem;
-      text-align:center;
-      padding-top: 10px;
+      line-height: 1.4;
     }
 
-    @media (min-width: 760px){
-      .list{ grid-template-columns: 1fr 1fr; }
+    .visit-indy-arrow {
+      font-size: 20px;
+      color: rgba(255,255,255,.40);
+      flex-shrink: 0;
     }
 
-    @media (max-width: 480px){
-      .logoBox{
-        width:min(100%,200px);
-        padding:8px;
-      }
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 20px;
+      padding-top: 12px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.35);
+      text-align: center;
+    }
 
-      .logoBox img{
-        max-width:184px;
-      }
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      h1 { font-size: 24px; }
+      .logo-box { width: min(100%, 200px); padding: 8px; }
+      .logo-box img { max-width: 184px; }
+      .visit-indy { gap: 12px; }
+      .visit-indy-icon { font-size: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton { animation: none; }
+      .back-link, .attr-card, .visit-indy, .retry-btn { transition: none; }
     }
   </style>
 </head>
 
 <body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+
   <div class="wrap">
 
-    <div class="hero">
-      <div class="logoBox">
-        <img src="profile.jpg.png" alt="Indy Classic Tournament Logo" />
+    <a href="index.html" class="back-link">← Home</a>
+
+    <!-- Header card with logo -->
+    <div class="header-card">
+      <div class="logo-wrap">
+        <div class="logo-box">
+          <img src="profile.jpg.png" alt="2026 Indy Classic Logo" />
+        </div>
+      </div>
+      <h1>Around Indy</h1>
+      <div class="page-sub">2026 Indy Classic &nbsp;·&nbsp; Places to explore in Indianapolis</div>
+    </div>
+
+    <!-- Status / skeleton shown while loading -->
+    <div class="status-wrap" id="statusWrap">
+      <div class="skel-section">
+        <div class="skel-header skeleton"></div>
+        <div class="skel-body">
+          <div class="skel-card skeleton"></div>
+          <div class="skel-card skeleton"></div>
+          <div class="skel-card skeleton"></div>
+          <div class="skel-card skeleton"></div>
+        </div>
+      </div>
+      <div class="skel-section">
+        <div class="skel-header skeleton"></div>
+        <div class="skel-body">
+          <div class="skel-card skeleton"></div>
+          <div class="skel-card skeleton"></div>
+        </div>
       </div>
     </div>
 
-    <h1 class="pageTitle">Indy Attractions</h1>
-    <p class="sub"></p>
-
-    <div id="status" class="status">Loading attractions…</div>
+    <!-- Content injected by JS -->
     <div id="content"></div>
 
-    <div class="visitIndy">
-      <a href="https://www.visitindy.com" target="_blank" rel="noopener noreferrer">
-        Click here to search for events and activities happening in Indy!
-      </a>
-    </div>
+    <!-- Visit Indy callout -->
+    <a class="visit-indy"
+       href="https://www.visitindy.com"
+       target="_blank"
+       rel="noopener noreferrer">
+      <div class="visit-indy-icon">🏙️</div>
+      <div class="visit-indy-text">
+        <div class="visit-indy-title">More to Explore — VisitIndy.com</div>
+        <div class="visit-indy-sub">Search events and activities happening in Indianapolis during your stay</div>
+      </div>
+      <div class="visit-indy-arrow">↗</div>
+    </a>
 
-    <footer>
-      
-    </footer>
-  </div>
+    <footer>© 2026 Indy Classic</footer>
+
+  </div><!-- /wrap -->
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwtmbtFt6Gy3K8RO4hyOb5apbN9sT42_lBhk1ULoVP8JSxntpygBQ5fzAlb-RsQUn4Yi9NzdNh9xpZ/pub?gid=0&single=true&output=csv";
 
     const TYPE_ORDER = [
-      { key: "LGBT Restaurant", title: "LGBT Restaurants" },
-      { key: "LGBT Bar",        title: "LGBT Bars" },
-      { key: "Sights",         title: "Sights" },
-      { key: "Museums/Cultur", title: "Museums" },
-      { key: "Nature",         title: "Nature" }
+      { key: "LGBT Restaurant", title: "🍽️ LGBT Restaurants" },
+      { key: "LGBT Bar",        title: "🍸 LGBT Bars" },
+      { key: "Sights",          title: "📸 Sights" },
+      { key: "Museums/Cultur",  title: "🏛️ Museums" },
+      { key: "Nature",          title: "🌿 Nature" }
     ];
 
-    function parseCSV(text) {
+    /* ── HELPERS ── */
+    function norm(s){ return (s ?? "").toString().trim(); }
+    function isSponsor(val){ return norm(val).toLowerCase() === "yes"; }
+    function sortByName(a, b){ return a.name.localeCompare(b.name, undefined, { sensitivity: "base" }); }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => (
+        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+      ));
+    }
+
+    function safeLink(url){
+      const u = norm(url);
+      if(!u) return "";
+      if(!/^https?:\/\//i.test(u)) return "https://" + u;
+      return u;
+    }
+
+    function mapsLink(address){
+      if(!address) return "";
+      return "https://www.google.com/maps/search/" + encodeURIComponent(address);
+    }
+
+    /* ── STRONG cache-busting fetch ── */
+    async function fetchCSV(url){
+      const bust = url
+        + (url.includes("?") ? "&" : "?")
+        + "t=" + Date.now()
+        + "&r=" + Math.random().toString(36).slice(2);
+
+      const res = await fetch(bust, {
+        cache: "no-store",
+        headers: {
+          "Pragma":        "no-cache",
+          "Cache-Control": "no-cache"
+        }
+      });
+
+      if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
+      return res.text();
+    }
+
+    /* ── CSV PARSER ── */
+    function parseCSV(text){
       const rows = [];
-      let row = [];
-      let cur = "";
-      let inQuotes = false;
+      let row = [], cur = "", inQuotes = false;
 
-      for (let i = 0; i < text.length; i++) {
-        const c = text[i];
-        const n = text[i + 1];
-
-        if (c === '"' ) {
-          if (inQuotes && n === '"') {
-            cur += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if (c === "," && !inQuotes) {
-          row.push(cur);
-          cur = "";
-        } else if ((c === "\n" || c === "\r") && !inQuotes) {
-          if (c === "\r" && n === "\n") i++;
-          row.push(cur);
-          rows.push(row);
-          row = [];
-          cur = "";
+      for(let i = 0; i < text.length; i++){
+        const c = text[i], n = text[i+1];
+        if(c === '"'){
+          if(inQuotes && n === '"'){ cur += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if(c === "," && !inQuotes){
+          row.push(cur); cur = "";
+        } else if((c === "\n" || c === "\r") && !inQuotes){
+          if(c === "\r" && n === "\n") i++;
+          row.push(cur); rows.push(row); row = []; cur = "";
         } else {
           cur += c;
         }
       }
-
-      if (cur.length || row.length) {
-        row.push(cur);
-        rows.push(row);
-      }
+      if(cur.length || row.length){ row.push(cur); rows.push(row); }
       return rows;
     }
 
-    function norm(s){ return (s ?? "").toString().trim(); }
-    function isSponsor(val){ return norm(val).toLowerCase() === "yes"; }
-    function sortByName(a, b){
-      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-    }
-    function safeLink(url){
-      const u = norm(url);
-      if (!u) return "";
-      if (!/^https?:\/\//i.test(u)) return "https://" + u;
-      return u;
-    }
-
-    function render(groups, lastUpdatedText){
+    /* ── RENDER ── */
+    function render(groups){
       const content = document.getElementById("content");
       content.innerHTML = "";
 
       TYPE_ORDER.forEach(t => {
         const items = groups.get(t.key) || [];
-        if (!items.length) return;
+        if(!items.length) return;
 
         const sponsors = items.filter(x => x.sponsor).sort(sortByName);
         const others   = items.filter(x => !x.sponsor).sort(sortByName);
-        const ordered  = sponsors.concat(others);
+        const ordered  = [...sponsors, ...others];
 
         const section = document.createElement("section");
         section.className = "section";
 
+        // Section header
         const header = document.createElement("div");
-        header.className = "sectionHeader";
+        header.className = "section-header";
         header.innerHTML = `
           <h2>${t.title}</h2>
-          <div class="count">${items.length} place${items.length === 1 ? "" : "s"}</div>
+          <div class="count-pill">${items.length} place${items.length === 1 ? "" : "s"}</div>
         `;
 
+        // Card grid
         const list = document.createElement("div");
-        list.className = "list";
+        list.className = "attr-list";
 
         ordered.forEach(x => {
           const card = document.createElement("div");
-          card.className = "card" + (x.sponsor ? " sponsor" : "");
+          card.className = "attr-card" + (x.sponsor ? " sponsor" : "");
 
-          const web = safeLink(x.web);
+          const web     = safeLink(x.web);
+          const mapUrl  = mapsLink(x.address);
+
           const webHtml = web
-            ? `<span><a href="${web}" target="_blank" rel="noopener noreferrer">Website</a></span>`
-            : `<span class="muted">No website listed</span>`;
+            ? `<a href="${escapeHtml(web)}" target="_blank" rel="noopener noreferrer">Website ↗</a>`
+            : `<span class="no-info">No website listed</span>`;
 
-          const addr = x.address ? `<span>${x.address}</span>` : `<span class="muted">Address not listed</span>`;
+          const addrHtml = x.address
+            ? `<a class="map-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">📍 ${escapeHtml(x.address)} ↗</a>`
+            : `<span class="no-info">Address not listed</span>`;
 
           card.innerHTML = `
-            <div class="topRow">
-              <p class="name">${x.name || "Unnamed"}</p>
-              ${x.sponsor ? `<span class="chip">🏆 Indy Classic Sponsor!</span>` : ``}
+            <div class="attr-top">
+              <p class="attr-name">${escapeHtml(x.name || "Unnamed")}</p>
+              ${x.sponsor ? `<span class="sponsor-chip">🏆 Sponsor</span>` : ""}
             </div>
-            <div class="meta">
-              ${addr}
+            <div class="attr-meta">
+              ${addrHtml}
               ${webHtml}
             </div>
           `;
@@ -367,63 +627,83 @@
         section.appendChild(list);
         content.appendChild(section);
       });
-
-      document.getElementById("status").textContent = lastUpdatedText;
     }
 
+    /* ── SHOW ERROR ── */
+    function showError(msg){
+      const wrap = document.getElementById("statusWrap");
+      wrap.innerHTML = `
+        <div class="status-msg err">
+          ${escapeHtml(msg)}
+          <br>
+          <button class="retry-btn" onclick="load()">↻ Try Again</button>
+        </div>
+      `;
+    }
+
+    /* ── LOAD ── */
     async function load(){
-      const status = document.getElementById("status");
+      // Reset to skeleton on retry
+      const statusWrap = document.getElementById("statusWrap");
+      statusWrap.innerHTML = `
+        <div class="skel-section">
+          <div class="skel-header skeleton"></div>
+          <div class="skel-body">
+            <div class="skel-card skeleton"></div>
+            <div class="skel-card skeleton"></div>
+            <div class="skel-card skeleton"></div>
+            <div class="skel-card skeleton"></div>
+          </div>
+        </div>
+        <div class="skel-section">
+          <div class="skel-header skeleton"></div>
+          <div class="skel-body">
+            <div class="skel-card skeleton"></div>
+            <div class="skel-card skeleton"></div>
+          </div>
+        </div>
+      `;
+      document.getElementById("content").innerHTML = "";
+
       try{
-        status.textContent = "Loading attractions…";
-
-        const res = await fetch(CSV_URL + "&_ts=" + Date.now(), { cache: "no-store" });
-        if (!res.ok) throw new Error("CSV fetch failed: " + res.status);
-
-        const text = await res.text();
+        const text = await fetchCSV(CSV_URL);
         const rows = parseCSV(text);
-        if (rows.length < 2) throw new Error("CSV appears empty.");
+        if(rows.length < 2) throw new Error("The attractions list appears to be empty right now.");
 
         const headers = rows[0].map(h => norm(h));
-        const idx = (name) => headers.findIndex(h => h.toLowerCase() === name.toLowerCase());
+        const idx = name => headers.findIndex(h => h.toLowerCase() === name.toLowerCase());
 
-        const iType    = idx("Type");
-        const iName    = idx("Name");
-        const iAddress = idx("Address");
-        const iSponsor = idx("Sponsor");
-        const iWeb     = idx("Web");
+        const iType = idx("Type"), iName = idx("Name"), iAddress = idx("Address"),
+              iSponsor = idx("Sponsor"), iWeb = idx("Web");
 
-        if ([iType,iName,iAddress,iSponsor,iWeb].some(i => i === -1)) {
-          throw new Error("CSV headers not found. Expected: Type, Name, Address, Sponsor, Web");
+        if([iType, iName, iAddress, iSponsor, iWeb].some(i => i === -1)){
+          throw new Error("Spreadsheet format has changed. Please contact the tournament director.");
         }
 
         const groups = new Map();
         TYPE_ORDER.forEach(t => groups.set(t.key, []));
 
-        for (let r = 1; r < rows.length; r++){
+        for(let r = 1; r < rows.length; r++){
           const row = rows[r] || [];
           const type = norm(row[iType]);
-          if (!type) continue;
-
+          if(!type) continue;
           const item = {
             type,
-            name: norm(row[iName]),
+            name:    norm(row[iName]),
             address: norm(row[iAddress]),
             sponsor: isSponsor(row[iSponsor]),
-            web: norm(row[iWeb])
+            web:     norm(row[iWeb])
           };
-
-          if (groups.has(type)) {
-            groups.get(type).push(item);
-          }
+          if(groups.has(type)) groups.get(type).push(item);
         }
 
-        const now = new Date();
-        const lastUpdatedText = ``;
-        render(groups, lastUpdatedText);
+        // Hide skeleton, render content
+        statusWrap.innerHTML = "";
+        render(groups);
 
-      } catch (e){
+      }catch(e){
         console.error(e);
-        status.textContent = "Could not load attractions. Please try again later.";
+        showError("Could not load attractions. Please check your connection and try again.");
       }
     }
 
