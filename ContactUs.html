@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact Us – Indy Classic 2026</title>
+  <title>Contact Us – 2026 Indy Classic</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -20,21 +23,24 @@
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; }
+
+    html, body { min-height: 100%; }
 
     body{
-      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
       background:
         radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
         radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
       padding: 24px;
-      overflow:hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .blob {
@@ -50,9 +56,42 @@
     .blob.b1 { top: -140px; left: -140px; background: rgba(56,189,248,.9); }
     .blob.b2 { bottom: -180px; right: -140px; background: rgba(168,85,247,.9); }
 
-    .card{
+    /* ── OUTER WRAPPER ── */
+    .outer {
       width: min(650px, 100%);
-      padding: 40px 30px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: color .18s ease, background .18s ease;
+      -webkit-tap-highlight-color: transparent;
+      align-self: flex-start;
+    }
+    .back-link:hover {
+      color: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.12);
+    }
+
+    /* ── MAIN CARD ── */
+    .card {
+      width: 100%;
+      padding: 40px 30px 32px;
       border-radius: var(--radius);
       background: var(--glass);
       border: 1px solid var(--glassBorder);
@@ -61,98 +100,184 @@
       -webkit-backdrop-filter: blur(16px);
       position: relative;
       z-index: 1;
-      text-align:center;
+      text-align: center;
     }
 
-    .logo-wrap{
-      display:flex;
-      justify-content:center;
+    /* ── LOGO ── */
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
       margin-bottom: 20px;
     }
 
-    .logo-box{
+    .logo-box {
       width: min(100%, 240px);
       padding: 10px;
       border-radius: 18px;
       background: rgba(255,255,255,.96);
       border: 1px solid rgba(255,255,255,.35);
       box-shadow: 0 14px 30px rgba(0,0,0,.30);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .logo{
+    .logo {
       width: 100%;
       max-width: 220px;
       height: auto;
-      display:block;
+      display: block;
       object-fit: contain;
-      border-radius: 0;
-      border: 0;
-      box-shadow: none;
-      background: transparent;
     }
 
-    h1{
+    /* ── HEADINGS ── */
+    h1 {
       font-size: 30px;
       font-weight: 800;
-      margin-bottom: 18px;
+      margin-bottom: 6px;
       letter-spacing: -0.02em;
     }
 
-    .contact-info{
-      font-size: 16px;
-      margin-bottom: 26px;
-      line-height: 1.6;
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
     }
 
-    .contact-info a{
-      color: #38bdf8;
+    /* ── CONTACT TILES ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .contact-tile {
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       text-decoration: none;
-      font-weight: 600;
+      transition: background .18s ease, border-color .18s ease;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .contact-info a:hover{
-      text-decoration: underline;
-    }
-
-    .committee{
-      margin-top: 12px;
-      text-align:left;
-      font-size: 15px;
-      line-height: 1.6;
-    }
-
-    .committee-title{
-      font-weight: 700;
-      margin-bottom: 10px;
-      text-align:center;
-      font-size: 16px;
-    }
-
-    .committee p{
-      margin-bottom: 6px;
-    }
-
-    .thanks{
-      margin-top: 22px;
-      font-weight: 700;
-      text-align:center;
-      letter-spacing: 0.03em;
-    }
-
-    @media (max-width: 480px){
-      .card{ padding: 32px 22px; }
-      .logo-box{
-        width: min(100%, 200px);
-        padding: 8px;
+    @media (hover:hover) and (pointer:fine) {
+      .contact-tile:hover {
+        background: rgba(255,255,255,.13);
+        border-color: rgba(255,255,255,.24);
       }
-      .logo{
-        max-width: 184px;
-      }
-      h1{ font-size: 24px; }
-      .committee{ font-size: 14px; }
+    }
+
+    .contact-tile-label {
+      font-size: 11.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.50);
+      font-weight: 700;
+    }
+
+    .contact-tile-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      line-height: 1.3;
+      word-break: break-all;
+    }
+
+    .contact-tile-note {
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      margin-top: 2px;
+    }
+
+    /* ── COMMITTEE SECTION ── */
+    .committee-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.50);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .committee-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    .member-tile {
+      border-radius: 14px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 12px 14px;
+    }
+
+    .member-role {
+      font-size: 11px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .member-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,.92);
+      line-height: 1.35;
+    }
+
+    /* ── THANKS NOTE ── */
+    .thanks-note {
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(34,197,94,.10);
+      border: 1px solid rgba(34,197,94,.22);
+      color: rgba(187,247,208,.88);
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 16px;
+      padding: 14px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.35);
+      text-align: center;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 520px) {
+      .contact-grid    { grid-template-columns: 1fr; }
+      .committee-grid  { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      body  { padding: 16px; }
+      .card { padding: 28px 20px 26px; }
+      .logo-box { width: min(100%, 200px); padding: 8px; }
+      .logo { max-width: 184px; }
+      h1 { font-size: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .back-link, .contact-tile { transition: none; }
     }
   </style>
 </head>
@@ -161,41 +286,84 @@
   <div class="blob b1"></div>
   <div class="blob b2"></div>
 
-  <div class="card">
-    <div class="logo-wrap">
-      <div class="logo-box">
-        <img src="profile.jpg.png" alt="Indy Classic Logo" class="logo">
+  <div class="outer">
+
+    <a href="index.html" class="back-link">← Home</a>
+
+    <div class="card">
+
+      <div class="logo-wrap">
+        <div class="logo-box">
+          <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="logo">
+        </div>
       </div>
-    </div>
 
-    <h1>Contact Us</h1>
+      <h1>Contact Us</h1>
+      <div class="subtitle">2026 Indy Classic &nbsp;·&nbsp; We'd love to hear from you</div>
 
-    <div class="contact-info">
-      📧 Email:
-      <a href="mailto:indytennisclassic@gmail.com">
-        indytennisclassic@gmail.com
-      </a>
-      <br>
-      📱 Phone:
-      <a href="sms:17085425972">
-        (708) 542-5972
-      </a> (Please text)
-    </div>
+      <!-- Contact tiles -->
+      <div class="contact-grid">
 
-    <div class="committee">
+        <a class="contact-tile" href="mailto:indytennisclassic@gmail.com">
+          <div class="contact-tile-label">📧 Email</div>
+          <div class="contact-tile-value">indytennisclassic@gmail.com</div>
+        </a>
+
+        <a class="contact-tile" href="tel:17085425972">
+          <div class="contact-tile-label">📱 Phone</div>
+          <div class="contact-tile-value">(708) 542-5972</div>
+          <div class="contact-tile-note">Please text, don't call</div>
+        </a>
+
+      </div>
+
+      <!-- Committee -->
       <div class="committee-title">Tournament Committee</div>
 
-      <p><strong>Tournament Director:</strong> Dan Fox</p>
-      <p><strong>Entertainment Chair:</strong> Brady Wagenknecht</p>
-      <p><strong>Marketing and Sponsorship Guru:</strong> Mark Phillips</p>
-      <p><strong>Catering Coordinator:</strong> Haley Bougher</p>
+      <div class="committee-grid">
 
-      <div class="thanks">
-        AND MANY MORE! THANK YOU ALL!
+        <div class="member-tile">
+          <div class="member-role">Tournament Director</div>
+          <div class="member-name">Dan Fox</div>
+        </div>
+
+        <div class="member-tile">
+          <div class="member-role">Entertainment Chair</div>
+          <div class="member-name">Brady Wagenknecht</div>
+        </div>
+
+        <div class="member-tile">
+          <div class="member-role">Marketing &amp; Sponsorship</div>
+          <div class="member-name">Mark Phillips</div>
+        </div>
+
+        <div class="member-tile">
+          <div class="member-role">Catering Coordinator</div>
+          <div class="member-name">Haley Bougher</div>
+        </div>
+
+        <div class="member-tile">
+          <div class="member-role">Brewmaster General</div>
+          <div class="member-name">Sherwin Bocade</div>
+        </div>
+
+        <div class="member-tile">
+          <div class="member-role">Masters of Miscellany</div>
+          <div class="member-name">Paul Warney &amp; Garth Brazelton</div>
+        </div>
+
       </div>
-    </div>
 
-  </div>
+      <!-- Thanks -->
+      <div class="thanks-note">
+        🎾 And many more — thank you all!
+      </div>
+
+    </div><!-- /card -->
+
+    <footer>© 2026 Indy Classic</footer>
+
+  </div><!-- /outer -->
 
 </body>
 </html>
