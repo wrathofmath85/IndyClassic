@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2026 Indy Classic</title>
 
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -17,6 +20,8 @@
       --glassBorder: rgba(255,255,255,.18);
       --shadow: 0 18px 50px rgba(0,0,0,.35);
       --radius: 20px;
+      --accent: #38bdf8;
+      --accentGlow: rgba(56,189,248,.25);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -79,7 +84,6 @@
       margin-bottom: 18px;
     }
 
-    /* Updated for full logo display */
     .logo-box{
       width: min(100%, 470px);
       padding: 14px;
@@ -108,37 +112,60 @@
       font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 14px;
+      margin-bottom: 6px;
       line-height: 1.15;
     }
 
     .subtitle{
       font-size: 14px;
       color: var(--muted);
-      margin-bottom: 18px;
+      margin-bottom: 22px;
+    }
+
+    /* ── SECTION DIVIDERS ── */
+    .links-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.40);
+      text-align: left;
+      padding: 10px 4px 4px;
+      margin-top: 4px;
+    }
+
+    .section-label:first-child {
+      padding-top: 0;
     }
 
     .links{
       display:flex;
       flex-direction:column;
-      gap: 12px;
-      margin-top: 6px;
+      gap: 8px;
     }
 
+    /* ── BASE BUTTON ── */
     .link-btn{
       text-decoration:none;
       color: var(--text);
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
       border-radius: 14px;
-      padding: 14px;
-      font-weight: 650;
+      padding: 14px 16px;
+      font-weight: 700;
+      font-size: 14px;
       display:flex;
       align-items:center;
       justify-content:center;
       min-height: 48px;
       transition: transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      box-shadow: 0 6px 18px rgba(0,0,0,.18);
       -webkit-tap-highlight-color: transparent;
       text-align: center;
       word-break: break-word;
@@ -146,10 +173,10 @@
 
     @media (hover:hover) and (pointer:fine) {
       .link-btn:hover{
-        transform: translateY(-3px);
-        background: rgba(255,255,255,.18);
-        border-color: rgba(255,255,255,.28);
-        box-shadow: 0 14px 34px rgba(0,0,0,.25);
+        transform: translateY(-2px);
+        background: rgba(255,255,255,.16);
+        border-color: rgba(255,255,255,.26);
+        box-shadow: 0 12px 28px rgba(0,0,0,.22);
       }
     }
 
@@ -157,9 +184,45 @@
       transform: scale(.99);
     }
 
+    /* ── CTA BUTTONS (Register / Payment) ── */
+    .link-btn.cta-primary {
+      background: linear-gradient(135deg, rgba(56,189,248,.28), rgba(99,102,241,.28));
+      border-color: rgba(56,189,248,.45);
+      color: #e0f4ff;
+      box-shadow: 0 8px 24px rgba(56,189,248,.15), 0 6px 18px rgba(0,0,0,.20);
+      font-weight: 800;
+    }
+
+    @media (hover:hover) and (pointer:fine) {
+      .link-btn.cta-primary:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, rgba(56,189,248,.38), rgba(99,102,241,.38));
+        border-color: rgba(56,189,248,.65);
+        box-shadow: 0 12px 32px rgba(56,189,248,.25), 0 8px 24px rgba(0,0,0,.22);
+      }
+    }
+
+    /* ── MUTED BUTTON (Privacy/Legal) ── */
+    .link-btn.muted-btn {
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.10);
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    @media (hover:hover) and (pointer:fine) {
+      .link-btn.muted-btn:hover {
+        color: rgba(255,255,255,.80);
+        background: rgba(255,255,255,.09);
+        border-color: rgba(255,255,255,.18);
+      }
+    }
+
+    /* ── SPONSORS ── */
     .sponsors{
-      margin-top: 18px;
-      padding-top: 14px;
+      margin-top: 28px;
+      padding-top: 18px;
       border-top: 1px solid rgba(255,255,255,.14);
     }
 
@@ -167,7 +230,7 @@
       font-size: 12px;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.65);
+      color: rgba(255,255,255,.55);
       margin-bottom: 14px;
     }
 
@@ -257,170 +320,86 @@
       );
     }
 
-    .sponsor.tier1 img{
-      max-height: 180px;
-    }
+    .sponsor.tier1 img{ max-height: 180px; }
 
     .sponsor.tier2{
       width: 250px;
       min-height: 120px;
       padding: 18px;
     }
-
-    .sponsor.tier2 img{
-      max-height: 78px;
-    }
+    .sponsor.tier2 img{ max-height: 78px; }
 
     .sponsor.tier3{
       width: 185px;
       min-height: 92px;
       padding: 14px;
     }
-
-    .sponsor.tier3 img{
-      max-height: 58px;
-    }
+    .sponsor.tier3 img{ max-height: 58px; }
 
     .sponsor.tier4{
       width: 145px;
       min-height: 74px;
       padding: 12px;
     }
-
-    .sponsor.tier4 img{
-      max-height: 42px;
-    }
+    .sponsor.tier4 img{ max-height: 42px; }
 
     footer{
-      margin-top: 16px;
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
       font-size: 12.5px;
-      color: rgba(255,255,255,.65);
+      color: rgba(255,255,255,.40);
     }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 520px){
-      .logo-box{
-        padding: 12px;
-        border-radius: 20px;
-      }
+      .logo-box{ padding: 12px; border-radius: 20px; }
+      .profile-img{ max-width: 100%; }
+      .sponsor-tier{ gap: 12px; }
 
-      .profile-img{
-        max-width: 100%;
-      }
+      .sponsor.tier1{ width: 100%; min-height: 170px; padding: 22px; }
+      .sponsor.tier1 img{ max-height: 115px; }
 
-      .sponsor-tier{
-        gap: 12px;
-      }
+      .sponsor.tier2{ width: calc(50% - 6px); min-width: 140px; min-height: 106px; }
+      .sponsor.tier2 img{ max-height: 68px; }
 
-      .sponsor.tier1{
-        width: 100%;
-        min-height: 170px;
-        padding: 22px;
-      }
-
-      .sponsor.tier1 img{
-        max-height: 115px;
-      }
-
-      .sponsor.tier2{
-        width: calc(50% - 6px);
-        min-width: 140px;
-        min-height: 106px;
-      }
-
-      .sponsor.tier2 img{
-        max-height: 68px;
-      }
-
-      .sponsor.tier3{
-        width: calc(50% - 6px);
-        min-width: 130px;
-      }
-
-      .sponsor.tier4{
-        width: calc(33.333% - 8px);
-        min-width: 96px;
-      }
+      .sponsor.tier3{ width: calc(50% - 6px); min-width: 130px; }
+      .sponsor.tier4{ width: calc(33.333% - 8px); min-width: 96px; }
     }
 
     @media (max-width: 420px){
       body{ padding: 18px; }
       .card{ padding: 22px 16px; border-radius: 18px; }
-      h1{ font-size: 24px; margin-bottom: 10px; }
-      .subtitle{ font-size: 13px; margin-bottom: 16px; }
-      .links{ gap: 10px; }
+      h1{ font-size: 24px; margin-bottom: 6px; }
+      .subtitle{ font-size: 13px; margin-bottom: 18px; }
+      .links{ gap: 8px; }
       .link-btn{ padding: 13px; border-radius: 13px; }
+      .logo-box{ padding: 10px; border-radius: 18px; }
+      .sponsor-tier{ gap: 10px; }
 
-      .logo-box{
-        padding: 10px;
-        border-radius: 18px;
-      }
+      .sponsor.tier1{ min-height: 150px; padding: 18px; }
+      .sponsor.tier1 img{ max-height: 96px; }
 
-      .sponsor-tier{
-        gap: 10px;
-      }
+      .sponsor.tier2{ width: 100%; min-height: 96px; padding: 16px; }
+      .sponsor.tier2 img{ max-height: 62px; }
 
-      .sponsor.tier1{
-        min-height: 150px;
-        padding: 18px;
-      }
+      .sponsor.tier3{ width: calc(50% - 5px); min-height: 82px; padding: 12px; }
+      .sponsor.tier3 img{ max-height: 50px; }
 
-      .sponsor.tier1 img{
-        max-height: 96px;
-      }
-
-      .sponsor.tier2{
-        width: 100%;
-        min-height: 96px;
-        padding: 16px;
-      }
-
-      .sponsor.tier2 img{
-        max-height: 62px;
-      }
-
-      .sponsor.tier3{
-        width: calc(50% - 5px);
-        min-height: 82px;
-        padding: 12px;
-      }
-
-      .sponsor.tier3 img{
-        max-height: 50px;
-      }
-
-      .sponsor.tier4{
-        width: calc(50% - 5px);
-        min-height: 68px;
-        padding: 10px;
-      }
-
-      .sponsor.tier4 img{
-        max-height: 38px;
-      }
+      .sponsor.tier4{ width: calc(50% - 5px); min-height: 68px; padding: 10px; }
+      .sponsor.tier4 img{ max-height: 38px; }
     }
 
     @media (min-width: 900px){
       .card{ padding: 30px 28px; }
       h1{ font-size: 30px; }
-      .logo-box{
-        width: min(100%, 500px);
-      }
-      .profile-img{
-        max-width: 470px;
-      }
+      .logo-box{ width: min(100%, 500px); }
+      .profile-img{ max-width: 470px; }
     }
 
     @media (prefers-reduced-motion: reduce){
-      .link-btn,
-      .sponsor,
-      .sponsor img{
-        transition: none;
-      }
-
-      .link-btn:active,
-      .sponsor:active{
-        transform:none;
-      }
+      .link-btn, .sponsor, .sponsor img{ transition: none; }
+      .link-btn:active, .sponsor:active{ transform:none; }
     }
   </style>
 </head>
@@ -430,66 +409,81 @@
 
   <div class="container">
     <div class="card">
+
       <div class="profile-wrap">
         <div class="logo-box">
           <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="profile-img">
         </div>
       </div>
 
-      <h1></h1>
-      <div class="subtitle"></div>
+      <div class="subtitle">May 28–31, 2026 &bull; Indianapolis, IN</div>
 
-      <div class="links">
-        <a href="https://glta.tournamentsoftware.com/tournament/0CAB8D49-7782-4492-89AD-12582D67ED9E"
-           class="link-btn"
-           target="_blank"
-           rel="noopener noreferrer">
-           Register ↗
-        </a>
+      <div class="links-section">
 
-        <a href="https://www.zeffy.com/en-US/ticketing/indytennis-tournament--2026"
-           class="link-btn"
-           target="_blank"
-           rel="noopener noreferrer">
-           Payment ↗
-        </a>
+        <!-- ACTION -->
+        <div class="section-label">Register &amp; Pay</div>
+        <div class="links">
+          <a href="https://glta.tournamentsoftware.com/tournament/0CAB8D49-7782-4492-89AD-12582D67ED9E"
+             class="link-btn cta-primary"
+             target="_blank" rel="noopener noreferrer">
+            Register ↗
+          </a>
+          <a href="https://www.zeffy.com/en-US/ticketing/indytennis-tournament--2026"
+             class="link-btn cta-primary"
+             target="_blank" rel="noopener noreferrer">
+            Payment ↗
+          </a>
+        </div>
 
-        <a href="ContactUs.html" class="link-btn">Contact Us</a>
-        <a href="Schedule.html" class="link-btn">Schedule</a>
-        <a href="tshirts.html" class="link-btn">T-Shirts</a>
-        <a href="Welcome.html" class="link-btn">Welcome Party Info</a>
-        <a href="MatchDisplay.html" class="link-btn">Court Assignments</a>
-        <a href="Banquet.html" class="link-btn">Banquet Info</a>
-        <a href="holdhorse.html" class="link-btn">Singles Consolation</a>
-        <a href="holdhorse.html" class="link-btn">Doubles Consolation</a>
-        <a href="hotel.html" class="link-btn">Hotel Info</a>
-        <a href="visitindy.html" class="link-btn">Around Indy</a>
-        <a href="holdhorse.html" class="link-btn">Tournament Financials</a>
-        <a href="Privacy.html" class="link-btn">Texting Privacy and Terms</a>
+        <!-- TOURNAMENT INFO -->
+        <div class="section-label">Tournament</div>
+        <div class="links">
+          <a href="Schedule.html" class="link-btn">Schedule</a>
+          <a href="MatchDisplay.html" class="link-btn">Court Assignments</a>
+          <a href="tshirts.html" class="link-btn">T-Shirts</a>
+          <a href="holdhorse.html" class="link-btn">Singles Consolation</a>
+          <a href="holdhorse.html" class="link-btn">Doubles Consolation</a>
+        </div>
 
-        <a href="https://indyracquet.com/"
-           class="link-btn"
-           target="_blank"
-           rel="noopener noreferrer">
-           Indianapolis Racquet Club ↗
-        </a>
+        <!-- EVENTS -->
+        <div class="section-label">Events</div>
+        <div class="links">
+          <a href="Welcome.html" class="link-btn">Welcome Party Info</a>
+          <a href="Banquet.html" class="link-btn">Banquet Info</a>
+        </div>
 
-        <a href="https://thfgi.org/"
-           class="link-btn"
-           target="_blank"
-           rel="noopener noreferrer">
-           Our Charity ↗
-        </a>
-      </div>
+        <!-- TRAVEL -->
+        <div class="section-label">Travel &amp; Stay</div>
+        <div class="links">
+          <a href="hotel.html" class="link-btn">Hotel Info</a>
+          <a href="visitindy.html" class="link-btn">Around Indy</a>
+        </div>
 
+        <!-- MORE -->
+        <div class="section-label">More</div>
+        <div class="links">
+          <a href="ContactUs.html" class="link-btn">Contact Us</a>
+          <a href="holdhorse.html" class="link-btn">Tournament Financials</a>
+          <a href="https://indyracquet.com/"
+             class="link-btn" target="_blank" rel="noopener noreferrer">
+            Indianapolis Racquet Club ↗
+          </a>
+          <a href="https://thfgi.org/"
+             class="link-btn" target="_blank" rel="noopener noreferrer">
+            Our Charity ↗
+          </a>
+          <a href="Privacy.html" class="link-btn muted-btn">Texting Privacy &amp; Terms</a>
+        </div>
+
+      </div><!-- /links-section -->
+
+      <!-- SPONSORS -->
       <div class="sponsors">
         <div class="sponsors-title">Sponsors</div>
 
         <div class="sponsor-tier">
           <div class="sponsor tier1">
-            <img src="tier1sponsor01.jpg"
-                 alt="Sponsor"
-                 loading="lazy"
+            <img src="tier1sponsor01.jpg" alt="Title Sponsor" loading="lazy"
                  onerror="this.closest('.sponsor').style.display='none'">
           </div>
         </div>
@@ -535,6 +529,7 @@
       </div>
 
       <footer>© 2026 Indy Classic</footer>
+
     </div>
   </div>
 </body>
