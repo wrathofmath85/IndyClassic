@@ -3,216 +3,360 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Banquet Info – Indy Classic 2026</title>
+<title>Banquet – 2026 Indy Classic</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<!-- Favicon: tennis ball emoji -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root{
---bg1:#0f172a;
---bg2:#1e293b;
---text: rgba(255,255,255,.92);
---muted: rgba(255,255,255,.70);
---glass: rgba(255,255,255,.10);
---glassBorder: rgba(255,255,255,.18);
---shadow: 0 18px 50px rgba(0,0,0,.35);
---radius: 22px;
+  --bg1:#0f172a;
+  --bg2:#1e293b;
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.70);
+  --glass: rgba(255,255,255,.10);
+  --glassBorder: rgba(255,255,255,.18);
+  --shadow: 0 18px 50px rgba(0,0,0,.35);
+  --radius: 22px;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;}
+* { margin:0; padding:0; box-sizing:border-box; }
 
-html,body{height:auto;min-height:100%;}
+html, body { height: auto; min-height: 100%; }
 
 body{
-font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-color:var(--text);
-background:
-radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
-radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
-linear-gradient(135deg,var(--bg1),var(--bg2));
-min-height:100vh;
-display:flex;
-align-items:flex-start;
-justify-content:center;
-padding:24px;
-overflow-x:hidden;
-overflow-y:auto;
--webkit-overflow-scrolling:touch;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
+    radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
+    linear-gradient(135deg, var(--bg1), var(--bg2));
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.blob{
-position:fixed;
-width:420px;
-height:420px;
-border-radius:999px;
-filter:blur(45px);
-opacity:.22;
-z-index:0;
-pointer-events:none;
+.blob {
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  border-radius: 999px;
+  filter: blur(45px);
+  opacity: .22;
+  z-index: 0;
+  pointer-events: none;
+}
+.blob.b1 { top: -140px; left: -140px; background: rgba(56,189,248,.9); }
+.blob.b2 { bottom: -180px; right: -140px; background: rgba(168,85,247,.9); }
+
+/* ── OUTER WRAPPER ── */
+.outer {
+  width: min(720px, 100%);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.blob.b1{top:-140px;left:-140px;background:rgba(56,189,248,.9);}
-.blob.b2{bottom:-180px;right:-140px;background:rgba(168,85,247,.9);}
-
-.card{
-width:min(720px,100%);
-padding:40px 30px 0 30px;
-border-radius:var(--radius);
-background:var(--glass);
-border:1px solid var(--glassBorder);
-box-shadow:var(--shadow);
-backdrop-filter:blur(16px);
--webkit-backdrop-filter:blur(16px);
-position:relative;
-z-index:1;
-text-align:center;
-overflow:hidden;
+/* ── BACK LINK ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,.55);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 14px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  transition: color .18s ease, background .18s ease;
+  -webkit-tap-highlight-color: transparent;
+  align-self: flex-start;
+}
+.back-link:hover {
+  color: rgba(255,255,255,.90);
+  background: rgba(255,255,255,.12);
 }
 
-.logo-wrap{
-display:flex;
-justify-content:center;
-margin-bottom:18px;
+/* ── MAIN CARD ── */
+.card {
+  width: 100%;
+  padding: 40px 30px 0 30px;
+  border-radius: var(--radius);
+  background: var(--glass);
+  border: 1px solid var(--glassBorder);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  overflow: hidden;
+  /* Fallback bottom padding if image fails to load */
+  padding-bottom: 0;
 }
 
-.logo-box{
-width:min(100%,240px);
-padding:10px;
-border-radius:18px;
-background:rgba(255,255,255,.96);
-border:1px solid rgba(255,255,255,.35);
-box-shadow:0 14px 30px rgba(0,0,0,.30);
-display:flex;
-align-items:center;
-justify-content:center;
+/* ── LOGO ── */
+.logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
 }
 
-.logo{
-width:100%;
-max-width:220px;
-height:auto;
-display:block;
-object-fit:contain;
-border-radius:0;
-border:0;
-box-shadow:none;
-background:transparent;
+.logo-box {
+  width: min(100%, 240px);
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(255,255,255,.35);
+  box-shadow: 0 14px 30px rgba(0,0,0,.30);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-h1{
-font-size:30px;
-font-weight:800;
-margin-bottom:8px;
-letter-spacing:-0.02em;
+.logo {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
-.subtitle{
-font-size:14px;
-color:var(--muted);
-margin-bottom:22px;
+/* ── HEADINGS ── */
+h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
 }
 
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-text-align:left;
-margin-bottom:18px;
+.subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
 }
 
-.tile{
-border-radius:16px;
-background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.12);
-padding:14px;
+/* ── INFO GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  text-align: left;
+  margin-bottom: 14px;
 }
 
-.label{
-font-size:12px;
-letter-spacing:.08em;
-text-transform:uppercase;
-color:rgba(255,255,255,.65);
-margin-bottom:6px;
+.tile {
+  border-radius: 16px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  padding: 14px;
 }
 
-.value{
-font-size:14.5px;
-font-weight:700;
-line-height:1.35;
+.label {
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 6px;
 }
 
-.value a{
-color:#38bdf8;
-text-decoration:none;
-font-weight:800;
+.value {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.40;
 }
 
-.value a:hover{text-decoration:underline;}
+.value a {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 800;
+}
+.value a:hover { text-decoration: underline; }
 
-.note{
-margin-top:10px;
-padding:14px;
-border-radius:16px;
-background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.12);
-text-align:left;
-line-height:1.55;
-font-size:14px;
-color:rgba(255,255,255,.88);
+.value-sub {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,.55);
+  margin-top: 4px;
 }
 
-.note strong{color:rgba(255,255,255,.95);}
-
-.raffle{
-margin-top:16px;
-text-align:left;
-padding:14px;
-border-radius:16px;
-background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.12);
-margin-bottom:28px;
+/* ── CATERING NOTE ── */
+.catering-note {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.85);
 }
 
-.raffle h2{
-margin:0 0 10px 0;
-font-size:15px;
-font-weight:900;
-letter-spacing:-0.01em;
+.catering-note .note-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
-.raffle ul{
-margin:0;
-padding-left:18px;
-line-height:1.7;
-color:rgba(255,255,255,.88);
-font-size:14px;
+.catering-note strong {
+  color: rgba(255,255,255,.95);
+  white-space: nowrap;
 }
 
-.banquet-image{
-width:100%;
-display:block;
-margin-top:10px;
-border-radius:0 0 var(--radius) var(--radius);
+/* ── COCKTAIL CALLOUT ── */
+.cocktail-callout {
+  margin-bottom: 14px;
+  padding: 15px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(168,85,247,.16), rgba(99,102,241,.16));
+  border: 1px solid rgba(168,85,247,.32);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-@media(max-width:640px){
-.grid{grid-template-columns:1fr;}
+.cocktail-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
-@media(max-width:480px){
-.card{padding:32px 22px 0 22px;}
-
-.logo-box{
-width:min(100%,200px);
-padding:8px;
+.cocktail-text {
+  flex: 1;
 }
 
-.logo{
-max-width:184px;
+.cocktail-title {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: rgba(216,180,254,.80);
+  margin-bottom: 5px;
 }
 
-h1{font-size:24px;}
-.subtitle{font-size:13px;}
+.cocktail-drinks {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(240,230,255,.92);
+  line-height: 1.5;
+}
+
+/* ── RAFFLE ── */
+.raffle {
+  margin-bottom: 20px;
+  text-align: left;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.raffle-title {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 12px;
+}
+
+.raffle-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.raffle-list li {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,.88);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.raffle-list li .ri {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.raffle-more {
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-style: italic;
+  color: rgba(255,255,255,.45);
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* ── BOTTOM PHOTO ── */
+.banquet-image {
+  width: 100%;
+  display: block;
+  margin-top: 4px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  object-fit: cover;
+  max-height: 440px;
+}
+
+/* Image error fallback — show padding so card doesn't end abruptly */
+.banquet-image-wrap {
+  margin-top: 4px;
+  min-height: 0;
+}
+
+/* ── FOOTER ── */
+footer {
+  margin-top: 16px;
+  padding: 14px;
+  font-size: 12.5px;
+  color: rgba(255,255,255,.35);
+  text-align: center;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  body { padding: 16px; }
+  .card { padding: 28px 20px 0 20px; }
+
+  .logo-box {
+    width: min(100%, 200px);
+    padding: 8px;
+  }
+  .logo { max-width: 184px; }
+
+  h1 { font-size: 24px; }
+  .subtitle { font-size: 13px; }
+  .cocktail-callout { gap: 10px; }
+  .cocktail-icon { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-link { transition: none; }
 }
 </style>
 </head>
@@ -222,67 +366,92 @@ h1{font-size:24px;}
 <div class="blob b1"></div>
 <div class="blob b2"></div>
 
-<div class="card">
+<div class="outer">
 
-<div class="logo-wrap">
-  <div class="logo-box">
-    <img src="profile.jpg.png" alt="Indy Classic Logo" class="logo">
-  </div>
-</div>
+  <a href="index.html" class="back-link">← Home</a>
 
-<h1>Banquet Info</h1>
-<div class="subtitle">Indy Classic 2026 • Player’s Banquet</div>
+  <div class="card">
 
-<div class="grid">
+    <div class="logo-wrap">
+      <div class="logo-box">
+        <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="logo">
+      </div>
+    </div>
 
-<div class="tile">
-<div class="label">Time</div>
-<div class="value">7PM–10PM • Saturday, May 30th</div>
-</div>
+    <h1>Player's Banquet</h1>
+    <div class="subtitle">2026 Indy Classic &nbsp;·&nbsp; Saturday, May 30th</div>
 
-<div class="tile">
-<div class="label">Location</div>
-<div class="value">Radius</div>
-</div>
+    <!-- Info grid -->
+    <div class="grid">
 
-<div class="tile">
-<div class="label">Address</div>
-<div class="value">
-<a href="https://www.google.com/maps?q=723+S+Capitol+Ave,+Indianapolis,+IN+46225" target="_blank" rel="noopener noreferrer">
-723 S Capitol Ave, Indianapolis, IN 46225 ↗
-</a>
-</div>
-</div>
+      <div class="tile">
+        <div class="label">Time</div>
+        <div class="value">7:00 PM – 10:00 PM</div>
+        <div class="value-sub">Dinner served at 8:00 PM</div>
+      </div>
 
-<div class="tile">
-<div class="label">Dinner</div>
-<div class="value">Dinner served at <strong>8PM</strong></div>
-</div>
+      <div class="tile">
+        <div class="label">Catering</div>
+        <div class="value">Sahm's Catering</div>
+      </div>
 
-</div>
+      <div class="tile" style="grid-column: 1 / -1;">
+        <div class="label">Location</div>
+        <div class="value">
+          Radius &nbsp;—&nbsp;
+          <a href="https://www.google.com/maps?q=723+S+Capitol+Ave,+Indianapolis,+IN+46225"
+             target="_blank" rel="noopener noreferrer">
+            723 S Capitol Ave, Indianapolis, IN 46225 ↗
+          </a>
+        </div>
+      </div>
 
-<div class="note">
-<strong>Catering:</strong> Sahm's Catering
-<br>
-<strong>Dietary note:</strong> Please let us know if you are <strong>Vegan</strong>!
-<br><br>
-Try our signature drinks —
-<strong>Pineapple Express Yourself</strong> and <strong>The Hoosier Paloma</strong>.
-</div>
+    </div>
 
-<div class="raffle">
-<h2>RAFFLE ITEMS</h2>
-<ul>
-<li>Wilson Tennis Racquet (of your choice)</li>
-<li>2027 Indy Classic Free Entry</li>
-<li>2027 Orange Blossom Free Entry</li>
-<li>Check Back as we add more items!</li>
-</ul>
-</div>
+    <!-- Dietary note -->
+    <div class="catering-note">
+      <div class="note-row">
+        <span>🌱</span>
+        <span><strong>Vegan?</strong> Please let us know ahead of time so we can accommodate you!</span>
+      </div>
+    </div>
 
-<img src="banquet.png" alt="Banquet" class="banquet-image">
+    <!-- Signature cocktails callout -->
+    <div class="cocktail-callout">
+      <div class="cocktail-icon">🍹</div>
+      <div class="cocktail-text">
+        <div class="cocktail-title">Signature Cocktails</div>
+        <div class="cocktail-drinks">
+          Pineapple Express Yourself<br>
+          The Hoosier Paloma
+        </div>
+      </div>
+    </div>
 
-</div>
+    <!-- Raffle -->
+    <div class="raffle">
+      <div class="raffle-title">🎟️ Raffle Items</div>
+      <ul class="raffle-list">
+        <li><span class="ri">🎾</span> Wilson Tennis Racquet (of your choice)</li>
+        <li><span class="ri">🏆</span> 2027 Indy Classic Free Entry</li>
+        <li><span class="ri">🌸</span> 2027 Orange Blossom Free Entry</li>
+      </ul>
+      <div class="raffle-more">More items being added — check back soon!</div>
+    </div>
+
+    <!-- Full-bleed bottom photo -->
+    <div class="banquet-image-wrap">
+      <img src="banquet.png"
+           alt="Player's Banquet at Radius"
+           class="banquet-image"
+           onerror="this.closest('.banquet-image-wrap').style.paddingBottom='28px'">
+    </div>
+
+  </div><!-- /card -->
+
+  <footer>© 2026 Indy Classic</footer>
+
+</div><!-- /outer -->
 
 </body>
 </html>
