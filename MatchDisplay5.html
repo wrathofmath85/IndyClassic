@@ -720,7 +720,17 @@
   function parseTimeColumn(s){
     const str=tidy(s); if(!str) return null;
 
-    // Google Sheets serial (5-digit integer or decimal like 46000.375)
+    // ── Fractional day from Google Sheets (e.g. 0.41448... = 9:56:56)
+    // These arrive as a decimal between 0 and 1 (or very close to 1).
+    // Multiply by ms-per-day and add to today's local midnight.
+    const numVal = Number(str);
+    if(!isNaN(numVal) && numVal >= 0 && numVal < 1){
+      const n = new Date();
+      const midnight = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0);
+      return new Date(midnight.getTime() + Math.round(numVal * 86400000));
+    }
+
+    // Google Sheets full date serial (5-digit integer or decimal like 46000.375)
     if(/^\d{5}(\.\d+)?$/.test(str)){
       const days=Number(str);
       const base=new Date(Date.UTC(1899,11,30));
@@ -728,7 +738,7 @@
     }
 
     // 24-hour with seconds: "9:56:56" or "14:03:00"
-    let m=str.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+    let m=str.match(/^(\d{1,2}):(\d{2}):(\d{2})(\.\d+)?$/);
     if(m){
       const h=parseInt(m[1],10), min=parseInt(m[2],10), sec=parseInt(m[3],10);
       if(h>=0&&h<24&&min>=0&&min<60&&sec>=0&&sec<60){
