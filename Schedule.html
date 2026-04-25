@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Schedule</title>
+  <title>Schedule – 2026 Indy Classic</title>
+
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -55,6 +58,29 @@
       position: relative;
       z-index: 1;
       margin: 0 auto;
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: color .18s ease, background .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-link:hover {
+      color: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.12);
     }
 
     .card{
@@ -115,6 +141,7 @@
       color: var(--muted);
     }
 
+    /* ── SCHEDULE ── */
     .schedule{
       margin-top: 18px;
       display:flex;
@@ -126,79 +153,203 @@
       display:flex;
       gap: 14px;
       align-items:flex-start;
-      padding: 14px;
+      padding: 16px 14px;
       border-radius: 16px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.12);
     }
 
-    .date{
-      min-width: 120px;
+    /* Championship day — special gold tint */
+    .row.championship {
+      background: linear-gradient(135deg, rgba(234,179,8,.10), rgba(255,255,255,.06));
+      border-color: rgba(234,179,8,.28);
+    }
+
+    .date-col {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 90px;
+    }
+
+    .day-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.50);
+    }
+
+    /* Championship day name accent */
+    .row.championship .day-name {
+      color: rgba(234,179,8,.70);
+    }
+
+    .date {
       font-weight: 800;
-      letter-spacing: -0.01em;
-      font-size: 14px;
+      font-size: 13.5px;
       color: rgba(255,255,255,.92);
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 999px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.14);
       text-align:center;
-      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .row.championship .date {
+      background: rgba(234,179,8,.12);
+      border-color: rgba(234,179,8,.30);
+      color: #fde68a;
     }
 
     .details{
       flex: 1 1 auto;
       display:flex;
       flex-direction:column;
-      gap: 10px;
+      gap: 12px;
       min-width: 0;
     }
 
-    .title{
+    /* ── EVENT BLOCK ── */
+    .event {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .event + .event {
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+
+    .event-title {
       font-weight: 800;
       font-size: 14.5px;
       letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Banquet badge */
+    .badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(168,85,247,.22);
+      border: 1px solid rgba(168,85,247,.40);
+      color: #d8b4fe;
+      white-space: nowrap;
+    }
+
+    .badge.gold {
+      background: rgba(234,179,8,.18);
+      border-color: rgba(234,179,8,.36);
+      color: #fde68a;
     }
 
     .meta{
       display:flex;
       flex-wrap:wrap;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 13px;
+      gap: 6px;
     }
 
     .pill{
-      padding: 7px 10px;
+      padding: 6px 10px;
       border-radius: 999px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
-      color: rgba(255,255,255,.80);
+      color: rgba(255,255,255,.78);
+      font-size: 12.5px;
       white-space: nowrap;
     }
 
-    footer{
-      margin-top: 16px;
+    .pill.highlight {
+      background: rgba(56,189,248,.10);
+      border-color: rgba(56,189,248,.24);
+      color: rgba(186,230,255,.90);
+    }
+
+    /* Sponsor shoutout row */
+    .sponsor-note {
       font-size: 12.5px;
-      color: rgba(255,255,255,.65);
+      color: rgba(255,255,255,.55);
+      font-style: italic;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(34,197,94,.07);
+      border: 1px solid rgba(34,197,94,.16);
+      color: rgba(187,247,208,.80);
+    }
+
+    /* Map link pill */
+    .pill.map-link {
+      background: rgba(56,189,248,.10);
+      border-color: rgba(56,189,248,.28);
+      color: #7dd3fc;
+      text-decoration: none;
+      transition: background .16s ease, border-color .16s ease;
+    }
+
+    .pill.map-link:hover {
+      background: rgba(56,189,248,.18);
+      border-color: rgba(56,189,248,.45);
+    }
+
+    footer{
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      font-size: 12.5px;
+      color: rgba(255,255,255,.40);
       text-align:center;
     }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 520px){
-      body{ padding: 18px; }
-      .row{ flex-direction:column; }
-      .date{ min-width: 0; width: fit-content; }
+      body{ padding: 16px; }
+
+      .row{
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .date-col {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .day-name {
+        font-size: 12px;
+      }
+
+      .date {
+        font-size: 13px;
+      }
+
       h1{ font-size: 24px; }
-      .card{ padding: 22px 16px; border-radius: 18px; }
+      .card{ padding: 20px 16px; border-radius: 18px; }
 
       .logo-box{
         width: min(100%, 200px);
         padding: 8px;
       }
 
-      .logo{
-        max-width: 184px;
-      }
+      .logo{ max-width: 184px; }
+
+      .pill { white-space: normal; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .back-link, .pill.map-link { transition: none; }
     }
   </style>
 </head>
@@ -207,115 +358,184 @@
   <div class="blob b2"></div>
 
   <div class="container">
+
+    <a href="index.html" class="back-link">← Home</a>
+
     <div class="card">
       <div class="header">
         <div class="logo-wrap">
           <div class="logo-box">
-            <img src="profile.jpg.png" alt="Indy Classic Logo" class="logo">
+            <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="logo">
           </div>
         </div>
 
         <h1>Schedule</h1>
-        <div class="subtitle">Times and locations subject to change</div>
+        <div class="subtitle">2026 Indy Classic &bull; Times and locations subject to change</div>
       </div>
 
       <div class="schedule">
 
+        <!-- THURSDAY MAY 28 -->
         <div class="row">
-          <div class="date">5/28/2026</div>
+          <div class="date-col">
+            <span class="day-name">Thursday</span>
+            <span class="date">May 28</span>
+          </div>
           <div class="details">
-            <div class="title">Welcome Party</div>
-            <div class="meta">
-              <span class="pill">Time: 7-9PM</span>
-              <span class="pill">Location: Metro</span>
+
+            <div class="event">
+              <div class="event-title">🥂 Welcome Party</div>
+              <div class="meta">
+                <span class="pill highlight">7–9 PM</span>
+                <span class="pill">Metro</span>
+                <a class="pill map-link"
+                   href="https://www.google.com/maps?q=707+Massachusetts+Ave,+Indianapolis,+IN+46204"
+                   target="_blank" rel="noopener noreferrer">
+                  707 Massachusetts Ave ↗
+                </a>
+              </div>
             </div>
 
-            <div class="title">Dinner</div>
-            <div class="meta">
-              <span class="pill">Time: On your own</span>
-              <span class="pill">Location: Please Support our sponsors 45 Degrees and Harrison's!</span>
+            <div class="event">
+              <div class="event-title">🍽️ Dinner</div>
+              <div class="meta">
+                <span class="pill">On your own</span>
+              </div>
+              <div class="sponsor-note">
+                🎾 Please support our sponsors — <strong>45 Degrees</strong> and <strong>Harrison's</strong>!
+              </div>
             </div>
+
           </div>
         </div>
 
+        <!-- FRIDAY MAY 29 -->
         <div class="row">
-          <div class="date">5/29/2026</div>
+          <div class="date-col">
+            <span class="day-name">Friday</span>
+            <span class="date">May 29</span>
+          </div>
           <div class="details">
-            <div class="title">Coffee Bar</div>
-            <div class="meta">
-              <span class="pill">Time: 7:30AM-GONE</span>
-              <span class="pill">Location: Upstairs Lounge</span>
+
+            <div class="event">
+              <div class="event-title">☕ Coffee Bar</div>
+              <div class="meta">
+                <span class="pill highlight">7:30 AM – Gone</span>
+                <span class="pill">Upstairs Lounge</span>
+              </div>
             </div>
 
-            <div class="title">First and Second Round Play</div>
-            <div class="meta">
-              <span class="pill">Time: 8AM-10PM</span>
-              <span class="pill">Location: Indianapolis Racquet Club</span>
+            <div class="event">
+              <div class="event-title">🎾 First &amp; Second Round Play</div>
+              <div class="meta">
+                <span class="pill highlight">8 AM – 10 PM</span>
+                <span class="pill">Indianapolis Racquet Club</span>
+              </div>
             </div>
 
-            <div class="title">Snacks</div>
-            <div class="meta">
-              <span class="pill">Time: All Day</span>
-              <span class="pill">Location: Upstairs Lounge</span>
+            <div class="event">
+              <div class="event-title">🍿 Snacks</div>
+              <div class="meta">
+                <span class="pill">All Day</span>
+                <span class="pill">Upstairs Lounge</span>
+              </div>
             </div>
 
-            <div class="title">Lunch</div>
-            <div class="meta">
-              <span class="pill">Menu: BIBIBOP</span>
-              <span class="pill">Time: Noon</span>
-              <span class="pill">Location: Upstairs Lounge</span>
+            <div class="event">
+              <div class="event-title">🥗 Lunch</div>
+              <div class="meta">
+                <span class="pill highlight">Noon</span>
+                <span class="pill">BIBIBOP</span>
+                <span class="pill">Upstairs Lounge</span>
+              </div>
             </div>
+
           </div>
         </div>
 
+        <!-- SATURDAY MAY 30 -->
         <div class="row">
-          <div class="date">5/30/2026</div>
+          <div class="date-col">
+            <span class="day-name">Saturday</span>
+            <span class="date">May 30</span>
+          </div>
           <div class="details">
-            <div class="title">Coffee Bar</div>
-            <div class="meta">
-              <span class="pill">Time: 7:30AM-GONE</span>
-              <span class="pill">Location: Upstairs Lounge</span>
-            </div>
-            <div class="title">Main Draw and Consolation Play</div>
-            <div class="meta">
-              <span class="pill">Time: 8AM–5PM</span>
-              <span class="pill">Location: Indianapolis Racquet Club</span>
+
+            <div class="event">
+              <div class="event-title">☕ Coffee Bar</div>
+              <div class="meta">
+                <span class="pill highlight">7:30 AM – Gone</span>
+                <span class="pill">Upstairs Lounge</span>
+              </div>
             </div>
 
-            <div class="title">Snacks</div>
-            <div class="meta">
-              <span class="pill">Time: All Day</span>
-              <span class="pill">Location: Upstairs Lounge</span>
+            <div class="event">
+              <div class="event-title">🎾 Main Draw &amp; Consolation Play</div>
+              <div class="meta">
+                <span class="pill highlight">8 AM – 5 PM</span>
+                <span class="pill">Indianapolis Racquet Club</span>
+              </div>
             </div>
 
-            <div class="title">Lunch</div>
-            <div class="meta">
-              <span class="pill">Menu: Jimmy John's</span>
-              <span class="pill">Time: Noon</span>
-              <span class="pill">Location: Upstairs Lounge</span>
+            <div class="event">
+              <div class="event-title">🍿 Snacks</div>
+              <div class="meta">
+                <span class="pill">All Day</span>
+                <span class="pill">Upstairs Lounge</span>
+              </div>
             </div>
 
-            <div class="title">Player’s Banquet</div>
-            <div class="meta">
-              <span class="pill">Time: 7PM–10PM</span>
-              <span class="pill">Location: Radius</span>
-              <span class="pill">723 S Capitol Ave, Indianapolis, IN 46225</span>
+            <div class="event">
+              <div class="event-title">🥪 Lunch</div>
+              <div class="meta">
+                <span class="pill highlight">Noon</span>
+                <span class="pill">Jimmy John's</span>
+                <span class="pill">Upstairs Lounge</span>
+              </div>
             </div>
+
+            <div class="event">
+              <div class="event-title">
+                🎉 Player's Banquet
+                <span class="badge">Featured Event</span>
+              </div>
+              <div class="meta">
+                <span class="pill highlight">7–10 PM</span>
+                <span class="pill">Radius</span>
+                <a class="pill map-link"
+                   href="https://www.google.com/maps?q=723+S+Capitol+Ave,+Indianapolis,+IN+46225"
+                   target="_blank" rel="noopener noreferrer">
+                  723 S Capitol Ave ↗
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div class="row">
-          <div class="date">5/31/2026</div>
+        <!-- SUNDAY MAY 31 — CHAMPIONSHIP -->
+        <div class="row championship">
+          <div class="date-col">
+            <span class="day-name">Sunday</span>
+            <span class="date">May 31</span>
+          </div>
           <div class="details">
-            <div class="title">Championship Play</div>
-            <div class="meta">
-              <span class="pill">Time: 8AM–4PM</span>
-              <span class="pill">Location: Indianapolis Racquet Club</span>
+
+            <div class="event">
+              <div class="event-title">
+                🏆 Championship Play
+                <span class="badge gold">Championships</span>
+              </div>
+              <div class="meta">
+                <span class="pill highlight">8 AM – 4 PM</span>
+                <span class="pill">Indianapolis Racquet Club</span>
+              </div>
             </div>
+
           </div>
         </div>
 
-      </div>
+      </div><!-- /schedule -->
 
       <footer>© 2026 Indy Classic</footer>
     </div>
