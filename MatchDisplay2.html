@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Indy Classic — Courts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080f0a;
+    --bg2:       #0d1810;
+    --surface:   #111e14;
+    --surface2:  #162019;
+    --border:    rgba(255,255,255,.10);
+    --border2:   rgba(255,255,255,.06);
+    --text:      #f0f7f1;
+    --muted:     rgba(240,247,241,.55);
+    --muted2:    rgba(240,247,241,.35);
+    --green:     #00e676;
+    --green-dim: rgba(0,230,118,.18);
+    --green-glow:rgba(0,230,118,.35);
+    --amber:     #ffb300;
+    --red:       #ff5252;
+    --accent:    #00e676;
+    --court-live-border: rgba(0,230,118,.6);
+    --court-live-bg:     rgba(0,230,118,.05);
+    --shadow-card: 0 4px 24px rgba(0,0,0,.5);
+    --shadow-live: 0 0 0 2px var(--court-live-border), 0 0 32px rgba(0,230,118,.2), 0 4px 24px rgba(0,0,0,.6);
+    font-family: 'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden; /* TV — no scroll */
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Subtle court-texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -10%, rgba(0,100,40,.35), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 90% 90%, rgba(0,60,30,.3), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ══════════════════════════════════
+     HEADER
+  ══════════════════════════════════ */
+  .tv-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 68px;
+    background: linear-gradient(180deg, #0a1a0d 0%, #0d1810 100%);
+    border-bottom: 1px solid rgba(0,230,118,.2);
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+
+  .tv-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+    opacity: .4;
+  }
+
+  .hd-left {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .hd-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .hd-subtitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--green);
+    opacity: .8;
+  }
+
+  .hd-center {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /* Live dot in header */
+  .hd-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .hd-live-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+    50%      { opacity: .5; box-shadow: 0 0 14px var(--green); }
+  }
+
+  .hd-refresh {
+    font-size: 11px;
+    color: var(--muted2);
+    font-weight: 500;
+  }
+
+  .hd-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .hd-clock {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .hd-date {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  /* ══════════════════════════════════
+     MAIN CONTENT
+  ══════════════════════════════════ */
+  .tv-main {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px 12px;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  /* ══════════════════════════════════
+     COURTS GRID  4 × 4
+  ══════════════════════════════════ */
+  .courts-grid {
+    flex: 1 1 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  /* ── Court card ── */
+  .court {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 12px 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: border-color .3s, box-shadow .3s, background .3s;
+  }
+
+  /* corner accent line */
+  .court::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--border);
+    border-radius: 12px 0 0 12px;
+    transition: background .3s;
+  }
+
+  .court.live {
+    background: var(--court-live-bg);
+    border-color: var(--court-live-border);
+    box-shadow: var(--shadow-live);
+  }
+
+  .court.live::before {
+    background: linear-gradient(180deg, var(--green), rgba(0,230,118,.3));
+  }
+
+  /* ── Court top row ── */
+  .court-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .court-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .court-event {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted2);
+    letter-spacing: .05em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 55%;
+    text-align: right;
+  }
+
+  .court-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .court-badge.live {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid rgba(0,230,118,.3);
+    animation: badge-pulse 2.5s ease-in-out infinite;
+  }
+
+  .court-badge.empty {
+    background: rgba(255,255,255,.05);
+    color: var(--muted2);
+    border: 1px solid var(--border2);
+  }
+
+  @keyframes badge-pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .6; }
+  }
+
+  /* ── Divider ── */
+  .court-divider {
+    height: 1px;
+    background: var(--border2);
+    margin: 0 0 8px;
+    transition: background .3s;
+  }
+  .court.live .court-divider {
+    background: rgba(0,230,118,.2);
+  }
+
+  /* ── Player names ── */
+  .court-players {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .player-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--muted2);
+    transition: background .3s;
+  }
+  .court.live .player-dot {
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+
+  .player-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: clamp(15px, 1.4vw, 22px);
+    letter-spacing: .01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+    line-height: 1.15;
+    color: var(--muted);
+    transition: color .3s;
+  }
+
+  .court.live .player-name {
+    color: var(--text);
+  }
+
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 1px 0;
+  }
+
+  .vs-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border2);
+  }
+
+  .vs-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    color: var(--muted2);
+    text-transform: uppercase;
+  }
+
+  /* ── Time info ── */
+  .court-times {
+    margin-top: 8px;
+    padding: 6px 8px;
+    background: rgba(0,0,0,.25);
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .time-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .time-item + .time-item {
+    border-left: 1px solid var(--border2);
+  }
+
+  .time-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    white-space: nowrap;
+  }
+
+  .time-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(10px, 0.9vw, 13px);
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .court.live .time-value {
+    color: var(--text);
+  }
+
+  .duration-value {
+    color: var(--green) !important;
+  }
+
+  /* empty state */
+  .court.empty .player-name {
+    color: var(--muted2);
+  }
+
+  /* ══════════════════════════════════
+     FOOTER STRIP
+  ══════════════════════════════════ */
+  .tv-footer {
+    flex: 0 0 auto;
+    height: 58px;
+    background: linear-gradient(180deg, #0a1a0d 0%, #080f0a 100%);
+    border-top: 1px solid rgba(0,230,118,.15);
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Last placed section */
+  .footer-section {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .footer-section + .footer-section,
+  .footer-section + .footer-upcoming,
+  .footer-upcoming + .footer-section {
+    border-left: 1px solid var(--border2);
+  }
+
+  .footer-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--green);
+    opacity: .7;
+    white-space: nowrap;
+  }
+
+  .footer-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .footer-meta {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Upcoming matches ticker */
+  .footer-upcoming {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .upcoming-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    opacity: .8;
+    white-space: nowrap;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+
+  .upcoming-track {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Scrolling ticker */
+  .upcoming-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    white-space: nowrap;
+    animation: ticker-scroll 30s linear infinite;
+    will-change: transform;
+  }
+
+  .upcoming-inner:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .upcoming-match {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    border-right: 1px solid var(--border2);
+  }
+
+  .upcoming-teams {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .upcoming-time {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--amber);
+    opacity: .85;
+  }
+
+  /* Error */
+  .err-bar {
+    position: fixed;
+    top: 68px; left: 0; right: 0;
+    background: rgba(255,82,82,.15);
+    border-bottom: 1px solid rgba(255,82,82,.4);
+    color: var(--red);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 28px;
+    z-index: 20;
+    display: none;
+  }
+  .err-bar.show { display: block; }
+
+  /* ══════════════════════════════════
+     RESPONSIVE — if somehow on smaller screen
+  ══════════════════════════════════ */
+  @media (max-width: 1200px) {
+    .courts-grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .courts-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: minmax(160px, 1fr);
+    }
+    .hd-clock { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="tv-header">
+    <div class="hd-left">
+      <span class="hd-title">Indy Classic</span>
+      <span class="hd-subtitle">Court Assignments</span>
+    </div>
+    <div class="hd-center">
+      <div class="hd-live">
+        <div class="hd-live-dot"></div>
+        Live
+      </div>
+      <div class="hd-refresh" id="lastRefreshStamp">—</div>
+    </div>
+    <div class="hd-right">
+      <div class="hd-clock" id="liveClock">--:--</div>
+      <div class="hd-date" id="liveDate">—</div>
+    </div>
+  </header>
+
+  <!-- ── ERROR BAR ── -->
+  <div class="err-bar" id="errorBar"></div>
+
+  <!-- ── MAIN ── -->
+  <main class="tv-main">
+    <div class="courts-grid" id="courtsGrid" aria-label="Courts"></div>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="tv-footer">
+
+    <div class="footer-section" id="lastPlacedSection">
+      <div>
+        <div class="footer-label">Last Placed</div>
+        <div class="footer-value" id="lastMatchName">—</div>
+        <div class="footer-meta" id="lastMatchMeta">—</div>
+      </div>
+    </div>
+
+    <div class="footer-upcoming">
+      <div class="upcoming-label">Up Next</div>
+      <div class="upcoming-track">
+        <div class="upcoming-inner" id="upcomingInner">
+          <div class="upcoming-match">
+            <span class="upcoming-teams">Loading…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-section">
+      <div>
+        <div class="footer-label">Auto-refresh</div>
+        <div class="footer-meta">Every 30 seconds</div>
+      </div>
+    </div>
+
+  </footer>
+
+<script>
+  /* ═══════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════ */
+  const JSON_URL      = "https://script.google.com/macros/s/AKfycbwv9yiFvW1VBrY_iL9T5ZvhUH_2ygptxukgt8dj5ZaEFSw63fQopzcAfIwETaTx5WJ7/exec";
+  const NUM_COURTS    = 16;
+  const UPCOMING_COUNT = 8;
+  const REFRESH_MS    = 30000; // 30 seconds
+
+  /* ═══════════════════════════════════════
+     DOM refs
+  ═══════════════════════════════════════ */
+  const courtsGrid       = document.getElementById('courtsGrid');
+  const errorBar         = document.getElementById('errorBar');
+  const lastRefreshStamp = document.getElementById('lastRefreshStamp');
+  const lastMatchName    = document.getElementById('lastMatchName');
+  const lastMatchMeta    = document.getElementById('lastMatchMeta');
+  const upcomingInner    = document.getElementById('upcomingInner');
+  const liveClock        = document.getElementById('liveClock');
+  const liveDate         = document.getElementById('liveDate');
+
+  let loading = false;
+
+  /* ═══════════════════════════════════════
+     LIVE CLOCK
+  ═══════════════════════════════════════ */
+  function tickClock(){
+    const now = new Date();
+    let h = now.getHours(), m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    liveClock.textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+    liveDate.textContent = now.toLocaleDateString(undefined, {
+      weekday:'long', month:'long', day:'numeric', year:'numeric'
+    });
+  }
+  tickClock();
+  setInterval(tickClock, 10000);
+
+  /* ═══════════════════════════════════════
+     DURATION TICKER (updates every minute)
+  ═══════════════════════════════════════ */
+  setInterval(() => {
+    document.querySelectorAll('.duration-value[data-started]').forEach(el => {
+      const started = new Date(el.dataset.started);
+      el.textContent = formatDuration(started);
+    });
+  }, 60000);
+
+  /* ═══════════════════════════════════════
+     UTILS
+  ═══════════════════════════════════════ */
+  const tidy = v => (v == null ? '' : String(v).trim());
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function isCourtEmpty(v){
+    const t = tidy(v).toLowerCase();
+    return !t || ['na','n/a','none','null','-','—','0'].includes(t);
+  }
+
+  function parseTimeToday(s){
+    const str = tidy(s);
+    if(!str) return null;
+    let m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]m)$/i);
+    if(m){
+      let [,hh,mm,ss,ap] = m;
+      let h = parseInt(hh,10);
+      const min = parseInt(mm,10);
+      const sec = ss ? parseInt(ss,10) : 0;
+      ap = ap.toLowerCase();
+      if(h===12) h=0;
+      if(ap==='pm') h+=12;
+      const now = new Date();
+      return new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,min,sec,0);
+    }
+    m = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if(m){
+      let [,hh,mm,ss] = m;
+      const h = parseInt(hh,10), min = parseInt(mm,10), sec = ss ? parseInt(ss,10) : 0;
+      if(h>=0&&h<24&&min>=0&&min<60){
+        const now = new Date();
+        return new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,min,sec,0);
+      }
+    }
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function toDateOrNull(v){
+    const s = tidy(v);
+    if(!s) return null;
+    const d = new Date(s);
+    if(!isNaN(d.getTime())) return d;
+    return parseTimeToday(s);
+  }
+
+  function formatTime(dt){
+    if(!dt) return '—';
+    let h = dt.getHours();
+    const m = dt.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+  }
+
+  function formatDuration(since){
+    if(!since) return '—';
+    const diff = (new Date() - since) / 60000;
+    if(diff < 1) return 'Just started';
+    const hrs = Math.floor(diff / 60);
+    const mins = Math.floor(diff % 60);
+    if(hrs > 0) return `${hrs}h ${mins}m`;
+    return `${mins} min`;
+  }
+
+  function formatRefresh(dt){
+    if(!dt) return '—';
+    return `Updated ${formatTime(dt)}`;
+  }
+
+  /* ═══════════════════════════════════════
+     BUILD COURT SHELLS
+  ═══════════════════════════════════════ */
+  function buildCourtShells(){
+    courtsGrid.innerHTML = '';
+    for(let i = 1; i <= NUM_COURTS; i++){
+      const card = document.createElement('article');
+      card.className = 'court empty';
+      card.dataset.court = i;
+      card.innerHTML = `
+        <div class="court-top">
+          <div class="court-num">Court ${i}</div>
+          <div class="court-event" data-event></div>
+          <div class="court-badge empty" data-badge>Empty</div>
+        </div>
+        <div class="court-divider"></div>
+        <div class="court-players">
+          <div class="player-row">
+            <div class="player-dot"></div>
+            <div class="player-name" data-team1>—</div>
+          </div>
+          <div class="vs-divider">
+            <div class="vs-line"></div>
+            <div class="vs-label">VS</div>
+            <div class="vs-line"></div>
+          </div>
+          <div class="player-row">
+            <div class="player-dot"></div>
+            <div class="player-name" data-team2>—</div>
+          </div>
+        </div>
+        <div class="court-times" data-times>
+          <div class="time-item">
+            <div class="time-label">Sched</div>
+            <div class="time-value" data-sched>—</div>
+          </div>
+          <div class="time-item">
+            <div class="time-label">Started</div>
+            <div class="time-value" data-started-val>—</div>
+          </div>
+          <div class="time-item">
+            <div class="time-label">Duration</div>
+            <div class="time-value duration-value" data-dur>—</div>
+          </div>
+        </div>
+      `;
+      courtsGrid.appendChild(card);
+    }
+  }
+
+  /* ═══════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════ */
+  function renderFromRows(rows){
+    buildCourtShells();
+
+    const normalized = rows.map((r, idx) => {
+      const startRaw  = tidy(r['Start Time']);
+      const timeRaw   = tidy(r['Time']);
+      const courtRaw  = tidy(r['Court']) || tidy(r['Court #']);
+      const team1     = tidy(r['Team 1']) || tidy(r['Team1']);
+      const team2     = tidy(r['Team 2']) || tidy(r['Team2']);
+      const event     = tidy(r['Event']);
+      const round     = tidy(r['Round']);
+      const num       = parseInt(courtRaw, 10);
+      const court     = (!isCourtEmpty(courtRaw) && !isNaN(num)) ? num : null;
+      const startTime = toDateOrNull(startRaw);
+      const time      = parseTimeToday(timeRaw) ?? null;
+      return { _row:idx, startTime, time, event, round, team1, team2, courtRaw, court };
+    });
+
+    /* Last placed */
+    const placedCandidates = normalized.filter(r => r.court != null && (r.time || r.startTime));
+    let lastPlaced = null;
+    for(const r of placedCandidates){
+      const key     = r.time ?? r.startTime;
+      const bestKey = lastPlaced ? (lastPlaced.time ?? lastPlaced.startTime) : null;
+      if(!lastPlaced || key.getTime() > bestKey.getTime()) lastPlaced = r;
+    }
+
+    if(lastPlaced){
+      lastMatchName.textContent = `${lastPlaced.team1 || '—'} vs ${lastPlaced.team2 || '—'}`;
+      const sched  = formatTime(lastPlaced.startTime);
+      const actual = formatTime(lastPlaced.time);
+      lastMatchMeta.textContent = `Court ${lastPlaced.court} · Sched: ${sched} · Started: ${actual}`;
+    } else {
+      lastMatchName.textContent = '—';
+      lastMatchMeta.textContent = '—';
+    }
+
+    /* Populate courts — latest match per court */
+    const latestByCourt = new Map();
+    for(const r of normalized){
+      if(r.court == null) continue;
+      const key  = r.time ?? r.startTime ?? null;
+      if(!key) continue;
+      const prev = latestByCourt.get(r.court);
+      const prevKey = prev ? (prev.time ?? prev.startTime) : null;
+      if(!prev || key.getTime() > prevKey.getTime()) latestByCourt.set(r.court, r);
+    }
+
+    for(const [num, row] of latestByCourt.entries()){
+      const card = document.querySelector(`.court[data-court="${num}"]`);
+      if(!card) continue;
+
+      card.querySelector('[data-team1]').textContent = row.team1 || '—';
+      card.querySelector('[data-team2]').textContent = row.team2 || '—';
+
+      const evTxt = [row.event, row.round].filter(Boolean).join(' · ');
+      card.querySelector('[data-event]').textContent = evTxt;
+
+      const schedEl   = card.querySelector('[data-sched]');
+      const startedEl = card.querySelector('[data-started-val]');
+      const durEl     = card.querySelector('[data-dur]');
+
+      schedEl.textContent   = formatTime(row.startTime);
+      startedEl.textContent = formatTime(row.time);
+
+      if(row.time){
+        durEl.textContent = formatDuration(row.time);
+        durEl.dataset.started = row.time.toISOString();
+      } else {
+        durEl.textContent = '—';
+        delete durEl.dataset.started;
+      }
+
+      card.classList.remove('empty');
+      card.classList.add('live');
+      const badge = card.querySelector('[data-badge]');
+      badge.textContent = 'Live';
+      badge.classList.remove('empty');
+      badge.classList.add('live');
+    }
+
+    /* Upcoming */
+    const upcoming = normalized
+      .filter(r => r.court == null)
+      .sort((a, b) => {
+        const ak = (a.startTime ?? a.time ?? new Date(8640000000000000)).getTime();
+        const bk = (b.startTime ?? b.time ?? new Date(8640000000000000)).getTime();
+        return ak - bk;
+      })
+      .slice(0, UPCOMING_COUNT);
+
+    if(upcoming.length === 0){
+      upcomingInner.innerHTML = `<div class="upcoming-match"><span class="upcoming-teams">No upcoming matches</span></div>`;
+    } else {
+      // Duplicate for seamless loop
+      const items = upcoming.map(r => {
+        const when = formatTime(r.startTime ?? r.time);
+        const matchText = esc(`${r.team1 || '—'} vs ${r.team2 || '—'}`);
+        return `<div class="upcoming-match">
+          <span class="upcoming-teams">${matchText}</span>
+          <span class="upcoming-time">${when}</span>
+        </div>`;
+      }).join('');
+      // Duplicate for seamless ticker
+      upcomingInner.innerHTML = items + items;
+
+      // Adjust animation speed based on content width
+      requestAnimationFrame(() => {
+        const totalW = upcomingInner.scrollWidth / 2;
+        const speed = Math.max(20, totalW / 40); // px/s roughly
+        upcomingInner.style.animationDuration = speed + 's';
+      });
+    }
+  }
+
+  /* ═══════════════════════════════════════
+     FETCH
+  ═══════════════════════════════════════ */
+  function loadCSV(){
+    if(loading) return;
+    loading = true;
+
+    fetch(JSON_URL + '?t=' + Date.now())
+      .then(r => r.json())
+      .then(rows => {
+        try{
+          renderFromRows(rows);
+          lastRefreshStamp.textContent = formatRefresh(new Date());
+          errorBar.classList.remove('show');
+        } catch(e){
+          showError('Render error: ' + e.message);
+          console.error(e);
+        } finally {
+          loading = false;
+        }
+      })
+      .catch(e => {
+        showError('Data load failed: ' + e.message);
+        loading = false;
+        console.error(e);
+      });
+  }
+
+  function showError(msg){
+    errorBar.textContent = '⚠ ' + msg;
+    errorBar.classList.add('show');
+  }
+
+  /* ═══════════════════════════════════════
+     BOOT
+  ═══════════════════════════════════════ */
+  buildCourtShells();
+  loadCSV();
+  setInterval(loadCSV, REFRESH_MS);
+</script>
+</body>
+</html>
