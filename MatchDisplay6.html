@@ -717,18 +717,17 @@
      Also handles Google Sheets serial numbers and 12-hour format
      just in case.
   ───────────────────────────────────────────────────────────── */
-  function parseTimeColumn(s){
+ function parseTimeColumn(s){
     const str=tidy(s); if(!str) return null;
+    console.log('TIME RAW VALUE:', JSON.stringify(s), typeof s);
 
-    // ── Fractional day from Google Sheets (e.g. 0.41448... = 9:56:56)
-    // These arrive as a decimal between 0 and 1 (or very close to 1).
-    // Multiply by ms-per-day and add to today's local midnight.
     const numVal = Number(str);
     if(!isNaN(numVal) && numVal >= 0 && numVal < 1){
       const n = new Date();
       const midnight = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0);
       return new Date(midnight.getTime() + Math.round(numVal * 86400000));
     }
+    
 
     // Google Sheets full date serial (5-digit integer or decimal like 46000.375)
     if(/^\d{5}(\.\d+)?$/.test(str)){
