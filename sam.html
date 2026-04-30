@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>NFL Picker – Sam</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg0:#070A12; --bg1:#0B1226; --bg2:#101B3A;
+      --glass:rgba(255,255,255,.10); --glass2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.18);
+      --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.68);
+      --good:rgba(52,211,153,1); --bad:rgba(248,113,113,1); --warn:rgba(250,204,21,1);
+      --shadow:0 18px 55px rgba(0,0,0,.55); --radius:22px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text); min-height:100vh; overflow-x:hidden;
+      background:
+        radial-gradient(1100px 600px at 15% 15%,rgba(59,130,246,.25),transparent 60%),
+        radial-gradient(900px 600px at 85% 20%,rgba(249,115,22,.20),transparent 55%),
+        radial-gradient(900px 700px at 55% 90%,rgba(34,197,94,.15),transparent 55%),
+        linear-gradient(180deg,var(--bg0),var(--bg1) 40%,var(--bg2));
+    }
+    .wrap{ max-width:1200px; margin:0 auto; padding:24px 16px 40px; }
+    .topbar{ display:flex; gap:14px; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(249,115,22,.75));
+      box-shadow:var(--shadow); position:relative; overflow:hidden;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .logo:before{
+      content:""; position:absolute; inset:-30%;
+      background:repeating-linear-gradient(90deg,rgba(255,255,255,.0) 0 18px,rgba(255,255,255,.12) 18px 22px);
+      transform:rotate(12deg);
+    }
+    .brand h1{ font-size:18px; line-height:1.1; margin:0; font-weight:800; letter-spacing:.4px; }
+    .brand p{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+    .statusbar{ display:flex; gap:10px; align-items:center; color:var(--muted); font-size:12px; flex-wrap:wrap; justify-content:flex-end; }
+    .dot{ width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.25); box-shadow:0 0 0 4px rgba(255,255,255,.06); flex-shrink:0; }
+    .dot.ok{ background:rgba(52,211,153,.95); box-shadow:0 0 0 4px rgba(52,211,153,.12); }
+    .dot.bad{ background:rgba(248,113,113,.95); box-shadow:0 0 0 4px rgba(248,113,113,.12); }
+    .tsText{ font-size:11px; color:var(--muted); }
+    .card{
+      background:linear-gradient(180deg,var(--glass),var(--glass2));
+      border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--shadow); overflow:hidden;
+    }
+    .hero{
+      padding:18px 18px 16px; display:flex; gap:14px;
+      align-items:flex-end; justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .hero .title{ display:flex; flex-direction:column; gap:6px; }
+    .hero .big{ font-size:26px; font-weight:800; letter-spacing:.2px; margin:0; }
+    .pillrow{ display:flex; gap:8px; flex-wrap:wrap; }
+    .pill{
+      font-size:12px; color:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.07);
+      padding:6px 10px; border-radius:999px;
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    }
+    .tableWrap{ overflow:auto; -webkit-overflow-scrolling:touch; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:980px; }
+    thead th{
+      position:sticky; top:0; z-index:2;
+      background:rgba(12,18,40,.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      font-size:12px; letter-spacing:.35px; text-transform:uppercase;
+      color:rgba(255,255,255,.72); padding:12px; text-align:left; white-space:nowrap;
+    }
+    tbody td{
+      padding:12px; border-bottom:1px solid rgba(255,255,255,.08);
+      white-space:nowrap; font-size:13px; color:rgba(255,255,255,.88); vertical-align:middle;
+    }
+    tbody tr:hover td{ background:rgba(255,255,255,.04); }
+    .pickNum{ font-weight:800; color:rgba(255,255,255,.82); }
+    .meta{ color:rgba(255,255,255,.84); font-variant-numeric:tabular-nums; }
+    .mutedText{ color:var(--muted); }
+    .cellFlex{ display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; max-width:100%; }
+    .value{ overflow:hidden; text-overflow:ellipsis; max-width:220px; }
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:26px; height:22px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06);
+      font-weight:900; line-height:1; font-size:14px; flex:0 0 auto;
+    }
+    .badge.good{ border-color:rgba(52,211,153,.35); background:rgba(52,211,153,.14); color:rgba(52,211,153,1); }
+    .badge.bad{  border-color:rgba(248,113,113,.35); background:rgba(248,113,113,.14); color:rgba(248,113,113,1); }
+    .badge.arrow{ width:30px; font-size:16px; border-color:rgba(250,204,21,.35); background:rgba(250,204,21,.14); color:rgba(250,204,21,1); }
+    .playerInput{
+      width:260px; max-width:100%;
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16);
+      color:rgba(255,255,255,.92); padding:10px; border-radius:14px; outline:none;
+      font-family:inherit; font-size:13px;
+      transition:border-color .15s;
+    }
+    .playerInput:focus{ border-color:rgba(255,255,255,.32); }
+    .playerInput:disabled{ opacity:.55; cursor:not-allowed; }
+    .btn{
+      cursor:pointer; border:1px solid rgba(255,255,255,.16);
+      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.06));
+      color:rgba(255,255,255,.92); padding:10px 12px; border-radius:14px;
+      font-weight:700; letter-spacing:.2px; font-family:inherit;
+      transition:transform .08s ease,border-color .15s ease; user-select:none; white-space:nowrap;
+    }
+    .btn:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.22); }
+    .btn:active{ transform:translateY(0); }
+    .btn.primary{ border-color:rgba(59,130,246,.40); background:linear-gradient(180deg,rgba(59,130,246,.38),rgba(59,130,246,.16)); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+    .toast{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:rgba(10,14,28,.78); border:1px solid rgba(255,255,255,.18);
+      box-shadow:var(--shadow); border-radius:999px; padding:10px 14px;
+      color:rgba(255,255,255,.92); font-size:13px; display:none; gap:10px;
+      align-items:center; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+      max-width:calc(100vw - 24px);
+    }
+    .toast.show{ display:flex; }
+    .toast .chip{ width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.25); }
+    .toast.ok  .chip{ background:rgba(52,211,153,.95); }
+    .toast.bad .chip{ background:rgba(248,113,113,.95); }
+    .curSel{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:12px; color:var(--muted); padding:6px 12px;
+      border:1px solid rgba(255,255,255,.10); border-radius:999px;
+      background:rgba(255,255,255,.04);
+    }
+    .curSel .dot{ width:8px; height:8px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Work NFL Picker</h1>
+        <p>Submit page</p>
+      </div>
+    </div>
+    <div class="statusbar">
+      <span class="tsText" id="tsText"></span>
+      <span id="dot" class="dot"></span>
+      <span id="statusText">Loading…</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="hero">
+      <div class="title">
+        <p style="margin:0;font-size:12px;letter-spacing:.35px;text-transform:uppercase;color:var(--muted);">Player</p>
+        <h2 id="playerName" class="big">SAM</h2>
+        <div class="pillrow">
+          <span class="pill">5 picks</span>
+          <span class="pill">Auto-fill from player list</span>
+          <span class="pill">Compare on submit</span>
+        </div>
+      </div>
+      <div class="curSel" id="curSelBadge">
+        <span class="dot" id="curDot"></span>
+        <span id="currentStatus">Current selection: loading…</span>
+      </div>
+    </div>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px;">#</th>
+            <th style="width:300px;">Selection</th>
+            <th>Position</th>
+            <th>Age</th>
+            <th>Points</th>
+            <th>Conference</th>
+            <th>Division</th>
+            <th style="min-width:200px;">Team</th>
+            <th style="width:140px;">Submit</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"><span class="chip"></span><span id="toastText"></span></div>
+
+<!-- Shared datalist for all 5 pick inputs -->
+<datalist id="playerList"></datalist>
+
+<script>
+/*** CONFIG – only change these ***/
+const SCRIPT_WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbygBfNQAiyWaKf69z-0mJ58JfHZRmn1nX7iJ9gv0UxXDxxBNzDo9XQ83BeErmhrIqr3VQ/exec";
+
+const PLAYER_KEY       = "sam";      // <-- "sam" in sam.html
+const PLAYER_NAME_COL  = 8;          // Column I (0-indexed) of picks sheet = Sam label row
+const PLAYER_PICKS_COL = 9;          // Column J (0-indexed) = Sam pick name cells
+
+// How many picks to show
+const NUM_PICKS = 5;
+
+// Auto-refresh interval in milliseconds (60 seconds)
+const AUTO_REFRESH_MS = 60000;
+/*** END CONFIG ***/
+
+/* ── DOM refs ── */
+const elRows      = document.getElementById('rows');
+const elName      = document.getElementById('playerName');
+const elDot       = document.getElementById('dot');
+const elStatus    = document.getElementById('statusText');
+const elToast     = document.getElementById('toast');
+const elToastTxt  = document.getElementById('toastText');
+const elCurStatus = document.getElementById('currentStatus');
+const elCurDot    = document.getElementById('curDot');
+const elTsText    = document.getElementById('tsText');
+const elDatalist  = document.getElementById('playerList');
+
+/* ── State ── */
+let dataByName       = new Map();
+let allNames         = [];
+let currentSelection = null;
+let autoRefreshTimer = null;
+let countdown        = Math.round(AUTO_REFRESH_MS / 1000);
+let countdownTimer   = null;
+
+/* ── Status helpers ── */
+function setStatus(ok, text) {
+  elDot.className = "dot " + (ok ? "ok" : "bad");
+  elStatus.textContent = text;
+}
+
+function setCurStatus(found) {
+  elCurDot.className = "dot " + (found ? "ok" : "bad");
+  elCurStatus.textContent = found ? "Current selection: loaded" : "Current selection: not found";
+}
+
+function updateTimestamp() {
+  const now = new Date();
+  const t = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  elTsText.textContent = "Refreshed " + t;
+}
+
+function startCountdown() {
+  clearInterval(countdownTimer);
+  countdown = Math.round(AUTO_REFRESH_MS / 1000);
+  countdownTimer = setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      clearInterval(countdownTimer);
+    } else {
+      elTsText.textContent = elTsText.textContent.replace(/ · \d+s/, '') + ' · ' + countdown + 's';
+    }
+  }, 1000);
+}
+
+function toast(ok, msg) {
+  elToast.className = "toast show " + (ok ? "ok" : "bad");
+  elToastTxt.textContent = msg;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { elToast.className = "toast"; }, 2800);
+}
+
+/* ── Data fetch via Apps Script (always fresh, no CSV cache) ── */
+async function fetchLiveData() {
+  const url = new URL(SCRIPT_WEB_APP_URL);
+  url.searchParams.set("action", "getdata");
+  url.searchParams.set("_", String(Date.now()));
+
+  const resp = await fetch(url.toString(), { cache: "no-store" });
+  if (!resp.ok) throw new Error("HTTP " + resp.status);
+  const data = await resp.json();
+  if (!data.ok) throw new Error(data.error || "Server error");
+  return data;
+}
+
+/* ── Build player data map from Apps Script response ── */
+function buildDataMap(playerRows) {
+  dataByName.clear();
+
+  if (!playerRows || !playerRows.length) return;
+
+  // Find required header keys (case-insensitive)
+  const probe = playerRows[0];
+  const keys  = Object.keys(probe);
+
+  function findKey(contains) {
+    const k = keys.find(x => x.toLowerCase().includes(contains));
+    if (!k) throw new Error('Could not find a column containing "' + contains + '" in player data headers: ' + JSON.stringify(keys));
+    return k;
+  }
+
+  const nameKey = findKey('name');
+  const posKey  = findKey('pos');
+  const ageKey  = findKey('age');
+  const ptsKey  = findKey('poi');   // "points" contains "poi"
+  const confKey = findKey('conf');
+  const divKey  = findKey('div');
+  const teamKey = findKey('team');
+
+  for (const r of playerRows) {
+    const nm = (r[nameKey] || '').trim();
+    if (!nm) continue;
+    dataByName.set(nm, {
+      name:       nm,
+      position:   (r[posKey]  || '').trim(),
+      age:        (r[ageKey]  || '').trim(),
+      points:     (r[ptsKey]  || '').trim(),
+      conference: (r[confKey] || '').trim(),
+      division:   (r[divKey]  || '').trim(),
+      team:       (r[teamKey] || '').trim()
+    });
+  }
+
+  allNames = Array.from(dataByName.keys()).sort((a, b) => a.localeCompare(b));
+}
+
+/* ── Build current selection object ── */
+function buildCurrentSelection(curRows) {
+  const first = (curRows || []).find(r => Object.values(r).some(v => String(v || '').trim() !== ''));
+  if (!first) return null;
+
+  const keys = Object.keys(first);
+  function findKey(contains) {
+    return keys.find(x => x.toLowerCase().includes(contains)) || null;
+  }
+
+  return {
+    position:   (findKey('pos')  ? (first[findKey('pos')]  || '') : '').trim(),
+    age:        (findKey('age')  ? (first[findKey('age')]  || '') : '').trim(),
+    points:     (findKey('poi')  ? (first[findKey('poi')]  || '') : '').trim(),
+    conference: (findKey('conf') ? (first[findKey('conf')] || '') : '').trim(),
+    division:   (findKey('div')  ? (first[findKey('div')]  || '') : '').trim(),
+    team:       (findKey('team') ? (first[findKey('team')] || '') : '').trim()
+  };
+}
+
+/* ── Extract player name from raw picks grid ── */
+function getPlayerNameFromGrid(picksGrid) {
+  // Row 0 = header row; Nathan name is at col 0 (A1), Sam name is at col 8 (I1)
+  // We use PLAYER_NAME_COL which is 0 for nathan, 8 for sam
+  const headerRow = picksGrid[0] || [];
+  return String(headerRow[PLAYER_NAME_COL] || '').trim();
+}
+
+/* ── Populate the shared datalist ── */
+function populateDatalist() {
+  elDatalist.innerHTML = allNames
+    .map(n => `<option value="${escapeHtml(n)}"></option>`)
+    .join('');
+}
+
+/* ── Escape HTML ── */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ── Badge helpers ── */
+function renderValueWithBadge(value, badgeHtml) {
+  return `<div class="cellFlex"><span class="value">${escapeHtml(value || '—')}</span>${badgeHtml || ''}</div>`;
+}
+function badgeGood(title)     { return `<span class="badge good"  title="${escapeHtml(title)}">✓</span>`; }
+function badgeBad(title)      { return `<span class="badge bad"   title="${escapeHtml(title)}">✗</span>`; }
+function badgeArrow(dir, tip) { return `<span class="badge arrow" title="${escapeHtml(tip)}">${dir}</span>`; }
+
+function toNum(v) {
+  const n = parseFloat(String(v || '').replace(/[^0-9.\-]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
+/* ── Compare submitted pick against current selection and mark badges ── */
+function compareAndMark(tr, picked) {
+  if (!currentSelection) return;
+  const c = tr._cells;
+
+  // Boolean fields
+  [
+    ['tdPos',  'position',   'Position'],
+    ['tdConf', 'conference', 'Conference'],
+    ['tdDiv',  'division',   'Division'],
+    ['tdTeam', 'team',       'Team']
+  ].forEach(([cell, field, label]) => {
+    const match = picked[field] && currentSelection[field] && picked[field] === currentSelection[field];
+    c[cell].innerHTML = renderValueWithBadge(
+      picked[field],
+      match ? badgeGood(label + ' matches') : badgeBad(label + ' does not match')
+    );
+  });
+
+  // Numeric fields with directional hints
+  [
+    ['tdAge', 'age',    'Age'],
+    ['tdPts', 'points', 'Points']
+  ].forEach(([cell, field, label]) => {
+    const vPick = toNum(picked[field]);
+    const vCur  = toNum(currentSelection[field]);
+    if (vPick != null && vCur != null && vPick === vCur) {
+      c[cell].innerHTML = renderValueWithBadge(String(picked[field]), badgeGood(label + ' matches'));
+    } else if (vPick != null && vCur != null) {
+      const dir = vCur > vPick ? '↑' : '↓';
+      const tip = vCur > vPick ? label + ' is higher' : label + ' is lower';
+      c[cell].innerHTML = renderValueWithBadge(String(picked[field]), badgeArrow(dir, tip));
+    } else {
+      c[cell].innerHTML = renderValueWithBadge(String(picked[field]), badgeBad(label + ' — data missing'));
+    }
+  });
+}
+
+/* ── Fill row with player attributes (pre-submit preview) ── */
+/* NOTE: Player info is intentionally hidden before submit so players
+   cannot check attributes before committing to a guess. */
+function fillRow(tr, row) {
+  const c = tr._cells;
+  // Always show dashes — never reveal player info before submission
+  ['tdPos','tdAge','tdPts','tdConf','tdDiv','tdTeam'].forEach(k => {
+    c[k].textContent = '—';
+    c[k].className = 'meta mutedText';
+  });
+}
+
+/* ── Render all 5 pick rows ── */
+function renderRows() {
+  elRows.innerHTML = '';
+
+  for (let i = 1; i <= NUM_PICKS; i++) {
+    const tr = document.createElement('tr');
+
+    // # column
+    const tdPick = document.createElement('td');
+    tdPick.innerHTML = `<span class="pickNum">${i}</span>`;
+    tr.appendChild(tdPick);
+
+    // Input column — single shared datalist referenced by all inputs
+    const tdSel = document.createElement('td');
+    const inputWrap = document.createElement('div');
+    inputWrap.style.display = 'flex';
+    inputWrap.style.gap = '10px';
+    inputWrap.style.alignItems = 'center';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'playerInput';
+    input.placeholder = '— type player name —';
+    input.setAttribute('list', 'playerList');  // shared datalist
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+
+    inputWrap.appendChild(input);
+    tdSel.appendChild(inputWrap);
+    tr.appendChild(tdSel);
+
+    // Attribute columns
+    const tdPos  = document.createElement('td'); tdPos.className  = 'meta mutedText'; tdPos.textContent  = '—'; tr.appendChild(tdPos);
+    const tdAge  = document.createElement('td'); tdAge.className  = 'meta mutedText'; tdAge.textContent  = '—'; tr.appendChild(tdAge);
+    const tdPts  = document.createElement('td'); tdPts.className  = 'meta mutedText'; tdPts.textContent  = '—'; tr.appendChild(tdPts);
+    const tdConf = document.createElement('td'); tdConf.className = 'meta mutedText'; tdConf.textContent = '—'; tr.appendChild(tdConf);
+    const tdDiv  = document.createElement('td'); tdDiv.className  = 'meta mutedText'; tdDiv.textContent  = '—'; tr.appendChild(tdDiv);
+    const tdTeam = document.createElement('td'); tdTeam.className = 'meta mutedText'; tdTeam.textContent = '—'; tr.appendChild(tdTeam);
+
+    // Submit button column
+    const tdBtn = document.createElement('td');
+    const btn = document.createElement('button');
+    btn.className = 'btn primary';
+    btn.textContent = 'Submit';
+    btn.disabled = true;
+    tdBtn.appendChild(btn);
+    tr.appendChild(tdBtn);
+
+    tr._cells     = { tdPos, tdAge, tdPts, tdConf, tdDiv, tdTeam };
+    tr._submitted = false;
+
+    // Input change handler
+    function handlePickChange() {
+      if (tr._submitted) return;
+      const val = (input.value || '').trim();
+      const row = dataByName.get(val);
+      fillRow(tr, row || null);
+      btn.disabled = !row;
+    }
+    input.addEventListener('input',  handlePickChange);
+    input.addEventListener('change', handlePickChange);
+
+    // Submit handler
+    btn.addEventListener('click', async () => {
+      if (tr._submitted) return;
+      const pickedName = (input.value || '').trim();
+      const pickedRow  = dataByName.get(pickedName);
+      if (!pickedRow) return;
+
+      const sheetRow = i + 1;  // picks sheet rows 2–6
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try {
+        await sendSubmission({ player: PLAYER_KEY, row: sheetRow, name: pickedName });
+        tr._submitted   = true;
+        input.disabled  = true;
+        compareAndMark(tr, pickedRow);
+        btn.textContent = 'Submitted ✓';
+        toast(true, 'Pick #' + i + ' submitted: ' + pickedName);
+      } catch (e) {
+        console.error('Submit failed:', e);
+        btn.disabled    = false;
+        btn.textContent = 'Submit';
+        toast(false, 'Submit failed — check your connection.');
+      }
+    });
+
+    elRows.appendChild(tr);
+  }
+}
+
+/* ── Send pick to Apps Script ── */
+async function sendSubmission(payload) {
+  const url = new URL(SCRIPT_WEB_APP_URL);
+  url.searchParams.set("action", "submit");
+  url.searchParams.set("player", payload.player);
+  url.searchParams.set("row",    String(payload.row));
+  url.searchParams.set("name",   payload.name);
+  url.searchParams.set("_",      String(Date.now()));
+
+  // Primary: fetch with JSON response check
+  try {
+    const resp = await fetch(url.toString(), { method: "GET", cache: "no-store" });
+    const txt  = await resp.text();
+    const j    = JSON.parse(txt);
+    if (!j.ok) throw new Error(j.error || "Server error");
+    return true;
+  } catch (primaryErr) {
+    console.warn('Primary submit failed, trying Image fallback:', primaryErr);
+  }
+
+  // Fallback: Image ping for corporate proxies that block fetch CORS
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    let done = false;
+    const finish = (ok) => {
+      if (done) return;
+      done = true;
+      if (ok) resolve(true);
+      else reject(new Error('Image fallback failed'));
+    };
+    img.onload  = () => finish(true);
+    img.onerror = () => finish(true);  // treat network error as "sent" — GAS fires on onerror too
+    img.src = url.toString();
+    setTimeout(() => finish(true), 1500);
+  });
+}
+
+/* ── Main init / refresh ── */
+async function init(silent = false) {
+  if (!silent) setStatus(true, 'Loading…');
+
+  try {
+    const data = await fetchLiveData();
+
+    // Player name from picks grid header row
+    const picksGrid = data.picks || [];
+    const playerLabel = getPlayerNameFromGrid(picksGrid);
+    if (playerLabel) elName.textContent = playerLabel;
+
+    // Build player data map
+    buildDataMap(data.playerData || []);
+
+    // Build current selection
+    currentSelection = buildCurrentSelection(data.currentSelection || []);
+    setCurStatus(!!currentSelection);
+
+    // Populate shared datalist
+    populateDatalist();
+
+    // Only render rows on first load — preserve any in-progress submissions
+    if (!silent) renderRows();
+
+    setStatus(true, 'Ready');
+    updateTimestamp();
+    startCountdown();
+
+  } catch (e) {
+    console.error('Init failed:', e);
+    setStatus(false, 'Load failed');
+    setCurStatus(false);
+    if (!silent) toast(false, 'Could not load data — check your network.');
+  }
+}
+
+/* ── Auto-refresh (re-fetches data without rebuilding submitted rows) ── */
+function scheduleAutoRefresh() {
+  clearTimeout(autoRefreshTimer);
+  autoRefreshTimer = setTimeout(async () => {
+    await init(true);   // silent = true: keeps existing rows, just refreshes data
+    scheduleAutoRefresh();
+  }, AUTO_REFRESH_MS);
+}
+
+init();
+scheduleAutoRefresh();
+</script>
+</body>
+</html>

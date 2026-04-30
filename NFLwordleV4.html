@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Work NFL Picker – Summary</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg0:#070A12; --bg1:#0B1226; --bg2:#101B3A;
+      --glass:rgba(255,255,255,.10); --glass2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.18);
+      --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.68);
+      --good:rgba(52,211,153,1); --bad:rgba(248,113,113,1); --warn:rgba(250,204,21,1);
+      --shadow:0 18px 55px rgba(0,0,0,.55); --radius:22px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text); min-height:100vh; overflow-x:hidden;
+      background:
+        radial-gradient(1000px 650px at 20% 20%,rgba(249,115,22,.18),transparent 60%),
+        radial-gradient(900px 650px at 80% 25%,rgba(59,130,246,.18),transparent 55%),
+        radial-gradient(900px 700px at 50% 90%,rgba(168,85,247,.14),transparent 55%),
+        linear-gradient(180deg,var(--bg0),var(--bg1) 40%,var(--bg2));
+    }
+    .wrap{ max-width:1280px; margin:0 auto; padding:24px 16px 44px; }
+
+    /* ── Top bar ── */
+    .topbar{ display:flex; gap:14px; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background:linear-gradient(135deg,rgba(249,115,22,.80),rgba(59,130,246,.72));
+      box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.18);
+      position:relative; overflow:hidden;
+    }
+    .logo:before{
+      content:""; position:absolute; inset:-30%;
+      background:repeating-linear-gradient(90deg,rgba(255,255,255,.0) 0 18px,rgba(255,255,255,.12) 18px 22px);
+      transform:rotate(12deg);
+    }
+    .brand h1{ font-size:18px; line-height:1.1; margin:0; font-weight:800; letter-spacing:.4px; }
+    .brand p{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+    .topRight{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .statusbar{ display:flex; gap:10px; align-items:center; color:var(--muted); font-size:12px; }
+    .dot{ width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.25); box-shadow:0 0 0 4px rgba(255,255,255,.06); flex-shrink:0; }
+    .dot.ok{ background:rgba(52,211,153,.95); box-shadow:0 0 0 4px rgba(52,211,153,.12); }
+    .dot.bad{ background:rgba(248,113,113,.95); box-shadow:0 0 0 4px rgba(248,113,113,.12); }
+    .tsText{ font-size:11px; color:var(--muted); }
+    .btn{
+      cursor:pointer; border:1px solid rgba(255,255,255,.16);
+      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.06));
+      color:rgba(255,255,255,.92); padding:10px 14px; border-radius:14px;
+      font-weight:700; font-family:inherit; letter-spacing:.2px;
+      transition:transform .08s ease,border-color .15s; user-select:none; white-space:nowrap;
+    }
+    .btn:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.22); }
+    .btn:active{ transform:translateY(0); }
+
+    /* ── Score cards ── */
+    .scoreRow{
+      display:grid; grid-template-columns:1fr auto 1fr;
+      gap:14px; align-items:center; margin-bottom:18px;
+    }
+    .scoreCard{
+      background:linear-gradient(180deg,var(--glass),var(--glass2));
+      border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:18px 20px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .scoreCard.leading{ border-color:rgba(52,211,153,.45); box-shadow:0 0 0 1px rgba(52,211,153,.15),var(--shadow); }
+    .avatar{
+      width:46px; height:46px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; font-weight:800; flex-shrink:0;
+    }
+    .av-n{ background:rgba(59,130,246,.22); color:rgba(147,197,253,1); border:1px solid rgba(59,130,246,.30); }
+    .av-s{ background:rgba(249,115,22,.22); color:rgba(253,186,116,1); border:1px solid rgba(249,115,22,.30); }
+    .scoreInfo{ flex:1; min-width:0; }
+    .scoreName{ font-size:18px; font-weight:800; letter-spacing:.2px; }
+    .scoreNum{ text-align:right; flex-shrink:0; }
+    .scoreNumBig{ font-size:32px; font-weight:800; line-height:1; }
+    .scoreNumBig.leading{ color:rgba(52,211,153,1); }
+    .scoreNumBig.trailing{ color:var(--muted); }
+    .scoreNumLabel{ font-size:11px; color:var(--muted); margin-top:2px; text-align:right; }
+    .leaderBadge{
+      font-size:11px; font-weight:700; letter-spacing:.3px; text-transform:uppercase;
+      background:rgba(52,211,153,.18); color:rgba(52,211,153,1);
+      border:1px solid rgba(52,211,153,.28); border-radius:999px;
+      padding:4px 10px; white-space:nowrap; flex-shrink:0;
+    }
+    .vsBadge{
+      font-size:13px; font-weight:800; color:var(--muted);
+      background:var(--glass); border:1px solid var(--border);
+      border-radius:999px; padding:8px 14px; text-align:center; white-space:nowrap;
+    }
+
+    /* ── Main picks card ── */
+    .card{
+      background:linear-gradient(180deg,var(--glass),var(--glass2));
+      border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--shadow); overflow:hidden;
+    }
+    .cardHeader{
+      padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .cardTitle{ font-size:14px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); }
+
+    /* ── Column header row ── */
+    .colHeader{
+      display:grid;
+      grid-template-columns: 50px 1fr 28px 28px 28px 28px 28px 28px 8px 1fr 28px 28px 28px 28px 28px 28px;
+      gap:6px; padding:10px 16px;
+      background:rgba(12,18,40,.55);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      font-size:11px; letter-spacing:.4px; text-transform:uppercase; color:var(--muted);
+      align-items:center;
+    }
+    .colHeader .playerLabel{ font-size:12px; font-weight:700; color:rgba(255,255,255,.75); }
+    .colHeader .attrLabel{ text-align:center; }
+    .colDivider{ width:1px; background:rgba(255,255,255,.10); align-self:stretch; }
+
+    /* ── Pick row ── */
+    .pickRow{
+      display:grid;
+      grid-template-columns: 50px 1fr 28px 28px 28px 28px 28px 28px 8px 1fr 28px 28px 28px 28px 28px 28px;
+      gap:6px; padding:12px 16px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      align-items:center;
+      transition:background .1s;
+    }
+    .pickRow:last-child{ border-bottom:none; }
+    .pickRow:hover{ background:rgba(255,255,255,.03); }
+
+    /* Solved row — both got it right (tie) */
+    .pickRow.solved-tie{
+      background: rgba(250,204,21,.05);
+      border-left: 3px solid rgba(250,204,21,.5);
+    }
+    /* Solved row — only one person got it right */
+    .pickRow.solved-n{
+      background: rgba(52,211,153,.04);
+      border-left: 3px solid rgba(52,211,153,.4);
+    }
+    .pickRow.solved-s{
+      background: rgba(52,211,153,.04);
+      border-left: 3px solid rgba(52,211,153,.4);
+    }
+
+    .pickNumCircle{
+      width:28px; height:28px; border-radius:50%;
+      background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:800; color:rgba(255,255,255,.70);
+    }
+    .playerPickName{
+      font-size:13px; font-weight:600; white-space:nowrap;
+      overflow:hidden; text-overflow:ellipsis;
+      color:rgba(255,255,255,.90);
+    }
+    .playerPickName.pending{ color:var(--muted); font-weight:400; font-style:italic; }
+    .playerPickName.got-it{ color:rgba(52,211,153,1); }
+    .playerPickName.tied-it{ color:rgba(250,204,21,1); }
+
+    /* ── Status badges ── */
+    .badge{
+      width:26px; height:22px; border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:900; line-height:1;
+      border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:var(--muted);
+      cursor:default;
+    }
+    .badge.ok{   border-color:rgba(52,211,153,.35); background:rgba(52,211,153,.14); color:rgba(52,211,153,1); }
+    .badge.bad{  border-color:rgba(248,113,113,.35); background:rgba(248,113,113,.14); color:rgba(248,113,113,1); }
+    .badge.arr{  border-color:rgba(250,204,21,.35);  background:rgba(250,204,21,.14);  color:rgba(250,204,21,1); }
+    .badge.muted{ opacity:.45; }
+
+    /* ── Legend ── */
+    .legend{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .legItem{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 10px; border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04); border-radius:999px;
+      font-size:12px; color:var(--muted);
+    }
+
+    /* ── No data state ── */
+    .emptyMsg{ padding:32px; text-align:center; color:var(--muted); font-size:14px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Work NFL Picker</h1>
+        <p>Summary &amp; Results</p>
+      </div>
+    </div>
+    <div class="topRight">
+      <span class="tsText" id="tsText"></span>
+      <div class="statusbar">
+        <span id="dot" class="dot"></span>
+        <span id="statusText">Loading…</span>
+      </div>
+      <button class="btn" id="refreshBtn">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Score summary cards -->
+  <div class="scoreRow" id="scoreRow"></div>
+
+  <!-- Picks comparison card -->
+  <div class="card">
+    <div class="cardHeader">
+      <span class="cardTitle">Pick-by-pick results</span>
+      <span style="font-size:12px;color:var(--muted);">Hover badges for details · Columns: Pos · Age · Pts · Conf · Div · Team</span>
+    </div>
+    <div class="colHeader">
+      <div></div>
+      <div class="playerLabel" id="nColLabel">NATHAN</div>
+      <div class="attrLabel" title="Position">Po</div>
+      <div class="attrLabel" title="Age">Ag</div>
+      <div class="attrLabel" title="Points">Pt</div>
+      <div class="attrLabel" title="Conference">Co</div>
+      <div class="attrLabel" title="Division">Dv</div>
+      <div class="attrLabel" title="Team">Tm</div>
+      <div class="colDivider"></div>
+      <div class="playerLabel" id="sColLabel">SAM</div>
+      <div class="attrLabel" title="Position">Po</div>
+      <div class="attrLabel" title="Age">Ag</div>
+      <div class="attrLabel" title="Points">Pt</div>
+      <div class="attrLabel" title="Conference">Co</div>
+      <div class="attrLabel" title="Division">Dv</div>
+      <div class="attrLabel" title="Team">Tm</div>
+    </div>
+    <div id="pickRows"><div class="emptyMsg">Loading…</div></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legItem"><span class="badge ok">✓</span> Correct</div>
+    <div class="legItem"><span class="badge bad">✗</span> Wrong</div>
+    <div class="legItem"><span class="badge arr">↑</span> Need higher</div>
+    <div class="legItem"><span class="badge arr">↓</span> Need lower</div>
+    <div class="legItem"><span class="badge muted">—</span> Not submitted</div>
+  </div>
+
+</div>
+
+<script>
+/*** CONFIG ***/
+const SCRIPT_WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbygBfNQAiyWaKf69z-0mJ58JfHZRmn1nX7iJ9gv0UxXDxxBNzDo9XQ83BeErmhrIqr3VQ/exec";
+
+// Public CSV for the running scoreboard (Nathan col A row 2, Sam col B row 2)
+const SCORES_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7-NfeL-PNHti9NS4z2Rk_i1MRyNwcrF8yYTA6VzpvFcdg3j5KxHQp2SPltrkuhgNXB9Q3vE0iU75K/pub?gid=224409268&single=true&output=csv";
+
+const NUM_PICKS = 5;
+
+// Column indices (0-based) in the picks sheet
+const COL_NATHAN_LABEL = 0;
+const COL_NATHAN_SEL   = 1;
+const COL_NATHAN_POS   = 2;
+
+const COL_SAM_LABEL    = 8;
+const COL_SAM_SEL      = 9;
+const COL_SAM_POS      = 10;
+
+const AUTO_REFRESH_MS = 60000;
+/*** END CONFIG ***/
+
+const elDot       = document.getElementById('dot');
+const elStatus    = document.getElementById('statusText');
+const elTsText    = document.getElementById('tsText');
+const elScoreRow  = document.getElementById('scoreRow');
+const elPickRows  = document.getElementById('pickRows');
+const elNColLabel = document.getElementById('nColLabel');
+const elSColLabel = document.getElementById('sColLabel');
+
+let autoRefreshTimer = null;
+let countdownTimer   = null;
+let countdown        = Math.round(AUTO_REFRESH_MS / 1000);
+
+document.getElementById('refreshBtn').addEventListener('click', () => load());
+
+function setStatus(ok, text) {
+  elDot.className = "dot " + (ok ? "ok" : "bad");
+  elStatus.textContent = text;
+}
+
+function updateTimestamp() {
+  const t = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  elTsText.textContent = "Refreshed " + t;
+}
+
+function startCountdown() {
+  clearInterval(countdownTimer);
+  countdown = Math.round(AUTO_REFRESH_MS / 1000);
+  countdownTimer = setInterval(() => {
+    countdown--;
+    if (countdown <= 0) { clearInterval(countdownTimer); }
+    else { elTsText.textContent = elTsText.textContent.replace(/ · \d+s/, '') + ' · ' + countdown + 's'; }
+  }, 1000);
+}
+
+/* ── Fetch picks from Apps Script ── */
+async function fetchPicksData() {
+  const url = new URL(SCRIPT_WEB_APP_URL);
+  url.searchParams.set("action", "getdata");
+  url.searchParams.set("_", String(Date.now()));
+  const resp = await fetch(url.toString(), { cache: "no-store" });
+  if (!resp.ok) throw new Error("HTTP " + resp.status);
+  const data = await resp.json();
+  if (!data.ok) throw new Error(data.error || "Server error");
+  return data;
+}
+
+/* ── Fetch running scores — tries Apps Script first (no cache lag), falls back to CSV ── */
+async function fetchScoresCSV() {
+  let nName = 'NATHAN', sName = 'SAM', nScore = 0, sScore = 0;
+
+  // Primary: Apps Script getscores action — always fresh, bypasses Google Sheets publish cache
+  try {
+    const url = new URL(SCRIPT_WEB_APP_URL);
+    url.searchParams.set("action", "getscores");
+    url.searchParams.set("_", String(Date.now()));
+    const resp = await fetch(url.toString(), { cache: "no-store" });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.ok && data.scores) {
+        nName  = data.scores.nName  || nName;
+        sName  = data.scores.sName  || sName;
+        nScore = parseInt(data.scores.nScore, 10) || 0;
+        sScore = parseInt(data.scores.sScore, 10) || 0;
+        // Cache freshly-fetched scores so page refreshes don't flicker to stale data
+        try { sessionStorage.setItem('nflScores', JSON.stringify({ nName, sName, nScore, sScore, ts: Date.now() })); } catch(_) {}
+        return { nName, sName, nScore, sScore };
+      }
+    }
+  } catch(e) {
+    console.warn('Apps Script getscores failed, falling back to CSV:', e);
+  }
+
+  // Fallback: CSV export (Google Sheets publish cache can be up to ~5 min stale)
+  try {
+    const csvUrl = SCORES_CSV_URL + "&cachebust=" + Date.now();
+    const resp2  = await fetch(csvUrl, { cache: "no-store" });
+    if (resp2.ok) {
+      const text = await resp2.text();
+      const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim().replace(/^"|"$/g,'')));
+      nName  = (rows[0] && rows[0][0]) ? rows[0][0] : nName;
+      sName  = (rows[0] && rows[0][1]) ? rows[0][1] : sName;
+      nScore = parseInt((rows[1] && rows[1][0]) || '0', 10);
+      sScore = parseInt((rows[1] && rows[1][1]) || '0', 10);
+      return { nName, sName, nScore: isNaN(nScore) ? 0 : nScore, sScore: isNaN(sScore) ? 0 : sScore };
+    }
+  } catch(e2) {
+    console.warn('CSV scores fallback also failed:', e2);
+  }
+
+  // Last resort: use sessionStorage cache if it's recent (< 5 min old)
+  try {
+    const cached = JSON.parse(sessionStorage.getItem('nflScores') || 'null');
+    if (cached && (Date.now() - cached.ts) < 300000) {
+      return { nName: cached.nName, sName: cached.sName, nScore: cached.nScore, sScore: cached.sScore };
+    }
+  } catch(_) {}
+
+  return { nName, sName, nScore: 0, sScore: 0 };
+}
+
+function cell(row, idx) {
+  return String((row || [])[idx] ?? '').trim();
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function badge(type, symbol, title) {
+  return `<span class="badge ${type}" title="${esc(title)}">${symbol}</span>`;
+}
+
+function badgeFromSheetValue(v, labelBase) {
+  const t = String(v ?? '').trim().toUpperCase();
+  if (!t || t === '—' || t === 'N/A' || t === '#N/A' || t === 'NA' || t === 'NULL') {
+    return badge('muted', '—', labelBase + ': not submitted');
+  }
+  if (t === 'TRUE'  || t === 'YES') return badge('ok',  '✓', labelBase + ': correct');
+  if (t === 'FALSE' || t === 'NO')  return badge('bad', '✗', labelBase + ': wrong');
+  if (t === 'HIGHER') return badge('arr', '↑', labelBase + ': need higher');
+  if (t === 'LOWER')  return badge('arr', '↓', labelBase + ': need lower');
+  return badge('muted', t.slice(0, 2), labelBase + ': ' + t);
+}
+
+/* Returns true if all 6 attribute cols for this row are YES/TRUE */
+function isAllCorrect(row, posCol) {
+  for (let a = 0; a < 6; a++) {
+    const v = String((row || [])[posCol + a] ?? '').trim().toUpperCase();
+    if (v !== 'TRUE' && v !== 'YES') return false;
+  }
+  return true;
+}
+
+/* ── Render score cards (numbers come from CSV) ── */
+function renderScoreCards(nName, sName, nScore, sScore) {
+  const nLeading = nScore > sScore;
+  const sLeading = sScore > nScore;
+  const tied     = nScore === sScore;
+
+  function card(initial, colorClass, name, score, isLeading) {
+    const numClass = isLeading ? 'leading' : 'trailing';
+    return `
+      <div class="scoreCard ${isLeading ? 'leading' : ''}">
+        <div class="avatar ${colorClass}">${initial}</div>
+        <div class="scoreInfo">
+          <div class="scoreName">${esc(name)}</div>
+        </div>
+        <div class="scoreNum">
+          <div class="scoreNumBig ${numClass}">${score}</div>
+          <div class="scoreNumLabel">correct</div>
+        </div>
+        ${isLeading ? '<div class="leaderBadge">Leader</div>' : ''}
+      </div>`;
+  }
+
+  elScoreRow.innerHTML =
+    card('N', 'av-n', nName, nScore, nLeading) +
+    `<div class="vsBadge">${tied ? 'Tied' : 'VS'}</div>` +
+    card('S', 'av-s', sName, sScore, sLeading);
+}
+
+/* ── Render pick rows ── */
+function renderPickRows(rows) {
+  const ATTR_LABELS = ['Position','Age','Points','Conference','Division','Team'];
+
+  // Count how many picks each person has submitted (non-empty selection cell)
+  let nPickCount = 0, sPickCount = 0;
+  for (let i = 1; i <= NUM_PICKS; i++) {
+    const row = rows[i] || [];
+    if (cell(row, COL_NATHAN_SEL)) nPickCount++;
+    if (cell(row, COL_SAM_SEL))    sPickCount++;
+  }
+
+  // For each round, we need to know: at what pick# did each person get it right?
+  // A player's name is revealed for round i only when:
+  //   - that player got it right on pick i (isAllCorrect)
+  //   - AND both players have made at least i picks total (equal pick count >= i)
+  // OR if neither got it right yet, show "Submitted" (no name) as before.
+
+  let html = '';
+
+  for (let i = 1; i <= NUM_PICKS; i++) {
+    const row   = rows[i] || [];
+    const nName = cell(row, COL_NATHAN_SEL);
+    const sName = cell(row, COL_SAM_SEL);
+
+    const nCorrect = nName ? isAllCorrect(row, COL_NATHAN_POS) : false;
+    const sCorrect = sName ? isAllCorrect(row, COL_SAM_POS)    : false;
+    const bothCorrect = nCorrect && sCorrect;
+
+    // Can we reveal names for this round?
+    // Reveal is allowed once BOTH players have >= i picks submitted.
+    const bothHaveReachedThisRound = nPickCount >= i && sPickCount >= i;
+    const canReveal = bothHaveReachedThisRound;
+
+    // Row highlight class
+    let rowClass = 'pickRow';
+    if (bothCorrect)       rowClass += ' solved-tie';
+    else if (nCorrect)     rowClass += ' solved-n';
+    else if (sCorrect)     rowClass += ' solved-s';
+
+    let nBadges = '', sBadges = '';
+    for (let a = 0; a < 6; a++) {
+      nBadges += badgeFromSheetValue(cell(row, COL_NATHAN_POS + a), 'Nathan · ' + ATTR_LABELS[a]);
+      sBadges += badgeFromSheetValue(cell(row, COL_SAM_POS    + a), 'Sam · '    + ATTR_LABELS[a]);
+    }
+
+    // Pick label logic:
+    // - If not submitted yet: "— not yet —"
+    // - If submitted but can't reveal yet: "Submitted" (no player name)
+    // - If can reveal AND correct: show player name + "Got it! 🎉" or "Tied 🤝"
+    // - If can reveal AND not correct: show player name (so you can see what they guessed)
+    let nLabel, sLabel;
+
+    if (!nName) {
+      nLabel = `<span class="playerPickName pending">— not yet —</span>`;
+    } else if (!canReveal) {
+      // Submitted but other player hasn't caught up — hide name
+      nLabel = `<span class="playerPickName">Submitted</span>`;
+    } else if (bothCorrect) {
+      nLabel = `<span class="playerPickName tied-it" title="${esc(nName)}">${esc(nName)} · Tied 🤝</span>`;
+    } else if (nCorrect) {
+      nLabel = `<span class="playerPickName got-it" title="${esc(nName)}">${esc(nName)} · Got it! 🎉</span>`;
+    } else {
+      nLabel = `<span class="playerPickName" title="${esc(nName)}">${esc(nName)}</span>`;
+    }
+
+    if (!sName) {
+      sLabel = `<span class="playerPickName pending">— not yet —</span>`;
+    } else if (!canReveal) {
+      sLabel = `<span class="playerPickName">Submitted</span>`;
+    } else if (bothCorrect) {
+      sLabel = `<span class="playerPickName tied-it" title="${esc(sName)}">${esc(sName)} · Tied 🤝</span>`;
+    } else if (sCorrect) {
+      sLabel = `<span class="playerPickName got-it" title="${esc(sName)}">${esc(sName)} · Got it! 🎉</span>`;
+    } else {
+      sLabel = `<span class="playerPickName" title="${esc(sName)}">${esc(sName)}</span>`;
+    }
+
+    html += `
+      <div class="${rowClass}">
+        <div class="pickNumCircle">${i}</div>
+        ${nLabel}
+        ${nBadges}
+        <div class="colDivider"></div>
+        ${sLabel}
+        ${sBadges}
+      </div>`;
+  }
+
+  elPickRows.innerHTML = html || '<div class="emptyMsg">No pick data found.</div>';
+}
+
+/* ── Main load ── */
+async function load() {
+  setStatus(true, 'Loading…');
+  elPickRows.innerHTML = '<div class="emptyMsg">Loading…</div>';
+  elScoreRow.innerHTML = '';
+
+  try {
+    // Fetch both sources in parallel
+    const [picksData, scoresData] = await Promise.all([fetchPicksData(), fetchScoresCSV()]);
+
+    const picks     = picksData.picks || [];
+    const headerRow = picks[0] || [];
+
+    // Names: prefer picks sheet header, fall back to scores CSV
+    const nName = String(headerRow[COL_NATHAN_LABEL] || '').trim() || scoresData.nName;
+    const sName = String(headerRow[COL_SAM_LABEL]    || '').trim() || scoresData.sName;
+
+    elNColLabel.textContent = nName;
+    elSColLabel.textContent = sName;
+
+    // Scores always come from the CSV
+    renderScoreCards(nName, sName, scoresData.nScore, scoresData.sScore);
+
+    renderPickRows(picks);
+
+    setStatus(true, 'Ready');
+    updateTimestamp();
+    startCountdown();
+
+  } catch (e) {
+    console.error('Load failed:', e);
+    setStatus(false, 'Load failed');
+    elPickRows.innerHTML = '<div class="emptyMsg">Could not load data. Try refreshing.</div>';
+  }
+}
+
+function scheduleAutoRefresh() {
+  clearTimeout(autoRefreshTimer);
+  autoRefreshTimer = setTimeout(() => { load(); scheduleAutoRefresh(); }, AUTO_REFRESH_MS);
+}
+
+load();
+scheduleAutoRefresh();
+</script>
+</body>
+</html>
