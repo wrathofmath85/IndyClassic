@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Indy Classic – Consolation</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,300&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --bg1:#09090f;
+      --bg2:#0f0f1a;
+      --accent:#38bdf8;
+      --accent2:#22c55e;
+      --gold:#f59e0b;
+      --text:rgba(255,255,255,.93);
+      --muted:rgba(255,255,255,.55);
+      --glass:rgba(255,255,255,.06);
+      --glassBorder:rgba(255,255,255,.12);
+      --shadow:0 20px 60px rgba(0,0,0,.5);
+      --radius:20px;
+      --ok:rgba(34,197,94,.15);
+      --okBorder:rgba(34,197,94,.35);
+      --warn:rgba(245,158,11,.15);
+      --warnBorder:rgba(245,158,11,.35);
+      --danger:rgba(244,63,94,.15);
+      --dangerBorder:rgba(244,63,94,.35);
+      --closed:rgba(255,255,255,.06);
+      --closedBorder:rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{min-height:100%;}
+    body{
+      font-family:'DM Sans',system-ui,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(ellipse 1100px 600px at 10% 0%, rgba(56,189,248,.12), transparent 60%),
+        radial-gradient(ellipse 800px 500px at 90% 60%, rgba(34,197,94,.08), transparent 55%),
+        linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 100%);
+      min-height:100vh;
+      padding:0 0 60px;
+      overflow-x:hidden;
+    }
+
+    /* ── decorative blobs ── */
+    .blob{position:fixed;border-radius:999px;filter:blur(70px);opacity:.12;z-index:0;pointer-events:none;}
+    .blob1{width:520px;height:520px;top:-200px;left:-150px;background:rgba(56,189,248,.9);}
+    .blob2{width:420px;height:420px;bottom:-160px;right:-120px;background:rgba(168,85,247,.9);}
+
+    /* ── top banner ── */
+    .banner{
+      position:relative;z-index:2;
+      background:rgba(0,0,0,.45);
+      border-bottom:1px solid rgba(255,255,255,.09);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      padding:28px 28px 24px;
+    }
+    .bannerInner{
+      max-width:1100px;margin:0 auto;
+      display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+      justify-content:space-between;
+    }
+    .logoBlock{display:flex;align-items:center;gap:16px;}
+    .logoMark{
+      width:56px;height:56px;
+      border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),rgba(56,189,248,.4));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:28px;letter-spacing:.02em;
+      color:#fff;
+      border:1px solid rgba(56,189,248,.4);
+      box-shadow:0 0 28px rgba(56,189,248,.25);
+      flex-shrink:0;
+    }
+    .titleBlock{}
+    .titleBlock .eyebrow{
+      font-size:10px;font-weight:700;
+      letter-spacing:.16em;text-transform:uppercase;
+      color:var(--accent);margin-bottom:4px;
+    }
+    .titleBlock h1{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(26px,5vw,42px);
+      letter-spacing:.04em;line-height:1;color:#fff;
+    }
+    .titleBlock .sub{
+      font-size:12px;color:var(--muted);margin-top:4px;font-weight:500;
+    }
+    .refreshArea{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    }
+    .refreshNote{font-size:11.5px;color:var(--muted);}
+    .refreshBtn{
+      font-size:12px;font-weight:700;
+      padding:8px 16px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.07);
+      color:var(--text);cursor:pointer;
+      transition:background .18s,border-color .18s;
+    }
+    .refreshBtn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.26);}
+
+    /* ── main wrap ── */
+    .wrap{max-width:1100px;margin:0 auto;position:relative;z-index:1;padding:32px 24px 0;}
+
+    /* ── view switching ── */
+    .view{display:none;}
+    .view.active{display:block;}
+
+    /* ── events grid (main hub) ── */
+    .sectionTitle{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:22px;letter-spacing:.06em;
+      color:rgba(255,255,255,.6);
+      margin-bottom:18px;
+      display:flex;align-items:center;gap:12px;
+    }
+    .sectionTitle::after{
+      content:'';flex:1;height:1px;
+      background:linear-gradient(90deg,rgba(255,255,255,.12),transparent);
+    }
+
+    .eventsGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:14px;
+    }
+
+    .eventCard{
+      background:var(--glass);
+      border:1px solid var(--glassBorder);
+      border-radius:var(--radius);
+      padding:18px 20px;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      transition:border-color .2s,box-shadow .2s,background .2s;
+    }
+    .eventCard:hover{
+      border-color:rgba(255,255,255,.2);
+      background:rgba(255,255,255,.09);
+      box-shadow:0 8px 32px rgba(0,0,0,.3);
+    }
+
+    .eventName{
+      font-weight:700;font-size:15px;
+      letter-spacing:-.01em;line-height:1.25;
+      flex:1;min-width:0;
+    }
+
+    /* status badges */
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:11.5px;font-weight:700;letter-spacing:.04em;
+      padding:7px 13px;border-radius:999px;
+      white-space:nowrap;flex-shrink:0;
+    }
+    .badge.closed{
+      background:var(--closed);border:1px solid var(--closedBorder);
+      color:var(--muted);
+    }
+    .badge.open{
+      background:var(--ok);border:1px solid var(--okBorder);
+      color:#4ade80;cursor:pointer;
+      transition:background .18s,border-color .18s,transform .14s;
+    }
+    .badge.open:hover{
+      background:rgba(34,197,94,.25);
+      transform:scale(1.04);
+    }
+    .badge.draws{
+      background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);
+      color:var(--accent);cursor:pointer;
+      transition:background .18s,border-color .18s,transform .14s;
+    }
+    .badge.draws:hover{
+      background:rgba(56,189,248,.22);
+      transform:scale(1.04);
+    }
+    .badge.soon{
+      background:var(--warn);border:1px solid var(--warnBorder);
+      color:#fbbf24;
+    }
+    .dot{width:7px;height:7px;border-radius:999px;flex-shrink:0;}
+    .dot.green{background:#4ade80;box-shadow:0 0 6px #4ade80;}
+    .dot.blue{background:var(--accent);box-shadow:0 0 6px var(--accent);}
+    .dot.amber{background:#fbbf24;box-shadow:0 0 6px #fbbf24;}
+
+    /* closing-soon countdown */
+    .closingSoon{
+      font-size:11px;color:#fbbf24;font-weight:600;
+      margin-top:5px;
+    }
+
+    /* skeleton loading */
+    .skeletonGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+    .skeletonCard{
+      height:72px;border-radius:var(--radius);
+      background:rgba(255,255,255,.05);border:1px solid var(--glassBorder);
+      animation:shimmer 1.5s ease-in-out infinite;
+    }
+    @keyframes shimmer{
+      0%,100%{opacity:.5;}50%{opacity:1;}
+    }
+
+    .loadMsg{
+      text-align:center;padding:40px;color:var(--muted);font-size:14px;
+    }
+    .errMsg{
+      padding:20px 22px;border-radius:var(--radius);
+      background:var(--danger);border:1px solid var(--dangerBorder);
+      color:rgba(255,255,255,.88);font-size:13.5px;
+    }
+
+    /* ── back button / sub-page header ── */
+    .subHeader{
+      display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap;
+    }
+    .backBtn{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12.5px;font-weight:700;letter-spacing:.04em;
+      padding:9px 16px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.07);
+      color:var(--text);cursor:pointer;
+      transition:background .18s,border-color .18s;
+    }
+    .backBtn:hover{background:rgba(255,255,255,.12);}
+    .subTitle{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(20px,4vw,32px);
+      letter-spacing:.05em;line-height:1;
+    }
+    .subPill{
+      font-size:12px;font-weight:700;
+      padding:6px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.07);
+      color:var(--muted);margin-left:auto;
+    }
+
+    /* ── panel ── */
+    .panel{
+      background:var(--glass);
+      border:1px solid var(--glassBorder);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      padding:22px 24px;
+    }
+
+    /* ── form controls ── */
+    .form{display:flex;flex-direction:column;gap:14px;}
+    label.lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+    select{
+      width:100%;padding:13px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(9,9,15,.6);
+      color:var(--text);outline:none;
+      font-family:'DM Sans',sans-serif;font-size:14px;
+      cursor:pointer;
+    }
+    select:focus{border-color:rgba(56,189,248,.4);}
+
+    .infoBox{
+      padding:13px 14px;border-radius:14px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.11);
+      color:rgba(255,255,255,.8);font-size:13.5px;
+      min-height:46px;display:flex;align-items:center;
+    }
+
+    .btn{
+      width:100%;padding:14px 18px;
+      border-radius:14px;
+      border:1px solid rgba(56,189,248,.35);
+      background:rgba(56,189,248,.14);
+      color:#fff;font-family:'DM Sans',sans-serif;font-size:14.5px;font-weight:800;
+      cursor:pointer;letter-spacing:.02em;
+      transition:background .18s,border-color .18s,transform .14s,box-shadow .18s;
+      box-shadow:0 8px 24px rgba(56,189,248,.12);
+    }
+    .btn:hover{
+      background:rgba(56,189,248,.24);
+      border-color:rgba(56,189,248,.6);
+      transform:translateY(-2px);
+      box-shadow:0 14px 36px rgba(56,189,248,.2);
+    }
+    .btn:active{transform:scale(.99);}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+
+    /* ── status toast ── */
+    .toast{
+      margin-top:16px;padding:13px 16px;
+      border-radius:14px;font-size:13.5px;color:rgba(255,255,255,.9);
+      display:none;
+    }
+    .toast.ok{display:block;background:var(--ok);border:1px solid var(--okBorder);}
+    .toast.err{display:block;background:var(--danger);border:1px solid var(--dangerBorder);}
+    .toast.warn{display:block;background:var(--warn);border:1px solid var(--warnBorder);}
+
+    /* spinner */
+    .spinner{
+      width:16px;height:16px;border-radius:999px;
+      border:2px solid rgba(255,255,255,.3);
+      border-top-color:#fff;display:inline-block;
+      vertical-align:-3px;animation:spin .8s linear infinite;
+      margin-right:8px;
+    }
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ── notice box ── */
+    .notice{
+      padding:14px 16px;border-radius:16px;
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
+      font-size:13.5px;line-height:1.5;margin-bottom:16px;
+    }
+    .notice strong{color:#fff;}
+
+    /* ── summary grid (signups) ── */
+    .summaryGrid{margin-top:20px;display:grid;grid-template-columns:1fr;gap:10px;}
+    .divCard{
+      padding:14px 16px;border-radius:16px;
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);
+    }
+    .divTop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+    .divName{font-weight:800;font-size:14px;letter-spacing:-.01em;}
+    .nameList{list-style:none;display:flex;flex-wrap:wrap;gap:7px;}
+    .nameChip{
+      font-size:12px;padding:5px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);color:rgba(255,255,255,.82);
+    }
+
+    /* ── draws bracket ── */
+    .drawControls{
+      display:grid;grid-template-columns:minmax(220px,380px) 1fr;
+      gap:14px;align-items:end;margin-bottom:16px;
+    }
+    .metaGrid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px;
+    }
+    .metaCard{
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;padding:12px 14px;
+    }
+    .metaLabel{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+    .metaValue{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.02em;}
+
+    .drawWrap{overflow-x:auto;padding-bottom:12px;}
+    .bracket{display:flex;gap:24px;min-width:max-content;align-items:flex-start;}
+    .roundCol{min-width:244px;}
+    .roundTitle{font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+    .roundStack{display:flex;flex-direction:column;}
+    .matchCard{
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;overflow:hidden;min-height:82px;
+    }
+    .playerRow{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 12px;
+    }
+    .playerRow+.playerRow{border-top:1px solid rgba(255,255,255,.08);}
+    .playerLeft{display:flex;align-items:center;gap:8px;min-width:0;}
+    .seedBadge{
+      min-width:30px;height:22px;padding:0 7px;border-radius:999px;
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:900;color:rgba(255,255,255,.85);
+      background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.11);flex-shrink:0;
+    }
+    .playerName{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .playerNum{color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+    .byeRow{background:rgba(99,102,241,.1);}
+    .advancedRow{background:rgba(34,197,94,.1);}
+    .seedList{
+      margin-top:16px;display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;
+    }
+    .seedItem{
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);
+      border-radius:13px;padding:10px 12px;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      font-size:13px;
+    }
+    .emptyDraw{
+      padding:20px;border-radius:16px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);font-size:13.5px;
+    }
+
+    /* ── footer note ── */
+    .footNote{
+      margin-top:20px;font-size:11.5px;color:var(--muted);
+      text-align:center;
+    }
+
+    @media(max-width:860px){
+      .drawControls{grid-template-columns:1fr;}
+      .metaGrid{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:540px){
+      .banner{padding:20px 18px 18px;}
+      .wrap{padding:22px 16px 0;}
+      .metaGrid{grid-template-columns:1fr;}
+      .panel{padding:18px 16px;}
+      .eventsGrid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <!-- ── TOP BANNER ── -->
+  <div class="banner">
+    <div class="bannerInner">
+      <div class="logoBlock">
+        <div class="logoMark">IC</div>
+        <div class="titleBlock">
+          <div class="eyebrow">2026 Indy Classic Tennis Tournament</div>
+          <h1>Consolation</h1>
+          <div class="sub">Sign-up &amp; Draws Hub</div>
+        </div>
+      </div>
+      <div class="refreshArea">
+        <span class="refreshNote" id="lastUpdated">Loading…</span>
+        <button class="refreshBtn" id="refreshBtn">↻ Refresh</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW: HUB (main events list)              -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view active" id="viewHub">
+      <div class="sectionTitle">Events</div>
+      <div id="eventsContainer">
+        <div class="skeletonGrid">
+          <div class="skeletonCard"></div>
+          <div class="skeletonCard"></div>
+          <div class="skeletonCard"></div>
+          <div class="skeletonCard"></div>
+          <div class="skeletonCard"></div>
+          <div class="skeletonCard"></div>
+        </div>
+      </div>
+      <div class="footNote" id="hubFootNote"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW: SIGNUP for a specific event         -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view" id="viewSignup">
+      <div class="subHeader">
+        <button class="backBtn" id="backFromSignup">← Back</button>
+        <div class="subTitle" id="signupTitle">Sign Up</div>
+        <div class="subPill" id="signupPill"></div>
+      </div>
+
+      <div class="panel" id="signupPanel">
+        <div class="loadMsg">Loading…</div>
+      </div>
+      <div class="toast" id="signupToast"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW: DRAW for a specific event           -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view" id="viewDraw">
+      <div class="subHeader">
+        <button class="backBtn" id="backFromDraw">← Back</button>
+        <div class="subTitle" id="drawTitle">Draw</div>
+        <div class="subPill" id="drawPill"></div>
+      </div>
+
+      <div class="panel" id="drawPanel">
+        <div class="loadMsg">Loading draw…</div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+// ── CONFIGURATION ─────────────────────────────────────────────
+// Events sheet: columns Event | Status
+// Published CSV of your events/status tab
+const EVENTS_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=YOUR_EVENTS_GID&single=true&output=csv";
+
+// Players / entry list: columns Name | Firstname | Entry Info | Include (Y/N)
+const ENTRY_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
+
+// Per-event submissions: columns Name | Firstname | Event | Number
+// This is one consolidated sheet that stores sign-ups for ALL events.
+// The Apps Script should accept an "event" field and record it here.
+const SUBMISSIONS_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
+
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
+
+// How often to auto-refresh the hub (ms). 90 seconds.
+const AUTO_REFRESH_MS = 90_000;
+// ── END CONFIGURATION ─────────────────────────────────────────
+
+const tidy  = v => (v == null ? "" : String(v).trim());
+const upper = v => tidy(v).toUpperCase();
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ── Cache-busted fetch ──────────────────────────────────────
+async function parseCSV(url){
+  const bust = url + (url.includes("?")?"&":"?") + "_t=" + Date.now();
+  const r = await fetch(bust, { cache:"no-store" });
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const txt = await r.text();
+  return new Promise((res,rej) => {
+    Papa.parse(txt,{
+      header:true, skipEmptyLines:"greedy",
+      complete:d=>res(d.data||[]),
+      error:e=>rej(e)
+    });
+  });
+}
+
+// ── Status parsing ─────────────────────────────────────────
+// Status meanings:
+//   "Closed"              → closed, no link
+//   "Open"                → open indefinitely (show sign-up link)
+//   "10AM", "2PM", "4:30PM" → open until that time today (then auto-shows draw link)
+//   "Draw" / "Draws"      → show draw link
+//   anything else          → treat as closed / coming soon
+const TIME_RE = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i;
+
+function parseTimeStatus(raw){
+  const m = tidy(raw).match(TIME_RE);
+  if(!m) return null;
+  let h = parseInt(m[1],10);
+  const min = parseInt(m[2]||"0",10);
+  const ampm = m[3].toUpperCase();
+  if(ampm==="PM" && h!==12) h+=12;
+  if(ampm==="AM" && h===12) h=0;
+  return { h, min, display: tidy(raw).toUpperCase() };
+}
+
+function classifyStatus(rawStatus){
+  const s = tidy(rawStatus);
+  const up = upper(s);
+
+  if(!s || up==="CLOSED") return { type:"closed" };
+  if(up==="OPEN")         return { type:"open" };
+  if(up==="DRAW" || up==="DRAWS") return { type:"draws" };
+
+  const t = parseTimeStatus(s);
+  if(t){
+    // Deadline is today at h:min
+    const now = new Date();
+    const deadline = new Date(now);
+    deadline.setHours(t.h, t.min, 0, 0);
+    if(now >= deadline){
+      return { type:"draws", closedAt: t.display };
+    }else{
+      return { type:"open", closesAt: deadline, closesDisplay: t.display };
+    }
+  }
+
+  return { type:"closed" };
+}
+
+// ── Submissions helpers ─────────────────────────────────────
+async function loadSubmissions(){
+  const rows = await parseCSV(SUBMISSIONS_CSV);
+  return rows.map(r=>({
+    name:     tidy(r["Name"]),
+    firstname:tidy(r["Firstname"]),
+    event:    tidy(r["Event"] || r["Singles"]),  // support old "Singles" column
+    number:   Number(tidy(r["Number"]))
+  })).filter(p=>(p.firstname||p.name)&&p.event);
+}
+
+function canonKey(fn,ln){
+  return (tidy(fn).toLowerCase()+"|"+tidy(ln).toLowerCase()).trim();
+}
+
+function pickUnique(used){
+  if(used.size>=1000) return null;
+  for(let t=0;t<5000;t++){
+    const c=Math.floor(Math.random()*1000)+1;
+    if(!used.has(c)) return c;
+  }
+  for(let i=1;i<=1000;i++) if(!used.has(i)) return i;
+  return null;
+}
+
+// ── Draw logic ─────────────────────────────────────────────
+function getDrawSize(n){
+  if(n<=0)  return 0;
+  if(n<=2)  return 2;
+  if(n<=4)  return 4;
+  if(n<=8)  return 8;
+  if(n<=16) return 16;
+  return 32;
+}
+
+function seedOrder(size){
+  if(size===1) return [1];
+  let a=[1,2];
+  while(a.length<size){
+    const ns=a.length*2,next=[];
+    for(const s of a){ next.push(s); next.push(ns+1-s); }
+    a=next;
+  }
+  return a;
+}
+
+function getRoundName(idx,total){
+  const r=total-idx;
+  if(r===1) return "Final";
+  if(r===2) return "Semifinals";
+  if(r===3) return "Quarterfinals";
+  if(r===4) return "Round of 16";
+  if(r===5) return "Round of 32";
+  return `Round ${idx+1}`;
+}
+
+function buildDraw(players){
+  const count=players.length;
+  const size=getDrawSize(count);
+  if(!size) return null;
+  const sm=new Map(players.map(p=>[p.seed,p]));
+  const so=seedOrder(size);
+  const pairs=[];
+  for(let i=0;i<so.length;i+=2) pairs.push([so[i],so[i+1]]);
+  const rounds=[];
+  const r1=pairs.map(([a,b])=>{
+    const pA=sm.get(a)||null, pB=sm.get(b)||null;
+    return{slotA:a,slotB:b,playerA:pA,playerB:pB,
+      autoWinner:pA&&!pB?pA:pB&&!pA?pB:null};
+  });
+  rounds.push(r1);
+  let prev=r1;
+  while(prev.length>1){
+    const next=[];
+    for(let i=0;i<prev.length;i+=2){
+      const m1=prev[i],m2=prev[i+1];
+      const pA=m1?m1.autoWinner:null, pB=m2?m2.autoWinner:null;
+      next.push({slotA:null,slotB:null,playerA:pA,playerB:pB,
+        autoWinner:pA&&!pB?pA:pB&&!pA?pB:null});
+    }
+    rounds.push(next); prev=next;
+  }
+  const total=Math.log2(size);
+  return{size,rounds,total};
+}
+
+function playerRowHtml(player,slot,isBye,isAdv){
+  let cls="";
+  if(isBye) cls+=" byeRow";
+  if(isAdv) cls+=" advancedRow";
+  const badge=slot!=null?slot:"W";
+  let name=isBye?"BYE":player?esc(player.displayName):"Winner of prior match";
+  const num=player?`# ${player.number??'—'}`:"";
+  return `<div class="playerRow${cls}">
+    <div class="playerLeft">
+      <div class="seedBadge">${badge}</div>
+      <div class="playerName">${name}</div>
+    </div>
+    <div class="playerNum">${num}</div>
+  </div>`;
+}
+
+function renderBracketHtml(rounds,total){
+  return `<div class="drawWrap"><div class="bracket">${
+    rounds.map((round,ri)=>{
+      const sp=ri===0?0:((Math.pow(2,ri)-1)*54);
+      const bt=ri===0?12:((Math.pow(2,ri)*108)-96);
+      return `<div class="roundCol">
+        <div class="roundTitle">${getRoundName(ri,total)}</div>
+        <div class="roundStack" style="padding-top:${sp}px;gap:${bt}px;">
+          ${round.map((m,mi)=>{
+            if(ri===0){
+              const aB=!m.playerA,bB=!m.playerB;
+              return `<div class="matchCard" data-round="${ri+1}" data-match="${mi+1}">
+                ${playerRowHtml(m.playerA,m.slotA,aB,!!(m.playerA&&bB))}
+                ${playerRowHtml(m.playerB,m.slotB,bB,!!(m.playerB&&aB))}
+              </div>`;
+            }
+            const aK=!!m.playerA,bK=!!m.playerB;
+            return `<div class="matchCard" data-round="${ri+1}" data-match="${mi+1}">
+              ${playerRowHtml(m.playerA,null,false,aK&&!bK)}
+              ${playerRowHtml(m.playerB,null,false,bK&&!aK)}
+            </div>`;
+          }).join("")}
+        </div>
+      </div>`;
+    }).join("")
+  }</div></div>`;
+}
+
+// ── DOM refs ────────────────────────────────────────────────
+const views       = { hub:document.getElementById("viewHub"),
+                      signup:document.getElementById("viewSignup"),
+                      draw:document.getElementById("viewDraw") };
+const eventsContainer = document.getElementById("eventsContainer");
+const hubFootNote     = document.getElementById("hubFootNote");
+const lastUpdated     = document.getElementById("lastUpdated");
+const refreshBtn      = document.getElementById("refreshBtn");
+
+const backFromSignup  = document.getElementById("backFromSignup");
+const signupTitle     = document.getElementById("signupTitle");
+const signupPill      = document.getElementById("signupPill");
+const signupPanel     = document.getElementById("signupPanel");
+const signupToast     = document.getElementById("signupToast");
+
+const backFromDraw    = document.getElementById("backFromDraw");
+const drawTitle       = document.getElementById("drawTitle");
+const drawPill        = document.getElementById("drawPill");
+const drawPanel       = document.getElementById("drawPanel");
+
+function showView(name){
+  for(const [k,el] of Object.entries(views)){
+    el.classList.toggle("active", k===name);
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// Toast helpers
+function setToast(type,msg){
+  signupToast.className="toast "+type;
+  signupToast.textContent=msg;
+}
+function clearToast(){ signupToast.className="toast"; }
+
+// ── Auto-refresh scheduling ─────────────────────────────────
+let refreshTimer=null;
+function scheduleRefresh(){
+  clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(()=>{ loadHub(false); }, AUTO_REFRESH_MS);
+}
+
+// ── HUB loader ──────────────────────────────────────────────
+async function loadHub(showSkeleton=true){
+  if(showSkeleton){
+    eventsContainer.innerHTML=`<div class="skeletonGrid">
+      ${Array(6).fill('<div class="skeletonCard"></div>').join("")}
+    </div>`;
+  }
+  lastUpdated.textContent="Refreshing…";
+
+  let eventRows=[];
+  try{
+    eventRows = await parseCSV(EVENTS_CSV);
+  }catch(e){
+    eventsContainer.innerHTML=`<div class="errMsg">⚠ Could not load the events list. Check the EVENTS_CSV URL. (${e.message})</div>`;
+    lastUpdated.textContent="Error";
+    scheduleRefresh();
+    return;
+  }
+
+  const now=new Date();
+  lastUpdated.textContent="Updated "+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  const rows = eventRows.filter(r=>tidy(r["Event"]));
+
+  if(!rows.length){
+    eventsContainer.innerHTML=`<div class="errMsg">No events found. Check that the sheet has an "Event" column.</div>`;
+    scheduleRefresh();
+    return;
+  }
+
+  // Figure out next auto-recalc time (earliest upcoming deadline)
+  let earliestDeadline=null;
+
+  const cards = rows.map(row=>{
+    const eventName = tidy(row["Event"]);
+    const rawStatus = tidy(row["Status"]);
+    const s = classifyStatus(rawStatus);
+
+    // Track earliest upcoming deadline for smart re-render
+    if(s.type==="open" && s.closesAt){
+      if(!earliestDeadline || s.closesAt < earliestDeadline) earliestDeadline=s.closesAt;
+    }
+
+    let badgeHtml="";
+    let closingSoonHtml="";
+
+    if(s.type==="closed"){
+      badgeHtml=`<div class="badge closed">Closed</div>`;
+    }else if(s.type==="open"){
+      const msLeft = s.closesAt ? (s.closesAt - now) : Infinity;
+      const minsLeft = Math.floor(msLeft/60000);
+      const closingLabel = s.closesDisplay ? `Sign Up · Closes ${s.closesDisplay}` : "Sign Up";
+      badgeHtml=`<div class="badge open" data-event="${esc(eventName)}" data-action="signup">
+        <span class="dot green"></span>${closingLabel}
+      </div>`;
+      if(s.closesAt && minsLeft<60 && minsLeft>=0){
+        closingSoonHtml=`<div class="closingSoon">Closes in ~${minsLeft} min</div>`;
+      }
+    }else if(s.type==="draws"){
+      badgeHtml=`<div class="badge draws" data-event="${esc(eventName)}" data-action="draw">
+        <span class="dot blue"></span>View Draw
+      </div>`;
+    }
+
+    return `<div class="eventCard">
+      <div>
+        <div class="eventName">${esc(eventName)}</div>
+        ${closingSoonHtml}
+      </div>
+      ${badgeHtml}
+    </div>`;
+  }).join("");
+
+  eventsContainer.innerHTML=`<div class="eventsGrid">${cards}</div>`;
+
+  // Click handlers
+  eventsContainer.querySelectorAll("[data-action='signup']").forEach(el=>{
+    el.addEventListener("click",()=>{
+      openSignup(el.dataset.event);
+    });
+  });
+  eventsContainer.querySelectorAll("[data-action='draw']").forEach(el=>{
+    el.addEventListener("click",()=>{
+      openDraw(el.dataset.event);
+    });
+  });
+
+  hubFootNote.textContent=`${rows.length} events · auto-refreshes every ${AUTO_REFRESH_MS/1000}s`;
+
+  // If a deadline is upcoming, schedule a precise re-render at that moment
+  if(earliestDeadline){
+    const msUntil = earliestDeadline - Date.now() + 500; // 500ms buffer
+    if(msUntil>0 && msUntil<AUTO_REFRESH_MS){
+      clearTimeout(refreshTimer);
+      refreshTimer=setTimeout(()=>{ loadHub(false); }, msUntil);
+      return; // will reschedule after
+    }
+  }
+  scheduleRefresh();
+}
+
+// ── SIGNUP VIEW ─────────────────────────────────────────────
+async function openSignup(eventName){
+  showView("signup");
+  signupTitle.textContent=eventName;
+  signupPill.textContent="Sign Up";
+  clearToast();
+  signupPanel.innerHTML=`<div class="loadMsg"><span class="spinner"></span> Loading player list…</div>`;
+
+  let entryRows=[], submissions=[];
+  try{ entryRows = await parseCSV(ENTRY_CSV); }catch(e){
+    signupPanel.innerHTML=`<div class="errMsg">Could not load the player list. (${e.message})</div>`;
+    return;
+  }
+  try{ submissions = await loadSubmissions(); }catch(_){}
+
+  // Players eligible for this event:
+  // Entry Info column (col C) must match eventName, Include (col E) must be Y
+  const eligible = entryRows
+    .map(r=>({
+      name:      tidy(r["Name"]),
+      firstname: tidy(r["Firstname"]),
+      entryInfo: tidy(r["Entry Info"] || r["Singles"]),
+      include:   upper(r["Include"])
+    }))
+    .filter(p=> p.include==="Y" && (p.name||p.firstname) &&
+                upper(p.entryInfo)===upper(eventName))
+    .sort((a,b)=>(a.firstname+" "+a.name).localeCompare(b.firstname+" "+b.name));
+
+  const signedUp = new Set(
+    submissions.filter(s=>upper(s.event)===upper(eventName))
+               .map(s=>canonKey(s.firstname,s.name))
+  );
+
+  // Build summary of current signups for this event
+  const currentNames = submissions
+    .filter(s=>upper(s.event)===upper(eventName))
+    .map(s=>`${s.firstname} ${s.name}`.trim())
+    .sort((a,b)=>a.localeCompare(b));
+
+  const summaryHtml = currentNames.length
+    ? `<div class="divCard" style="margin-top:20px;">
+        <div class="divTop">
+          <div class="divName">Current Entries</div>
+          <div class="badge closed" style="font-size:11px;padding:5px 10px;">${currentNames.length}</div>
+        </div>
+        <ul class="nameList">${currentNames.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("")}</ul>
+       </div>`
+    : `<div class="notice" style="margin-top:16px;color:var(--muted);">No entries yet for this event.</div>`;
+
+  if(!eligible.length){
+    signupPanel.innerHTML=`
+      <div class="notice"><strong>No eligible players found for "${esc(eventName)}".</strong><br>
+      Make sure the Entry Info column in the players sheet matches the event name exactly, and Include is Y.</div>
+      ${summaryHtml}`;
+    return;
+  }
+
+  signupPanel.innerHTML=`
+    <div class="notice">
+      <strong>Select your name to enter the consolation draw for ${esc(eventName)}.</strong>
+    </div>
+    <div class="form">
+      <div>
+        <label class="lbl" for="playerSel">Your name</label>
+        <select id="playerSel">
+          <option value="">— Select your name —</option>
+        </select>
+      </div>
+      <button class="btn" id="signupSubmitBtn" disabled>Submit Entry</button>
+    </div>
+    <div id="signupSummary">${summaryHtml}</div>
+  `;
+
+  const sel = document.getElementById("playerSel");
+  const btn = document.getElementById("signupSubmitBtn");
+  const summaryDiv = document.getElementById("signupSummary");
+
+  for(const p of eligible){
+    const label=`${p.firstname} ${p.name}`.trim();
+    const k=canonKey(p.firstname,p.name);
+    const opt=document.createElement("option");
+    opt.value=label;
+    opt.textContent=signedUp.has(k)?`${label} ✓ Already entered`:label;
+    opt.dataset.firstname=p.firstname;
+    opt.dataset.name=p.name;
+    opt.dataset.event=eventName;
+    if(signedUp.has(k)) opt.disabled=true;
+    sel.appendChild(opt);
+  }
+
+  sel.addEventListener("change",()=>{
+    clearToast();
+    btn.disabled=!sel.value;
+  });
+
+  btn.addEventListener("click", async()=>{
+    clearToast();
+    const opt=sel.selectedOptions[0];
+    const fn=opt?.dataset?.firstname||"";
+    const ln=opt?.dataset?.name||"";
+    const ev=opt?.dataset?.event||"";
+    if(!fn||!ln){ setToast("err","Please select your name."); return; }
+
+    const k=canonKey(fn,ln);
+
+    // Re-check for duplicates before submitting
+    try{
+      const latest=await loadSubmissions();
+      const latestSet=new Set(
+        latest.filter(s=>upper(s.event)===upper(ev)).map(s=>canonKey(s.firstname,s.name))
+      );
+      if(latestSet.has(k)){
+        setToast("err","You are already entered in this event.");
+        opt.textContent=`${fn} ${ln} ✓ Already entered`;
+        opt.disabled=true;
+        sel.value="";
+        btn.disabled=true;
+        return;
+      }
+    }catch(_){}
+
+    btn.disabled=true;
+    btn.innerHTML=`<span class="spinner"></span>Submitting…`;
+
+    try{
+      const used=new Set();
+      try{
+        const sub2=await loadSubmissions();
+        sub2.filter(s=>upper(s.event)===upper(ev))
+            .forEach(s=>{ if(Number.isFinite(s.number)) used.add(s.number); });
+      }catch(_){}
+      const num=pickUnique(used);
+      if(num==null) throw new Error("All numbers 1–1000 used.");
+
+      const fd=new FormData();
+      fd.append("firstname",fn);
+      fd.append("name",ln);
+      fd.append("singles",ev);  // keep "singles" for Apps Script compatibility
+      fd.append("event",ev);
+      fd.append("number",String(num));
+
+      await fetch(APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",body:fd});
+
+      setToast("ok",`✓ Submitted! Welcome to the ${ev} consolation draw.`);
+
+      // Update the entry list to show as signed up
+      opt.textContent=`${fn} ${ln} ✓ Already entered`;
+      opt.disabled=true;
+      sel.value="";
+      btn.disabled=true;
+
+      // Reload summary after a brief pause for the sheet to update
+      setTimeout(async()=>{
+        try{
+          const refreshed=await loadSubmissions();
+          const newNames=refreshed
+            .filter(s=>upper(s.event)===upper(ev))
+            .map(s=>`${s.firstname} ${s.name}`.trim())
+            .sort((a,b)=>a.localeCompare(b));
+          summaryDiv.innerHTML=newNames.length
+            ?`<div class="divCard" style="margin-top:20px;">
+               <div class="divTop">
+                 <div class="divName">Current Entries</div>
+                 <div class="badge closed" style="font-size:11px;padding:5px 10px;">${newNames.length}</div>
+               </div>
+               <ul class="nameList">${newNames.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("")}</ul>
+              </div>`
+            :summaryDiv.innerHTML;
+        }catch(_){}
+      }, 3500);
+
+    }catch(e){
+      setToast("err",e.message||"Submission failed. Please try again.");
+    }finally{
+      btn.innerHTML="Submit Entry";
+      if(!sel.value) btn.disabled=true;
+    }
+  });
+}
+
+// ── DRAW VIEW ───────────────────────────────────────────────
+async function openDraw(eventName){
+  showView("draw");
+  drawTitle.textContent=eventName;
+  drawPill.textContent="Draw";
+  drawPanel.innerHTML=`<div class="loadMsg"><span class="spinner"></span> Loading draw…</div>`;
+
+  let submissions=[];
+  try{ submissions=await loadSubmissions(); }catch(e){
+    drawPanel.innerHTML=`<div class="errMsg">Could not load submissions. (${e.message})</div>`;
+    return;
+  }
+
+  const players = submissions
+    .filter(s=>upper(s.event)===upper(eventName) && (s.firstname||s.name))
+    .sort((a,b)=>{
+      const an=Number.isFinite(a.number)?a.number:-Infinity;
+      const bn=Number.isFinite(b.number)?b.number:-Infinity;
+      if(bn!==an) return bn-an;
+      return (`${a.firstname} ${a.name}`).localeCompare(`${b.firstname} ${b.name}`);
+    })
+    .map((p,i)=>({
+      seed:i+1,
+      firstname:p.firstname,
+      name:p.name,
+      displayName:`${p.firstname} ${p.name}`.trim()||"—",
+      number:Number.isFinite(p.number)?p.number:null
+    }));
+
+  const count=players.length;
+  if(!count){
+    drawPanel.innerHTML=`<div class="emptyDraw">No entries found for ${esc(eventName)}.</div>`;
+    return;
+  }
+  if(count>32){
+    drawPanel.innerHTML=`<div class="emptyDraw">This event has ${count} entries — current draw logic supports up to 32 players.</div>`;
+    return;
+  }
+
+  const drawData=buildDraw(players);
+  if(!drawData){
+    drawPanel.innerHTML=`<div class="emptyDraw">Could not generate draw.</div>`;
+    return;
+  }
+
+  drawPill.textContent=`${count} entries · ${drawData.size}-player draw`;
+
+  const seedsHtml=`
+    <div style="margin-top:20px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Seeds</div>
+      <div class="seedList">
+        ${players.map(p=>`
+          <div class="seedItem">
+            <div><strong>${p.seed} Seed</strong> — ${esc(p.displayName)}</div>
+            <div style="font-size:11.5px;color:var(--muted);font-weight:700;">#${p.number??'—'}</div>
+          </div>`).join("")}
+      </div>
+    </div>`;
+
+  const metaHtml=`
+    <div class="metaGrid">
+      <div class="metaCard"><div class="metaLabel">Event</div><div class="metaValue" style="font-size:16px;font-family:'DM Sans',sans-serif;font-weight:900;">${esc(eventName)}</div></div>
+      <div class="metaCard"><div class="metaLabel">Entries</div><div class="metaValue">${count}</div></div>
+      <div class="metaCard"><div class="metaLabel">Draw Size</div><div class="metaValue">${drawData.size}</div></div>
+    </div>`;
+
+  drawPanel.innerHTML=metaHtml+renderBracketHtml(drawData.rounds,drawData.total)+seedsHtml;
+}
+
+// ── Navigation ──────────────────────────────────────────────
+backFromSignup.addEventListener("click",()=>{ showView("hub"); loadHub(false); });
+backFromDraw.addEventListener("click",()=>{ showView("hub"); loadHub(false); });
+refreshBtn.addEventListener("click",()=>{ loadHub(false); });
+
+// ── Boot ─────────────────────────────────────────────────────
+loadHub(true);
+</script>
+</body>
+</html>
