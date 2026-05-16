@@ -545,9 +545,15 @@ function esc(s){
 }
 
 // ── Cache-busted fetch ──────────────────────────────────────
+// Google Sheets CDN can serve stale data. Use both a timestamp AND a random
+// token plus aggressive headers to maximise the chance of a fresh response.
 async function parseCSV(url){
-  const bust = url + (url.includes("?")?"&":"?") + "_t=" + Date.now();
-  const r = await fetch(bust, { cache:"no-store" });
+  const sep  = url.includes("?") ? "&" : "?";
+  const bust = url + sep + "_t=" + Date.now() + "&_r=" + Math.random().toString(36).slice(2);
+  const r = await fetch(bust, {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" }
+  });
   if(!r.ok) throw new Error(`HTTP ${r.status}`);
   const txt = await r.text();
   return new Promise((res,rej) => {
@@ -608,7 +614,12 @@ function parsePartnerFromEntryInfo(entryInfo, eventName){
 }
 
 // ── Date/Time helpers for Eastern Time ─────────────────────
-// Parse "M/D/YYYY" date string
+
+// How many minutes past the close time before we flip to "View Draw".
+// This guards against stale CSV data causing the badge to toggle.
+const DRAW_GRACE_MINUTES = 5;
+
+// Parse "M/D/YYYY" or "MM/DD/YYYY" date string
 function parseDateString(dateStr){
   if(!dateStr) return null;
   const parts = dateStr.split("/");
@@ -633,46 +644,69 @@ function parseTimeString(timeStr){
   return { h, min };
 }
 
-// Build a Date object for a given date+time in Eastern Time
-// Uses the Intl API approach: construct an ISO string and adjust offset
+// Build a UTC Date for a specific wall-clock time in Eastern Time.
+// Strategy: use Intl.DateTimeFormat to find the ET UTC-offset at noon on that
+// calendar day (safe — noon is never ambiguous due to DST), then apply that
+// same offset to the actual hour:minute we want.  This is reliable across all
+// browsers because it never tries to parse a locale-formatted string.
 function buildEasternDate(dateObj, timeObj){
   if(!dateObj || !timeObj) return null;
-  // Format: "YYYY-MM-DDTHH:MM:00" in Eastern timezone
-  // We create the date in ET by using a string that the browser interprets correctly
-  // Use Intl to find the ET offset at roughly that moment
-  const approxUtc = new Date(Date.UTC(dateObj.year, dateObj.month-1, dateObj.day, timeObj.h, timeObj.min, 0));
-  // Get ET offset at that moment
-  const etStr = approxUtc.toLocaleString("en-US", { timeZone: EASTERN_TZ, hour12: false,
-    year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit" });
-  // etStr is like "05/30/2026, 07:00:00"
-  // We want to find offset = UTC - ET
-  const etParsed = new Date(etStr.replace(",",""));
-  const offsetMs = approxUtc - etParsed; // ms offset (ET is behind UTC, so positive)
-  // The actual UTC time for the desired ET time
-  return new Date(approxUtc.getTime() + offsetMs);
+  const { year, month, day } = dateObj;
+  const { h, min } = timeObj;
+
+  // Step 1: Get the ET offset (in minutes) at noon on the target date.
+  // We use noon so we're safely away from any DST transition hour.
+  const noonUtc = Date.UTC(year, month - 1, day, 17, 0, 0); // 17:00 UTC ≈ noon ET-ish
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: EASTERN_TZ,
+    hour: "numeric", minute: "numeric", second: "numeric",
+    hour12: false,
+    year: "numeric", month: "2-digit", day: "2-digit"
+  });
+  const parts = formatter.formatToParts(new Date(noonUtc));
+  const p = {};
+  for(const { type, value } of parts) p[type] = value;
+  // Reconstruct what ET says the local time is for noonUtc
+  const etLocal = Date.UTC(
+    parseInt(p.year,  10),
+    parseInt(p.month, 10) - 1,
+    parseInt(p.day,   10),
+    parseInt(p.hour,  10),
+    parseInt(p.minute,10),
+    parseInt(p.second,10)
+  );
+  // ET offset = UTC - ET_local  (e.g. -5h → offset = +5h in ms)
+  const offsetMs = noonUtc - etLocal;
+
+  // Step 2: The desired ET wall-clock time as if it were UTC, then shift by offset.
+  const wallClockAsUtc = Date.UTC(year, month - 1, day, h, min, 0);
+  return new Date(wallClockAsUtc + offsetMs);
 }
 
-// Format time nicely for display
-function formatTimeDisplay(timeStr){
-  if(!timeStr) return "";
-  return tidy(timeStr).toUpperCase();
+// Format a date for display: "Sat 5/30 · 7:00 AM ET"
+function formatDateTimeDisplay(dateObj, timeStr){
+  if(!dateObj || !timeStr) return timeStr ? tidy(timeStr).toUpperCase() : "";
+  const { year, month, day } = dateObj;
+  // Build a local date just for day-of-week display
+  const d = new Date(year, month - 1, day);
+  const dayName = d.toLocaleDateString("en-US", { weekday:"short" });
+  return `${dayName} ${month}/${day} · ${tidy(timeStr).toUpperCase()} ET`;
 }
 
 // ── Status classification using Date + Open + Close columns ─
 function classifyEventStatus(row){
-  const eventName = tidy(row["Event"]);
-  const dateStr   = tidy(row["Date"]);
-  const openStr   = tidy(row["Open"]);
-  const closeStr  = tidy(row["Close"]);
+  const dateStr  = tidy(row["Date"]);
+  const openStr  = tidy(row["Open"]);
+  const closeStr = tidy(row["Close"]);
 
   // If no date/open/close columns, fall back to old Status column
   if(!dateStr && !openStr && !closeStr){
-    return classifyLegacyStatus(tidy(row["Status"]), eventName);
+    return classifyLegacyStatus(tidy(row["Status"]));
   }
 
-  const dateParsed  = parseDateString(dateStr);
-  const openTime    = parseTimeString(openStr);
-  const closeTime   = parseTimeString(closeStr);
+  const dateParsed = parseDateString(dateStr);
+  const openTime   = parseTimeString(openStr);
+  const closeTime  = parseTimeString(closeStr);
 
   if(!dateParsed){
     return { type:"closed" };
@@ -682,32 +716,34 @@ function classifyEventStatus(row){
 
   // Build ET-based open and close timestamps
   const openDate  = openTime  ? buildEasternDate(dateParsed, openTime)  : null;
+  // Close timestamp + grace period before flipping to "View Draw"
   const closeDate = closeTime ? buildEasternDate(dateParsed, closeTime) : null;
+  const closeGrace = closeDate ? new Date(closeDate.getTime() + DRAW_GRACE_MINUTES * 60000) : null;
 
-  // If close time has passed → show draw
-  if(closeDate && now >= closeDate){
+  // DRAW: close time + grace period has passed
+  if(closeGrace && now >= closeGrace){
     return { type:"draws" };
   }
 
-  // If open time hasn't come yet → show closed with opens-at info
+  // CLOSED (not yet open): open time hasn't arrived yet
   if(openDate && now < openDate){
-    const opensDisplay = openStr ? formatTimeDisplay(openStr) : "";
+    const opensDisplay = formatDateTimeDisplay(dateParsed, openStr);
     return { type:"closed", opensAt: openDate, opensDisplay };
   }
 
-  // We're between open and close → open for signup
+  // OPEN: between open time and close time (or close grace)
   if(closeDate){
-    const msLeft  = closeDate - now;
+    const msLeft   = closeDate - now;
     const minsLeft = Math.floor(msLeft / 60000);
     return {
-      type:"open",
+      type: "open",
       closesAt: closeDate,
-      closesDisplay: formatTimeDisplay(closeStr),
+      closesDisplay: formatDateTimeDisplay(dateParsed, closeStr),
       minsLeft
     };
   }
 
-  // No close time specified, just open
+  // No close time — just open indefinitely
   return { type:"open" };
 }
 
