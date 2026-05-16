@@ -114,6 +114,7 @@
     .callout { border-radius: 14px; padding: 22px 26px; margin-bottom: 24px; }
     .callout-green { background: rgba(20,130,60,0.07); border: 1px solid rgba(20,130,60,0.22); }
     .callout-gold  { background: rgba(200,168,75,0.09); border: 1px solid rgba(200,168,75,0.30); }
+    .callout-navy  { background: rgba(15,31,61,0.05);  border: 1px solid rgba(15,31,61,0.15); }
 
     .callout-title {
       font-family: 'Playfair Display', serif;
@@ -138,9 +139,9 @@
       padding: 3px 10px;
     }
 
-    .callout-title .badge-gold { background: var(--gold); color: var(--navy2); }
+    .callout-title .badge-gold  { background: var(--gold);  color: var(--navy2); }
+    .callout-title .badge-navy  { background: var(--navy2); color: #fff; }
 
-    /* Plain list — no inline <strong> so text wraps naturally */
     ul.styled { list-style: none; padding: 0; margin: 0 0 8px; }
 
     ul.styled li {
@@ -174,7 +175,7 @@
 
     .note strong { color: var(--navy2); }
 
-    .banquet-link {
+    .cta-link {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -192,7 +193,13 @@
       box-shadow: 0 4px 16px rgba(20,130,60,0.3);
     }
 
-    .banquet-link:hover { background: var(--green2); transform: translateY(-1px); }
+    .cta-link:hover { background: var(--green2); transform: translateY(-1px); }
+
+    .cta-link.navy-btn {
+      background: var(--navy2);
+      box-shadow: 0 4px 16px rgba(15,31,61,0.25);
+    }
+    .cta-link.navy-btn:hover { background: #0a1528; }
 
     .signoff { margin-top: 36px; }
     .signoff p { margin-bottom: 6px; font-size: 1rem; }
@@ -231,6 +238,38 @@
 
       <hr class="divider" />
 
+      <!-- Main Draw -->
+      <h2 class="section-title">🏆 Main Draw — Day 2</h2>
+
+      <p>Play begins bright and early at <strong>8:00 AM</strong> tomorrow! Check the GLTA site for updated draws and your match time:</p>
+
+      <a href="https://glta.tournamentsoftware.com/sport/draws.aspx?id=0cab8d49-7782-4492-89ad-12582d67ed9e" target="_blank" class="cta-link navy-btn">
+        🎾 View Updated Draws →
+      </a>
+
+      <div class="note" style="margin-top: 20px;">
+        And even if you're no longer in the draw — come hang out! Cheer on your friends, cheer on whoever you find attractive, and enjoy the day. 😄
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Food & Coffee -->
+      <h2 class="section-title">☕ Food &amp; Drinks Tomorrow</h2>
+
+      <div class="callout callout-gold">
+        <div class="callout-title">
+          <span>What's On Deck</span>
+          <span class="badge badge-gold">Upstairs</span>
+        </div>
+        <ul class="styled">
+          <li>Coffee bar opens at <strong>7:30 AM</strong> — come early, it goes fast!</li>
+          <li>Jimmy John's served at <strong>noon</strong>, plus snacks available all day upstairs</li>
+        </ul>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Consolation -->
       <h2 class="section-title">🎾 Consolation Reminder</h2>
 
       <p>All Consolation Divisions will be played at <strong>Indianapolis Racquet Club Dean</strong>. Sign up via our website:</p>
@@ -251,7 +290,7 @@
         </div>
 
         <div style="margin-top: 16px;">
-          <a href="https://wrathofmath85.github.io/IndyClassic/Consolation.html" target="_blank" class="banquet-link">
+          <a href="https://wrathofmath85.github.io/IndyClassic/Consolation.html" target="_blank" class="cta-link">
             🔗 Consolation Sign-Up Website →
           </a>
         </div>
@@ -269,16 +308,18 @@
 
       <hr class="divider" />
 
-      <h2 class="section-title">🍽️ Players Banquet — Tomorrow!</h2>
+      <!-- Banquet -->
+      <h2 class="section-title">🍽️ Players Banquet — Tomorrow Night!</h2>
 
       <p>Our <strong>Players Banquet</strong> is tomorrow night from <strong>7:00 PM – 10:00 PM</strong> at <strong>Radius</strong> downtown. Visit the Banquet Website for all the details including address, menu, and what to expect!</p>
 
-      <a href="https://wrathofmath85.github.io/IndyClassic/Banquet.html" target="_blank" class="banquet-link">
+      <a href="https://wrathofmath85.github.io/IndyClassic/Banquet.html" target="_blank" class="cta-link">
         🥂 Banquet Details &amp; Info →
       </a>
 
       <hr class="divider" />
 
+      <!-- Sign-off -->
       <div class="signoff">
         <p>See you tomorrow — it's going to be a great Day 2!</p>
 
