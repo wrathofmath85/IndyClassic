@@ -514,21 +514,19 @@
 ============================================================ -->
 <script>
 // ── CONFIGURATION ─────────────────────────────────────────────
-// Events sheet: columns Event | Date | Open | Close
-// Published CSV of your events/status tab
-const EVENTS_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=994514669&single=true&output=csv";
+// Events are now fetched live from the Apps Script (doGet) so that
+// changes to dates/times appear immediately without CSV cache delay.
+// ENTRY_CSV and SUBMISSIONS_CSV still use published CSVs (player list
+// changes rarely; submissions are handled via doPost + JSON response).
 
-// Players / entry list: columns Name | Firstname | Entry Info | Doubles Partner | Include Singles (Y/N) | Include Doubles (Y/N)
 const ENTRY_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
 
-// Per-event submissions: columns Name | Firstname | Event | Number
 const SUBMISSIONS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyFd46TqI6sobzOF2ywEsXViQA_B481N1QQcKgNg5P6s-iDeEVt3I64bMG_m-IVNuwTjg/exec";
+  "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
 
 // How often to auto-refresh the hub (ms). 90 seconds.
 const AUTO_REFRESH_MS = 90_000;
@@ -957,9 +955,18 @@ async function loadHub(showSkeleton=true){
 
   let eventRows=[];
   try{
-    eventRows = await parseCSV(EVENTS_CSV);
+    // Fetch events live from Apps Script (doGet) — no CDN caching, always fresh
+    const r = await fetch(APPS_SCRIPT_URL, { cache:"no-store" });
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const json = await r.json();
+    if(json.status === "error") throw new Error(json.message);
+    // Apps Script returns { event, date, open, close } — normalise to same
+    // key capitalisation used elsewhere in the page ("Event", "Date", etc.)
+    eventRows = (json.events || []).map(ev=>({
+      "Event": ev.event, "Date": ev.date, "Open": ev.open, "Close": ev.close
+    }));
   }catch(e){
-    eventsContainer.innerHTML=`<div class="errMsg">⚠ Could not load the events list. Check the EVENTS_CSV URL. (${e.message})</div>`;
+    eventsContainer.innerHTML=`<div class="errMsg">⚠ Could not load the events list. (${e.message})</div>`;
     lastUpdated.textContent="Error";
     scheduleRefresh();
     return;
@@ -971,7 +978,7 @@ async function loadHub(showSkeleton=true){
   const rows = eventRows.filter(r=>tidy(r["Event"]));
 
   if(!rows.length){
-    eventsContainer.innerHTML=`<div class="errMsg">No events found. Check that the sheet has an "Event" column.</div>`;
+    eventsContainer.innerHTML=`<div class="errMsg">No events found in the sheet.</div>`;
     scheduleRefresh();
     return;
   }
@@ -1114,21 +1121,67 @@ async function openSignup(eventName){
   // (since partner signs up for them too)
   // We'll do this check dynamically in the select population
 
+  // Build a map of lowercase full name → partner display name, for pairing in the summary
+  const partnerMap = new Map();
+  if(isDoubles){
+    for(const p of allPlayers){
+      if(!p.doublesPartner) continue;
+      const key = (p.firstname+" "+p.name).trim().toLowerCase();
+      partnerMap.set(key, p.doublesPartner.trim());
+    }
+  }
+
+  // Takes a flat array of "Firstname Lastname" strings and returns HTML chips.
+  // For doubles events, pairs partners together into one chip: "A / B"
+  // Count shown in the badge reflects number of teams, not individuals.
+  function buildSummaryHtml(names){
+    if(!names.length) return `<div class="notice" style="margin-top:16px;color:var(--muted);">No entries yet for this event.</div>`;
+
+    let chips, count;
+    if(isDoubles){
+      // Pair up names into teams using the partnerMap, avoiding duplicates
+      const paired  = new Set();
+      const teams   = [];
+      for(const name of names){
+        if(paired.has(name.toLowerCase())) continue;
+        const partnerDisplay = partnerMap.get(name.toLowerCase());
+        if(partnerDisplay){
+          // Find the partner's full display name in the names list (case-insensitive)
+          const partnerInList = names.find(n => n.toLowerCase() === partnerDisplay.toLowerCase());
+          const partnerLabel  = partnerInList || partnerDisplay;
+          teams.push(`${esc(name)} / ${esc(partnerLabel)}`);
+          paired.add(name.toLowerCase());
+          paired.add(partnerLabel.toLowerCase());
+        } else {
+          // No partner found in roster — show solo
+          teams.push(esc(name));
+          paired.add(name.toLowerCase());
+        }
+      }
+      count = teams.length;
+      chips = teams.map(t=>`<li class="nameChip">${t}</li>`).join("");
+    } else {
+      count = names.length;
+      chips = names.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("");
+    }
+
+    const countLabel = isDoubles ? `${count} team${count!==1?"s":""}` : count;
+    return `<div class="divCard" style="margin-top:20px;">
+      <div class="divTop">
+        <div class="divName">Current Entries</div>
+        <div class="badge closed" style="font-size:11px;padding:5px 10px;">${countLabel}</div>
+      </div>
+      <ul class="nameList">${chips}</ul>
+    </div>`;
+  }
+
   // Build summary of current signups
   const currentNames = submissions
     .filter(s=>upper(s.event)===upper(eventName))
     .map(s=>`${s.firstname} ${s.name}`.trim())
     .sort((a,b)=>a.localeCompare(b));
 
-  const summaryHtml = currentNames.length
-    ? `<div class="divCard" style="margin-top:20px;">
-        <div class="divTop">
-          <div class="divName">Current Entries</div>
-          <div class="badge closed" style="font-size:11px;padding:5px 10px;">${currentNames.length}</div>
-        </div>
-        <ul class="nameList">${currentNames.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("")}</ul>
-       </div>`
-    : `<div class="notice" style="margin-top:16px;color:var(--muted);">No entries yet for this event.</div>`;
+  const summaryHtml = buildSummaryHtml(currentNames);
 
   if(!eligible.length){
     signupPanel.innerHTML=`
