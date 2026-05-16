@@ -527,7 +527,7 @@ const SUBMISSIONS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyFd46TqI6sobzOF2ywEsXViQA_B481N1QQcKgNg5P6s-iDeEVt3I64bMG_m-IVNuwTjg/exec";
+  "https://script.google.com/macros/s/AKfycbxfXYq-ozPRhmyNLsWnH7VbCOlAWg9289uLYvBiHKOXyb1lph0gZKnKmgpeRXxwPcU1RA/exec";
 
 // How often to auto-refresh the hub (ms). 90 seconds.
 const AUTO_REFRESH_MS = 90_000;
@@ -781,7 +781,8 @@ async function loadSubmissions(){
     name:     tidy(r["Name"]),
     firstname:tidy(r["Firstname"]),
     event:    tidy(r["Event"] || r["Singles"]),
-    number:   Number(tidy(r["Number"]))
+    number:   Number(tidy(r["Number"])),
+    partner:  tidy(r["Partner"] || "")   // doubles partner display name; blank for singles
   })).filter(p=>(p.firstname||p.name)&&p.event);
 }
 
@@ -865,7 +866,17 @@ function playerRowHtml(player,slot,isBye,isAdv){
   if(isBye) cls+=" byeRow";
   if(isAdv) cls+=" advancedRow";
   const badge=slot!=null?slot:"W";
-  let name=isBye?"BYE":player?esc(player.displayName):"Winner of prior match";
+  let name;
+  if(isBye){
+    name="BYE";
+  } else if(player){
+    // For doubles teams, show "Player / Partner" on one line
+    name = player.partner
+      ? `${esc(player.displayName)}<span style="color:var(--muted);margin:0 5px;font-weight:400">/</span>${esc(player.partner)}`
+      : esc(player.displayName);
+  } else {
+    name="Winner of prior match";
+  }
   const num=player?`# ${player.number??'—'}`:"";
   return `<div class="playerRow${cls}">
     <div class="playerLeft">
@@ -1105,66 +1116,31 @@ async function openSignup(eventName){
     .filter(p=> entryInfoMatchesEvent(p.entryInfo, eventName))
     .sort((a,b)=>(a.firstname+" "+a.name).localeCompare(b.firstname+" "+b.name));
 
-  // For doubles: build a lookup of partner name → player record
-  // so we can also find the partner's row and remove them from list
-  const playerByFullName = new Map();
-  for(const p of allPlayers){
-    const fullName = (p.firstname+" "+p.name).trim().toLowerCase();
-    playerByFullName.set(fullName, p);
-  }
-
-  const signedUp = new Set(
-    submissions.filter(s=>upper(s.event)===upper(eventName))
-               .map(s=>canonKey(s.firstname,s.name))
-  );
-
-  // For doubles, also mark people whose partner is already signed up
-  // (since partner signs up for them too)
-  // We'll do this check dynamically in the select population
-
-  // Build a map of lowercase full name → partner display name, for pairing in the summary
-  const partnerMap = new Map();
-  if(isDoubles){
-    for(const p of allPlayers){
-      if(!p.doublesPartner) continue;
-      const key = (p.firstname+" "+p.name).trim().toLowerCase();
-      partnerMap.set(key, p.doublesPartner.trim());
+  // Build set of already-entered names for this event.
+  // For doubles, one row covers two people (primary + partner), so add both.
+  const signedUp = new Set();
+  for(const s of submissions.filter(s=>upper(s.event)===upper(eventName))){
+    signedUp.add(canonKey(s.firstname, s.name));
+    if(s.partner){
+      // Partner stored as "Firstname Lastname" — split on first space
+      const pp = s.partner.trim().split(/\s+/);
+      signedUp.add(canonKey(pp[0]||"", pp.slice(1).join(" ")||""));
     }
   }
 
-  // Takes a flat array of "Firstname Lastname" strings and returns HTML chips.
-  // For doubles events, pairs partners together into one chip: "A / B"
-  // Count shown in the badge reflects number of teams, not individuals.
-  function buildSummaryHtml(names){
-    if(!names.length) return `<div class="notice" style="margin-top:16px;color:var(--muted);">No entries yet for this event.</div>`;
+  // Takes an array of entry objects {display, partner?} and builds the summary HTML.
+  // Singles: each entry is one chip. Doubles: each entry is one "A / B" chip.
+  function buildSummaryHtml(entries){
+    if(!entries.length) return `<div class="notice" style="margin-top:16px;color:var(--muted);">No entries yet for this event.</div>`;
 
-    let chips, count;
-    if(isDoubles){
-      // Pair up names into teams using the partnerMap, avoiding duplicates
-      const paired  = new Set();
-      const teams   = [];
-      for(const name of names){
-        if(paired.has(name.toLowerCase())) continue;
-        const partnerDisplay = partnerMap.get(name.toLowerCase());
-        if(partnerDisplay){
-          // Find the partner's full display name in the names list (case-insensitive)
-          const partnerInList = names.find(n => n.toLowerCase() === partnerDisplay.toLowerCase());
-          const partnerLabel  = partnerInList || partnerDisplay;
-          teams.push(`${esc(name)}<span class="sep">/</span>${esc(partnerLabel)}`);
-          paired.add(name.toLowerCase());
-          paired.add(partnerLabel.toLowerCase());
-        } else {
-          // No partner found in roster — show solo
-          teams.push(esc(name));
-          paired.add(name.toLowerCase());
-        }
+    const sorted = entries.slice().sort((a,b)=>a.display.localeCompare(b.display));
+    const count  = sorted.length;
+    const chips  = sorted.map(e=>{
+      if(e.partner){
+        return `<li class="nameChip">${esc(e.display)}<span class="sep">/</span>${esc(e.partner)}</li>`;
       }
-      count = teams.length;
-      chips = teams.map(t=>`<li class="nameChip">${t}</li>`).join("");
-    } else {
-      count = names.length;
-      chips = names.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("");
-    }
+      return `<li class="nameChip">${esc(e.display)}</li>`;
+    }).join("");
 
     const countLabel = isDoubles ? `${count} team${count!==1?"s":""}` : count;
     return `<div class="divCard" style="margin-top:20px;">
@@ -1176,13 +1152,13 @@ async function openSignup(eventName){
     </div>`;
   }
 
-  // Build summary of current signups
-  const currentNames = submissions
+  // Build summary of current signups — one entry object per row (team for doubles)
+  const currentEntries = submissions
     .filter(s=>upper(s.event)===upper(eventName))
-    .map(s=>`${s.firstname} ${s.name}`.trim())
-    .sort((a,b)=>a.localeCompare(b));
+    .map(s=>({ display:`${s.firstname} ${s.name}`.trim(), partner: s.partner||"" }))
+    .map(e=>e.partner ? e : { display: e.display }); // strip empty partner
 
-  const summaryHtml = buildSummaryHtml(currentNames);
+  const summaryHtml = buildSummaryHtml(currentEntries);
 
   if(!eligible.length){
     signupPanel.innerHTML=`
@@ -1225,28 +1201,8 @@ async function openSignup(eventName){
   for(const p of eligible){
     const label=`${p.firstname} ${p.name}`.trim();
     const k=canonKey(p.firstname,p.name);
-
-    // For doubles: also check if partner is already signed up (meaning this person is too)
-    let alreadyIn = signedUp.has(k);
-    if(!alreadyIn && isDoubles && p.doublesPartner){
-      // Check if partner is in signedUp by parsing partner name
-      const partnerFullLower = p.doublesPartner.trim().toLowerCase();
-      // Look up partner in allPlayers to get their canon key
-      const partnerPlayer = playerByFullName.get(partnerFullLower);
-      if(partnerPlayer){
-        const pk = canonKey(partnerPlayer.firstname, partnerPlayer.name);
-        if(signedUp.has(pk)) alreadyIn = true;
-      } else {
-        // Try to match by just checking submissions directly
-        const pLower = partnerFullLower;
-        for(const s of submissions){
-          if(upper(s.event)===upper(eventName)){
-            const sName = (s.firstname+" "+s.name).trim().toLowerCase();
-            if(sName === pLower){ alreadyIn = true; break; }
-          }
-        }
-      }
-    }
+    // signedUp already includes both primary and partner names from team rows
+    const alreadyIn = signedUp.has(k);
 
     const opt=document.createElement("option");
     opt.value=label;
@@ -1292,7 +1248,7 @@ async function openSignup(eventName){
     btn.innerHTML=`<span class="spinner"></span>Submitting…`;
 
     try{
-      // ── Helper: POST one entry, returns parsed JSON from Apps Script ──
+      // POST one team row — partner included in same request
       async function postEntry(fields){
         const fd = new FormData();
         for(const [k,v] of Object.entries(fields)) fd.append(k, v);
@@ -1301,24 +1257,14 @@ async function openSignup(eventName){
         return r.json();
       }
 
-      // Submit primary player — Apps Script returns JSON with updated entries list
+      // Single POST for the whole team — partner stored in col E server-side
       const result = await postEntry({
         firstname: fn, name: ln,
-        singles: ev, event: ev
-        // number omitted — let the script assign it server-side
+        singles: ev, event: ev,
+        partner: partner   // blank for singles; full display name for doubles
       });
 
       if(result.status === "error") throw new Error(result.message || "Submission failed.");
-
-      // For doubles: also submit the partner (fire-and-forget; server assigns number)
-      if(isDoubles && partner){
-        const partnerParts = partner.trim().split(/\s+/);
-        const partnerFn = partnerParts[0] || partner;
-        const partnerLn = partnerParts.slice(1).join(" ") || "";
-        // Don't await — partner write can happen in background
-        postEntry({ firstname: partnerFn, name: partnerLn, singles: ev, event: ev })
-          .catch(()=>{});
-      }
 
       const successMsg = isDoubles && partner
         ? `✓ Submitted! You and ${partner} are entered in the ${ev} consolation draw.`
@@ -1343,25 +1289,23 @@ async function openSignup(eventName){
       if(partnerBox) partnerBox.classList.remove("visible");
 
       // ── Update the Current Entries list ──
-      // Prefer the fresh list returned by the script; fall back to CSV if not present.
-      function renderSummary(names){
-        const html = buildSummaryHtml(names.slice().sort((a,b)=>a.localeCompare(b)));
-        summaryDiv.innerHTML = html;
+      // result.entries is [{display, partner?}, ...] — use directly, no CSV needed
+      function renderSummary(entries){
+        summaryDiv.innerHTML = buildSummaryHtml(entries);
       }
 
       if(result.entries && Array.isArray(result.entries)){
-        // Script returned the live list — update instantly, no wait needed
-        renderSummary(result.entries.sort((a,b)=>a.localeCompare(b)));
+        renderSummary(result.entries);
       } else {
-        // Fallback: wait a moment then re-fetch CSV (old behaviour)
+        // Fallback: re-fetch CSV after a pause
         setTimeout(async()=>{
           try{
             const refreshed = await loadSubmissions();
-            const newNames = refreshed
+            const entries = refreshed
               .filter(s=>upper(s.event)===upper(ev))
-              .map(s=>`${s.firstname} ${s.name}`.trim())
-              .sort((a,b)=>a.localeCompare(b));
-            renderSummary(newNames);
+              .map(s=>({ display:`${s.firstname} ${s.name}`.trim(), partner: s.partner||"" }))
+              .map(e=>e.partner ? e : { display: e.display });
+            renderSummary(entries);
           }catch(_){}
         }, 3500);
       }
@@ -1401,6 +1345,7 @@ async function openDraw(eventName){
       firstname:p.firstname,
       name:p.name,
       displayName:`${p.firstname} ${p.name}`.trim()||"—",
+      partner: p.partner||"",
       number:Number.isFinite(p.number)?p.number:null
     }));
 
@@ -1420,24 +1365,29 @@ async function openDraw(eventName){
     return;
   }
 
-  drawPill.textContent=`${count} entries · ${drawData.size}-player draw`;
+  const isDoublesDraw = isDoublesEvent(eventName);
+  drawPill.textContent=`${count} ${isDoublesDraw?"teams":"entries"} · ${drawData.size}-player draw`;
 
   const seedsHtml=`
     <div style="margin-top:20px;">
       <div style="font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Seeds</div>
       <div class="seedList">
-        ${players.map(p=>`
-          <div class="seedItem">
-            <div><strong>${p.seed} Seed</strong> — ${esc(p.displayName)}</div>
+        ${players.map(p=>{
+          const teamName = p.partner
+            ? `${esc(p.displayName)} / ${esc(p.partner)}`
+            : esc(p.displayName);
+          return `<div class="seedItem">
+            <div><strong>${p.seed} Seed</strong> — ${teamName}</div>
             <div style="font-size:11.5px;color:var(--muted);font-weight:700;">#${p.number??'—'}</div>
-          </div>`).join("")}
+          </div>`;
+        }).join("")}
       </div>
     </div>`;
 
   const metaHtml=`
     <div class="metaGrid">
       <div class="metaCard"><div class="metaLabel">Event</div><div class="metaValue" style="font-size:16px;font-family:'DM Sans',sans-serif;font-weight:900;">${esc(eventName)}</div></div>
-      <div class="metaCard"><div class="metaLabel">Entries</div><div class="metaValue">${count}</div></div>
+      <div class="metaCard"><div class="metaLabel">${isDoublesDraw?"Teams":"Entries"}</div><div class="metaValue">${count}</div></div>
       <div class="metaCard"><div class="metaLabel">Draw Size</div><div class="metaValue">${drawData.size}</div></div>
     </div>`;
 
