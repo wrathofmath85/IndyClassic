@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You — 2026 Indy Classic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0f1f3d;
+      --navy2:   #14213b;
+      --green:   #14823c;
+      --green2:  #0f6030;
+      --gold:    #c8a84b;
+      --gold2:   #e8c96a;
+      --cream:   #f7f3ec;
+      --paper:   #fdfaf5;
+      --text:    #1a2035;
+      --muted:   #5a6480;
+      --rule:    rgba(200,168,75,0.35);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(20,130,60,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(200,168,75,0.10) 0%, transparent 60%);
+      font-family: 'Source Serif 4', Georgia, serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 48px 16px 64px;
+    }
+
+    .shell { max-width: 780px; margin: 0 auto; }
+
+    .hero { text-align: center; padding: 0 20px 36px; color: #fff; }
+
+    .eyebrow {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+      opacity: 0.9;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.4rem, 7vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.08;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.4);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--gold2); }
+
+    .subhead {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.72);
+      margin-top: 4px;
+    }
+
+    .paper {
+      background: var(--paper);
+      border-radius: 24px;
+      padding: 52px 56px 56px;
+      box-shadow:
+        0 4px 6px rgba(0,0,0,0.08),
+        0 20px 60px rgba(0,0,0,0.38),
+        0 0 0 1px rgba(200,168,75,0.22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .paper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--green2), var(--green), var(--gold), var(--green), var(--green2));
+    }
+
+    .salutation { font-size: 1.1rem; font-weight: 600; color: var(--navy2); margin-bottom: 18px; }
+
+    p { font-size: 1.05rem; line-height: 1.75; color: #2a3248; margin-bottom: 18px; }
+
+    a { color: var(--green2); text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+    a:hover { color: var(--green); }
+
+    .divider { border: none; border-top: 1.5px solid var(--rule); margin: 36px 0; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--navy2);
+      margin-bottom: 22px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--rule);
+    }
+
+    .callout { border-radius: 14px; padding: 22px 26px; margin-bottom: 24px; }
+    .callout-green { background: rgba(20,130,60,0.07); border: 1px solid rgba(20,130,60,0.22); }
+    .callout-gold  { background: rgba(200,168,75,0.09); border: 1px solid rgba(200,168,75,0.30); }
+    .callout-navy  { background: rgba(15,31,61,0.05); border: 1px solid rgba(15,31,61,0.15); }
+
+    .callout-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--navy2);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .callout-title .badge {
+      background: var(--green);
+      color: #fff;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    .callout-title .badge-gold { background: var(--gold); color: var(--navy2); }
+    .callout-title .badge-navy { background: var(--navy2); color: #fff; }
+
+    .donation-amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+      margin: 8px 0 4px;
+    }
+
+    .donation-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .charity-list { list-style: none; padding: 0; margin: 14px 0 0; }
+    .charity-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.97rem;
+      line-height: 1.6;
+      color: #2a3248;
+      padding: 5px 0;
+    }
+    .charity-list li::before {
+      content: '♥';
+      color: var(--green);
+      font-size: 0.75rem;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #fff !important;
+      text-decoration: none !important;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 12px 22px;
+      border-radius: 50px;
+      margin-top: 12px;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 16px rgba(20,130,60,0.3);
+    }
+
+    .action-link:hover { background: var(--green2); transform: translateY(-1px); }
+
+    .action-link.gold-link {
+      background: var(--gold);
+      color: var(--navy2) !important;
+      box-shadow: 0 4px 16px rgba(200,168,75,0.3);
+    }
+    .action-link.gold-link:hover { background: var(--gold2); }
+
+    .action-link.navy-link {
+      background: var(--navy2);
+      color: #fff !important;
+      box-shadow: 0 4px 16px rgba(15,31,61,0.3);
+    }
+    .action-link.navy-link:hover { background: var(--navy); }
+
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .note {
+      background: rgba(15,31,61,0.05);
+      border-left: 3px solid var(--navy2);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    .note strong { color: var(--navy2); }
+
+    .signoff { margin-top: 36px; }
+    .signoff p { margin-bottom: 6px; font-size: 1rem; }
+
+    .staff-grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 24px;
+    }
+
+    .staff-item { font-size: 0.9rem; line-height: 1.5; color: #3a4560; }
+    .staff-item strong { display: block; color: var(--navy2); font-size: 0.95rem; }
+    .staff-item span { color: var(--muted); font-style: italic; font-size: 0.85rem; }
+
+    @media (max-width: 640px) {
+      body { padding: 24px 10px 48px; }
+      .paper { padding: 32px 22px 36px; border-radius: 18px; }
+      .staff-grid { grid-template-columns: 1fr; }
+      .link-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <div class="hero">
+      <div class="eyebrow">2026 Indy Classic Presented By CH Douglas &amp; Gray Wealth Management</div>
+      <h1>Thank <em>You!</em></h1>
+      <p class="subhead">From the bottom of our hearts — it was a privilege to host you.</p>
+    </div>
+
+    <article class="paper">
+      <p class="salutation">Dear Players,</p>
+
+      <p>One final time — we wanted to reach out and say <strong>THANK YOU!</strong> Our tournament is only as successful as you, the players, make it. We are so grateful for your energy, your sportsmanship, and your presence this weekend.</p>
+
+      <hr class="divider" />
+
+      <h2 class="section-title">💚 Charity Impact</h2>
+
+      <div class="callout callout-green">
+        <div class="callout-title">
+          <span>Estimated Tournament Donation</span>
+          <span class="badge">Making a Difference</span>
+        </div>
+        <div class="donation-amount">$4,200</div>
+        <div class="donation-label">To be combined with our year-end club donation</div>
+        <ul class="charity-list">
+          <li>The Health Foundation of Greater Indianapolis</li>
+          <li>The Indiana AIDS Fund</li>
+        </ul>
+        <div class="note">
+          We will combine the tournament donation with our club donation at year end to present one big gift to both organizations. Your participation made this possible.
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <h2 class="section-title">📊 Tournament Financials</h2>
+
+      <p>We've heard the concerns raised online and at tournaments regarding entry fees and how those funds are used. In the spirit of transparency, we're sharing a full breakdown of the various costs involved in running our tournament.</p>
+
+      <div class="callout callout-navy">
+        <div class="callout-title">
+          <span>Full Financial Breakdown</span>
+          <span class="badge badge-navy">Transparency</span>
+        </div>
+        <p style="margin: 0 0 4px; font-size: 0.97rem; line-height: 1.65;">
+          See exactly how entry fees and sponsorship dollars were allocated — from court fees and trophies to catering and charity.
+        </p>
+        <a href="https://wrathofmath85.github.io/IndyClassic/Financials.html" target="_blank" class="action-link navy-link">
+          📄 View Tournament Financials →
+        </a>
+      </div>
+
+      <hr class="divider" />
+
+      <h2 class="section-title">📸 Photos &amp; Champions</h2>
+
+      <div class="callout callout-gold">
+        <div class="callout-title">
+          <span>Relive the Memories</span>
+          <span class="badge badge-gold">New!</span>
+        </div>
+        <p style="margin: 0 0 12px; font-size: 0.97rem; line-height: 1.65;">
+          Champions and Finalists photos are up, along with all the great action shots Zack captured throughout the weekend.
+        </p>
+        <div class="link-row">
+          <a href="https://wrathofmath85.github.io/IndyClassic/holdhorse.html" target="_blank" class="action-link gold-link">
+            🏆 Champions &amp; Finalists →
+          </a>
+          <a href="https://wrathofmath85.github.io/IndyClassic/holdhorse.html" target="_blank" class="action-link">
+            📷 Action Shots by Zack →
+          </a>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <h2 class="section-title">📋 GLTA Tournament Survey</h2>
+
+      <p>In the coming days, you'll receive a tournament survey from the GLTA. We'd really appreciate it if you took a few moments to share your feedback. Brady and I personally review all suggestions to help improve the tournament each year. And if there's something you especially enjoyed, be sure to mention it so we know to keep it going!</p>
+
+      <hr class="divider" />
+
+      <h2 class="section-title">📅 See You in 2027!</h2>
+
+      <p>Look for registration of the <strong>2027 Indy Classic</strong> to open next <strong>February</strong>. We hope to see you all once again <strong>June 4–6, 2027!</strong></p>
+
+      <div class="signoff">
+        <p>With gratitude,</p>
+
+        <div class="staff-grid">
+          <div class="staff-item">
+            <strong>Dan Fox</strong>
+            <span>Tournament Director</span>
+          </div>
+          <div class="staff-item">
+            <strong>Brady Wagenknecht</strong>
+            <span>Entertainment Chair</span>
+          </div>
+          <div class="staff-item">
+            <strong>Mark Phillips</strong>
+            <span>Sponsorship Guru</span>
+          </div>
+          <div class="staff-item">
+            <strong>Haley Bougher</strong>
+            <span>Catering Coordinator</span>
+          </div>
+          <div class="staff-item">
+            <strong>Sherwin Bocade</strong>
+            <span>Brewmaster General</span>
+          </div>
+          <div class="staff-item">
+            <strong>Paul Warney &amp; Garth Brazelton</strong>
+            <span>Masters of Miscellany</span>
+          </div>
+        </div>
+      </div>
+
+    </article>
+  </div>
+</body>
+</html>
