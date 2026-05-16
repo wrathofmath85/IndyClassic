@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 1 Recap — 2026 Indy Classic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0f1f3d;
+      --navy2:   #14213b;
+      --green:   #14823c;
+      --green2:  #0f6030;
+      --gold:    #c8a84b;
+      --gold2:   #e8c96a;
+      --cream:   #f7f3ec;
+      --paper:   #fdfaf5;
+      --text:    #1a2035;
+      --muted:   #5a6480;
+      --rule:    rgba(200,168,75,0.35);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(20,130,60,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(200,168,75,0.10) 0%, transparent 60%);
+      font-family: 'Source Serif 4', Georgia, serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 48px 16px 64px;
+    }
+
+    /* ── Shell ── */
+    .shell {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 0 20px 36px;
+      color: #fff;
+    }
+
+    .eyebrow {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+      opacity: 0.9;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.4rem, 7vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.08;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.4);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold2);
+    }
+
+    .subhead {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.72);
+      margin-top: 4px;
+    }
+
+    /* ── Paper ── */
+    .paper {
+      background: var(--paper);
+      border-radius: 24px;
+      padding: 52px 56px 56px;
+      box-shadow:
+        0 4px 6px rgba(0,0,0,0.08),
+        0 20px 60px rgba(0,0,0,0.38),
+        0 0 0 1px rgba(200,168,75,0.22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .paper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--green2), var(--green), var(--gold), var(--green), var(--green2));
+    }
+
+    /* ── Body Text ── */
+    .salutation {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--navy2);
+      margin-bottom: 18px;
+    }
+
+    p {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: #2a3248;
+      margin-bottom: 18px;
+    }
+
+    a {
+      color: var(--green2);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 600;
+    }
+    a:hover { color: var(--green); }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1.5px solid var(--rule);
+      margin: 36px 0;
+    }
+
+    /* ── Section Title ── */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--navy2);
+      margin-bottom: 22px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--rule);
+    }
+
+    /* ── Alert / Callout Box ── */
+    .callout {
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 24px;
+    }
+
+    .callout-green {
+      background: rgba(20,130,60,0.07);
+      border: 1px solid rgba(20,130,60,0.22);
+    }
+
+    .callout-gold {
+      background: rgba(200,168,75,0.09);
+      border: 1px solid rgba(200,168,75,0.30);
+    }
+
+    .callout-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--navy2);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .callout-title .badge {
+      background: var(--green);
+      color: #fff;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    .callout-title .badge-gold {
+      background: var(--gold);
+      color: var(--navy2);
+    }
+
+    /* ── Schedule rows ── */
+    .sched-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-size: 0.97rem;
+      line-height: 1.55;
+      color: #2a3248;
+    }
+
+    .sched-row:last-child { border-bottom: none; }
+
+    .sched-time {
+      font-weight: 600;
+      color: var(--green2);
+      white-space: nowrap;
+      min-width: 90px;
+      font-size: 0.92rem;
+    }
+
+    /* ── Bullet list ── */
+    ul.styled {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 8px;
+    }
+
+    ul.styled li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.97rem;
+      line-height: 1.6;
+      color: #2a3248;
+      padding: 5px 0;
+    }
+
+    ul.styled li::before {
+      content: '●';
+      color: var(--green);
+      font-size: 0.55rem;
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    ul.styled li strong {
+      color: var(--navy2);
+    }
+
+    /* ── Note block ── */
+    .note {
+      background: rgba(15,31,61,0.05);
+      border-left: 3px solid var(--navy2);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    .note strong { color: var(--navy2); }
+
+    /* ── Banquet CTA ── */
+    .banquet-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #fff !important;
+      text-decoration: none !important;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 12px 22px;
+      border-radius: 50px;
+      margin-top: 12px;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 16px rgba(20,130,60,0.3);
+    }
+
+    .banquet-link:hover {
+      background: var(--green2);
+      transform: translateY(-1px);
+    }
+
+    /* ── Sign-off ── */
+    .signoff {
+      margin-top: 36px;
+    }
+
+    .signoff p {
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .staff-grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 24px;
+    }
+
+    .staff-item {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #3a4560;
+    }
+
+    .staff-item strong {
+      display: block;
+      color: var(--navy2);
+      font-size: 0.95rem;
+    }
+
+    .staff-item span {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      body { padding: 24px 10px 48px; }
+      .paper { padding: 32px 22px 36px; border-radius: 18px; }
+      .staff-grid { grid-template-columns: 1fr; }
+      .sched-time { min-width: 72px; font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="eyebrow">2026 Indy Classic Presented By CH Douglas &amp; Gray Wealth Management</div>
+      <h1>Day 1 <em>Recap</em></h1>
+      <p class="subhead">That was fun - Let's do it again tomrorow!</p>
+    </div>
+
+    <!-- Letter body -->
+    <article class="paper">
+      <p class="salutation">Dear Players,</p>
+
+      <p>Thank you for a lovely first day of tennis! The last matches are wrapping up on court right now — we hope you had a great time. Here's everything you need to know heading into Day 2.</p>
+
+      <hr class="divider" />
+
+      <!-- Consolation -->
+      <h2 class="section-title">🎾 Consolation Reminder</h2>
+
+      <p>All Consolation Divisions will be played at <strong>Indianapolis Racquet Club Dean</strong>. Sign up via our website:</p>
+
+      <div class="callout callout-green">
+        <div class="callout-title">
+          <span>Consolation Sign-Up Windows</span>
+          <span class="badge">Don't Miss It</span>
+        </div>
+
+        <ul class="styled">
+          <li><strong>Singles</strong> — Opens at <strong>7:00 AM</strong>, closes at <strong>9:00 AM</strong></li>
+          <li><strong>Doubles</strong> — Opens at <strong>12:00 PM (Noon)</strong>, closes at <strong>2:00 PM</strong></li>
+        </ul>
+
+        <div class="note">
+          <strong>Note:</strong> If you have not signed up by the close time, you will not be included in the draws — draws are automatically and randomly generated by the website once the window closes. Main Draw matches take precedent; we will fill in Consolation matches when possible. Please be patient with us and be ready when we call you!
+        </div>
+
+        <div style="margin-top: 16px;">
+          <a href="https://wrathofmath85.github.io/IndyClassic/Consolation.html" target="_blank" class="banquet-link" style="background: var(--green);">
+            🔗 Consolation Sign-Up Website →
+          </a>
+        </div>
+      </div>
+
+      <div class="callout callout-gold">
+        <div class="callout-title">
+          <span>Consolation Match Format</span>
+          <span class="badge badge-gold">Reminder</span>
+        </div>
+        <p style="margin:0; font-size: 0.97rem; line-height: 1.65;">
+          All Consolation matches <em>outside of the final</em> are <strong>pro sets</strong> — first to <strong>8 games</strong>, win by 2, with a <strong>12-point tiebreak</strong> at 7-all.
+        </p>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Banquet -->
+      <h2 class="section-title">🍽️ Players Banquet — Tomorrow!</h2>
+
+      <p>Our <strong>Players Banquet</strong> is tomorrow night from <strong>7:00 PM – 10:00 PM</strong> at <strong>Radius</strong> downtown. Visit the Banquet Website for all the details including address, menu, and what to expect!</p>
+
+      <a href="https://wrathofmath85.github.io/IndyClassic/Banquet.html" target="_blank" class="banquet-link">
+        🥂 Banquet Details &amp; Info →
+      </a>
+
+      <hr class="divider" />
+
+      <!-- Sign-off -->
+      <div class="signoff">
+        <p>See you tomorrow — it's going to be a great Day 2!</p>
+
+        <div class="staff-grid">
+          <div class="staff-item">
+            <strong>Dan Fox</strong>
+            <span>Tournament Director</span>
+          </div>
+          <div class="staff-item">
+            <strong>Brady Wagenknecht</strong>
+            <span>Entertainment Chair</span>
+          </div>
+          <div class="staff-item">
+            <strong>Mark Phillips</strong>
+            <span>Sponsorship Guru</span>
+          </div>
+          <div class="staff-item">
+            <strong>Haley Bougher</strong>
+            <span>Catering Coordinator</span>
+          </div>
+          <div class="staff-item">
+            <strong>Sherwin Bocade</strong>
+            <span>Brewmaster General</span>
+          </div>
+          <div class="staff-item">
+            <strong>Paul Warney &amp; Garth Brazelton</strong>
+            <span>Masters of Miscellany</span>
+          </div>
+        </div>
+      </div>
+
+    </article>
+  </div>
+</body>
+</html>
