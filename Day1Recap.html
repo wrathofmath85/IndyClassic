@@ -37,18 +37,9 @@
       padding: 48px 16px 64px;
     }
 
-    /* ── Shell ── */
-    .shell {
-      max-width: 780px;
-      margin: 0 auto;
-    }
+    .shell { max-width: 780px; margin: 0 auto; }
 
-    /* ── Hero ── */
-    .hero {
-      text-align: center;
-      padding: 0 20px 36px;
-      color: #fff;
-    }
+    .hero { text-align: center; padding: 0 20px 36px; color: #fff; }
 
     .eyebrow {
       font-family: 'Source Serif 4', serif;
@@ -71,10 +62,7 @@
       margin-bottom: 14px;
     }
 
-    .hero h1 em {
-      font-style: italic;
-      color: var(--gold2);
-    }
+    .hero h1 em { font-style: italic; color: var(--gold2); }
 
     .subhead {
       font-family: 'Playfair Display', serif;
@@ -84,7 +72,6 @@
       margin-top: 4px;
     }
 
-    /* ── Paper ── */
     .paper {
       background: var(--paper);
       border-radius: 24px;
@@ -105,37 +92,15 @@
       background: linear-gradient(90deg, var(--green2), var(--green), var(--gold), var(--green), var(--green2));
     }
 
-    /* ── Body Text ── */
-    .salutation {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--navy2);
-      margin-bottom: 18px;
-    }
+    .salutation { font-size: 1.1rem; font-weight: 600; color: var(--navy2); margin-bottom: 18px; }
 
-    p {
-      font-size: 1.05rem;
-      line-height: 1.75;
-      color: #2a3248;
-      margin-bottom: 18px;
-    }
+    p { font-size: 1.05rem; line-height: 1.75; color: #2a3248; margin-bottom: 18px; }
 
-    a {
-      color: var(--green2);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      font-weight: 600;
-    }
+    a { color: var(--green2); text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
     a:hover { color: var(--green); }
 
-    /* ── Divider ── */
-    .divider {
-      border: none;
-      border-top: 1.5px solid var(--rule);
-      margin: 36px 0;
-    }
+    .divider { border: none; border-top: 1.5px solid var(--rule); margin: 36px 0; }
 
-    /* ── Section Title ── */
     .section-title {
       font-family: 'Playfair Display', serif;
       font-size: 1.45rem;
@@ -146,22 +111,9 @@
       border-bottom: 2px solid var(--rule);
     }
 
-    /* ── Alert / Callout Box ── */
-    .callout {
-      border-radius: 14px;
-      padding: 22px 26px;
-      margin-bottom: 24px;
-    }
-
-    .callout-green {
-      background: rgba(20,130,60,0.07);
-      border: 1px solid rgba(20,130,60,0.22);
-    }
-
-    .callout-gold {
-      background: rgba(200,168,75,0.09);
-      border: 1px solid rgba(200,168,75,0.30);
-    }
+    .callout { border-radius: 14px; padding: 22px 26px; margin-bottom: 24px; }
+    .callout-green { background: rgba(20,130,60,0.07); border: 1px solid rgba(20,130,60,0.22); }
+    .callout-gold  { background: rgba(200,168,75,0.09); border: 1px solid rgba(200,168,75,0.30); }
 
     .callout-title {
       font-family: 'Playfair Display', serif;
@@ -186,39 +138,10 @@
       padding: 3px 10px;
     }
 
-    .callout-title .badge-gold {
-      background: var(--gold);
-      color: var(--navy2);
-    }
+    .callout-title .badge-gold { background: var(--gold); color: var(--navy2); }
 
-    /* ── Schedule rows ── */
-    .sched-row {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      font-size: 0.97rem;
-      line-height: 1.55;
-      color: #2a3248;
-    }
-
-    .sched-row:last-child { border-bottom: none; }
-
-    .sched-time {
-      font-weight: 600;
-      color: var(--green2);
-      white-space: nowrap;
-      min-width: 90px;
-      font-size: 0.92rem;
-    }
-
-    /* ── Bullet list ── */
-    ul.styled {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 8px;
-    }
+    /* Plain list — no inline <strong> so text wraps naturally */
+    ul.styled { list-style: none; padding: 0; margin: 0 0 8px; }
 
     ul.styled li {
       display: flex;
@@ -238,11 +161,6 @@
       flex-shrink: 0;
     }
 
-    ul.styled li strong {
-      color: var(--navy2);
-    }
-
-    /* ── Note block ── */
     .note {
       background: rgba(15,31,61,0.05);
       border-left: 3px solid var(--navy2);
@@ -256,7 +174,6 @@
 
     .note strong { color: var(--navy2); }
 
-    /* ── Banquet CTA ── */
     .banquet-link {
       display: inline-flex;
       align-items: center;
@@ -275,20 +192,10 @@
       box-shadow: 0 4px 16px rgba(20,130,60,0.3);
     }
 
-    .banquet-link:hover {
-      background: var(--green2);
-      transform: translateY(-1px);
-    }
+    .banquet-link:hover { background: var(--green2); transform: translateY(-1px); }
 
-    /* ── Sign-off ── */
-    .signoff {
-      margin-top: 36px;
-    }
-
-    .signoff p {
-      margin-bottom: 6px;
-      font-size: 1rem;
-    }
+    .signoff { margin-top: 36px; }
+    .signoff p { margin-bottom: 6px; font-size: 1rem; }
 
     .staff-grid {
       margin-top: 20px;
@@ -297,44 +204,26 @@
       gap: 6px 24px;
     }
 
-    .staff-item {
-      font-size: 0.9rem;
-      line-height: 1.5;
-      color: #3a4560;
-    }
+    .staff-item { font-size: 0.9rem; line-height: 1.5; color: #3a4560; }
+    .staff-item strong { display: block; color: var(--navy2); font-size: 0.95rem; }
+    .staff-item span { color: var(--muted); font-style: italic; font-size: 0.85rem; }
 
-    .staff-item strong {
-      display: block;
-      color: var(--navy2);
-      font-size: 0.95rem;
-    }
-
-    .staff-item span {
-      color: var(--muted);
-      font-style: italic;
-      font-size: 0.85rem;
-    }
-
-    /* ── Mobile ── */
     @media (max-width: 640px) {
       body { padding: 24px 10px 48px; }
       .paper { padding: 32px 22px 36px; border-radius: 18px; }
       .staff-grid { grid-template-columns: 1fr; }
-      .sched-time { min-width: 72px; font-size: 0.88rem; }
     }
   </style>
 </head>
 <body>
   <div class="shell">
 
-    <!-- Hero -->
     <div class="hero">
       <div class="eyebrow">2026 Indy Classic Presented By CH Douglas &amp; Gray Wealth Management</div>
       <h1>Day 1 <em>Recap</em></h1>
-      <p class="subhead">That was fun - Let's do it again tomrorow!</p>
+      <p class="subhead">That was fun — Let's do it again tomorrow!</p>
     </div>
 
-    <!-- Letter body -->
     <article class="paper">
       <p class="salutation">Dear Players,</p>
 
@@ -342,7 +231,6 @@
 
       <hr class="divider" />
 
-      <!-- Consolation -->
       <h2 class="section-title">🎾 Consolation Reminder</h2>
 
       <p>All Consolation Divisions will be played at <strong>Indianapolis Racquet Club Dean</strong>. Sign up via our website:</p>
@@ -354,16 +242,16 @@
         </div>
 
         <ul class="styled">
-          <li><strong>Singles</strong> — Opens at <strong>7:00 AM</strong>, closes at <strong>9:00 AM</strong>, Play begins around <strong>9:00 AM</strong></li>
-          <li><strong>Doubles</strong> — Opens at <strong>12:00 PM (Noon)</strong>, closes at <strong>2:00 PM</strong>, Play begins around <strong>2:00 PM</strong></li>
+          <li>Singles — Opens at 7:00 AM, closes at 9:00 AM, play begins around 9:00 AM</li>
+          <li>Doubles — Opens at 12:00 PM (Noon), closes at 2:00 PM, play begins around 2:00 PM</li>
         </ul>
 
         <div class="note">
-          <strong>Note:</strong> If you have not signed up by the close time, you will not be included in the draws — draws are automatically and randomly generated by the website once the window closes. Main Draw matches take precedent; we will fill in Consolation matches when possible. Getting consolation matches on court can become chaotic, we ask that you please be patient with us and be ready when we call you!
+          <strong>Note:</strong> If you have not signed up by the close time, you will not be included in the draws — draws are automatically and randomly generated by the website once the window closes. Main Draw matches take precedent; getting consolation matches on court can become chaotic, so we ask that you please be patient with us and be ready when we call you!
         </div>
 
         <div style="margin-top: 16px;">
-          <a href="https://wrathofmath85.github.io/IndyClassic/Consolation.html" target="_blank" class="banquet-link" style="background: var(--green);">
+          <a href="https://wrathofmath85.github.io/IndyClassic/Consolation.html" target="_blank" class="banquet-link">
             🔗 Consolation Sign-Up Website →
           </a>
         </div>
@@ -381,7 +269,6 @@
 
       <hr class="divider" />
 
-      <!-- Banquet -->
       <h2 class="section-title">🍽️ Players Banquet — Tomorrow!</h2>
 
       <p>Our <strong>Players Banquet</strong> is tomorrow night from <strong>7:00 PM – 10:00 PM</strong> at <strong>Radius</strong> downtown. Visit the Banquet Website for all the details including address, menu, and what to expect!</p>
@@ -392,7 +279,6 @@
 
       <hr class="divider" />
 
-      <!-- Sign-off -->
       <div class="signoff">
         <p>See you tomorrow — it's going to be a great Day 2!</p>
 
