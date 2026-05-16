@@ -1,0 +1,1481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Indy Tennis Ladder – Score Entry</title>
+<style>
+  :root{
+    --bg:#0b0e14;
+    --card:#11161f;
+    --muted:#8ea0b4;
+    --text:#e9eef5;
+    --line:#253043;
+    --accent:#5dd0ff;
+    --accent-ink:#052c3a;
+    --success:#3bd37f;
+    --danger:#ff6b6b;
+    --warn:#f5a623;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  html,body{background:linear-gradient(180deg,#0b0e14, #0b0e14 180px, #0d121b 100%); color:var(--text);}
+  body{ margin:24px; padding-bottom:calc(24px + env(safe-area-inset-bottom)); display:flex; justify-content:center; -webkit-tap-highlight-color:transparent; }
+  .wrap{ width:min(1100px,100%); }
+
+  header{
+    padding:20px 16px;
+    border-radius:14px;
+    background:
+      radial-gradient(1200px 400px at 20% -80%, rgba(93,208,255,.10), transparent 60%),
+      linear-gradient(180deg, rgba(93,208,255,.07), rgba(93,208,255,0));
+    border:1px solid var(--line);
+    margin-bottom:16px;
+  }
+  h1{ margin:0 0 6px; font-size:1.5rem; letter-spacing:.2px;}
+  .muted{ color:var(--muted); font-size:.95rem; }
+
+  /* ===== Deadline banner ===== */
+  .deadline-banner{
+    display:none;
+    margin-top:12px;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:.92rem;
+    font-weight:600;
+    line-height:1.4;
+  }
+  .deadline-banner.warn{
+    background: rgba(245,166,35,.12);
+    border: 1px solid rgba(245,166,35,.35);
+    color: var(--warn);
+  }
+  .deadline-banner.expired{
+    background: rgba(255,107,107,.12);
+    border: 1px solid rgba(255,107,107,.35);
+    color: var(--danger);
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+    margin:16px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+  legend.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; padding:0; margin:-1px; }
+  fieldset{ border: none; margin:0; padding:0; }
+
+  label{ display:block; margin:8px 0 6px; font-weight:600; }
+  select, input[type="number"], input[type="text"]{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#0e1420;
+    color:var(--text);
+    outline:none;
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    font-size:16px;
+    -webkit-appearance:none; -moz-appearance:none; appearance:none;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  input[readonly]{ opacity:.8; }
+
+  .invalid{
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 3px rgba(255,107,107,.25);
+    background: #170f12;
+  }
+
+  .grid{
+    display:grid; gap:14px;
+    grid-template-columns: 220px 1fr;
+    align-items:center;
+  }
+  @media (max-width:700px){
+    .grid{ grid-template-columns: 1fr; }
+    header{ padding:16px; }
+    .card{ padding:12px; }
+    .chip{ font-size:.95rem; padding:6px 10px; }
+  }
+
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{
+    padding:8px 12px; border-radius:999px; border:1px solid var(--line);
+    background:#0f1724; color:var(--text); cursor:pointer; user-select:none;
+  }
+  .chip.active{ background:var(--accent); color:var(--accent-ink); border-color:transparent; font-weight:700; }
+
+  button{
+    padding:12px 16px; border-radius:10px; border:1px solid transparent;
+    background:var(--accent); color:var(--accent-ink); font-weight:800; cursor:pointer;
+  }
+  button[disabled]{ opacity:.6; cursor:not-allowed; }
+
+  .scores{
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#0e1420;
+    padding:10px;
+  }
+
+  .scores-head,
+  .scores-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+    align-items:center;
+  }
+
+  .scores-head{
+    background:#101a2a;
+    border-radius:8px;
+    padding:10px;
+    font-weight:800;
+    text-align:center;
+    margin-bottom:8px;
+  }
+  .scores-head div:first-child{ text-align:left; }
+  .scores-head .col-label{ text-align:center; }
+
+  .scores-row{ padding:8px 4px; }
+  .scores-row + .scores-row{ border-top:1px solid #172033; }
+
+  .who{ font-weight:700; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .rank-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#0f1b2c; border:1px solid #1e2a42; border-radius:999px; padding:6px 10px; font-weight:700;
+  }
+  .rank-badge .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; }
+
+  .tight-num{
+    width:100%;
+    text-align:center;
+    padding:10px 0;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:#0e1420;
+    color:var(--text);
+    font-size:16px;
+  }
+
+  .disabled-like{ opacity:.5; }
+  .hidden{ display:none; }
+
+  .triple{ display:flex; gap:0; }
+  .triple > .tight-num{
+    border-radius:0; border-right:1px solid var(--line);
+    max-width:none;
+  }
+  .triple > .tight-num:first-child{
+    border-top-left-radius:10px; border-bottom-left-radius:10px;
+  }
+  .triple > .tight-num:last-child{
+    border-top-right-radius:10px; border-bottom-right-radius:10px;
+    border-right:1px solid var(--line);
+  }
+
+  .slot{ position:relative; }
+  .slot > select,
+  .slot > input[type="number"]{
+    position:relative;
+    width:100%;
+    height:100%;
+    border:0;
+    background:#0e1420 !important;
+    color:var(--text) !important;
+    padding:10px 0;
+    border-radius:0;
+    font-size:16px;
+    -webkit-appearance:none; -moz-appearance:none; appearance:none;
+  }
+  .slot > select option{ background:#0e1420; color:var(--text); }
+
+  @media (max-width:600px){
+    .scores-row{ grid-template-columns: 1fr; align-items:stretch; }
+    .who{ margin-bottom:6px; }
+    #winner{ min-width:0 !important; width:100% !important; }
+    .triple{ display:grid; grid-template-columns: repeat(3, 1fr); }
+    .tight-num{ height:48px; padding:0; display:flex; align-items:center; justify-content:center; }
+    .slot > select, .slot > input{ height:100%; padding:0 10px; }
+    .scores-head{ grid-template-columns: 1fr; text-align:left; }
+    .row-inline{ width:100%; }
+    #submitBtn{ width:100%; }
+  }
+
+  .help{ font-size:.9rem; margin-top:8px; color:var(--muted); }
+  .error{ color:var(--danger); margin-top:10px; }
+  .success{ color:var(--success); margin-left:10px; }
+  .row-inline{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+
+  /* ===== Submitting overlay + popup ===== */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    padding:24px;
+  }
+  .overlay.show{ display:flex; }
+  .overlay-card{
+    width:min(520px, 100%);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    padding:18px 16px;
+  }
+  .overlay-top{
+    display:flex; align-items:center; gap:12px; margin-bottom:10px;
+  }
+  .spinner{
+    width:18px; height:18px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.25);
+    border-top-color: rgba(255,255,255,.9);
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .overlay-title{ font-weight:900; }
+  .overlay-text{ color:var(--muted); font-size:.95rem; line-height:1.35; }
+
+  .modal{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.65);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:10000;
+    padding:24px;
+  }
+  .modal.show{ display:flex; }
+  .modal-card{
+    width:min(620px, 100%);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .modal-title{ font-weight:900; margin:0 0 8px; }
+  .modal-body{ color:var(--text); line-height:1.4; }
+  .modal-actions{ margin-top:14px; display:flex; justify-content:flex-end; gap:10px; }
+  .btn-secondary{
+    background:#0f1724; color:var(--text);
+    border:1px solid var(--line);
+  }
+
+  /* Step labels */
+  .step-label{
+    font-size:.75rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:12px; opacity:.8;
+  }
+
+  /* Score preview card */
+  .preview-text{
+    font-size:1rem; font-weight:700; color:var(--text); line-height:1.5;
+  }
+  .preview-text .pre-winner{ color:var(--success); }
+  .preview-text .pre-score{ color:#b9c6d8; font-weight:600; }
+  .preview-text .pre-empty{ color:var(--muted); font-style:italic; font-weight:400; font-size:.9rem; }
+
+  /* Sticky submit bar */
+  .submit-bar{
+    position:sticky; bottom:0;
+    background:linear-gradient(0deg, #0b0e14 70%, transparent);
+    padding:16px 0 calc(16px + env(safe-area-inset-bottom));
+    display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    z-index:100;
+  }
+  .submit-bar .error{ margin-top:0; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .88rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 12px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--line);
+  transition: color .15s ease, background .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-link:hover {
+  color: var(--text);
+  background: rgba(255,255,255,.10);
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+   <a class="back-link" href="ScoreExamples.html">❓ How to enter a score</a>
+
+  <header>
+    <h1 id="titleH1">Loading…</h1>
+    <p class="muted">The winner is the person who won the match, regardless of who is submitting. Third set can be a full set or a 10-point match tiebreak.</p>
+    <!-- Deadline banner: shown once End Date is loaded -->
+    <div id="deadlineBanner" class="deadline-banner"></div>
+  </header>
+
+  <section class="card">
+    <fieldset>
+      <legend class="sr-only">Players</legend>
+      <div class="step-label">Step 1 — Match Type</div>
+      <div class="grid">
+        <label>Match Type</label>
+        <div class="chips" id="matchTypeChips" role="tablist" aria-label="Match type">
+          <span class="chip active" data-type="Scheduled" role="button" tabindex="0">Scheduled</span>
+          <span class="chip" data-type="Challenge" role="button" tabindex="0">Challenge</span>
+        </div>
+        <div></div><div></div>
+      </div>
+      <p id="playersError" class="error" style="display:none;"></p>
+    </fieldset>
+  </section>
+
+  <section class="card">
+    <fieldset>
+      <legend class="step-label">Step 2 — Enter Scores</legend>
+
+      <div class="row-inline" style="margin-bottom:8px;">
+        <span class="muted">Match status:</span>
+        <div class="chips" role="tablist" aria-label="Match status">
+          <span id="chip-completed" class="chip active" data-status="Completed" role="button" tabindex="0">Completed</span>
+          <span id="chip-retired"   class="chip" data-status="Retired"   role="button" tabindex="0">Retired</span>
+          <span id="chip-walkover"  class="chip" data-status="Walkover"  role="button" tabindex="0">Walkover</span>
+        </div>
+      </div>
+
+      <div class="row-inline" style="margin-bottom:12px;">
+        <label class="row-inline" for="isTb" style="gap:10px;">
+          <input id="isTb" type="checkbox" /> Use 10-point <b>match</b> tiebreak instead of full third set
+        </label>
+        <span class="help">Tiebreak boxes enable only on 7–6 sets.</span>
+      </div>
+
+      <div class="scores" aria-label="Set scores">
+        <div class="scores-head">
+          <div></div>
+          <div class="col-label" id="col3Header">Scores</div>
+        </div>
+
+        <!-- Winner row -->
+        <div class="scores-row">
+          <div id="winnerLabel" class="who">
+            <span class="rank-badge"><span class="dot"></span><span>Winner</span></span>
+            <select id="winner" required style="min-width:220px; max-width:320px;">
+              <option value="">Select winner…</option>
+            </select>
+          </div>
+          <div class="triple" aria-label="Winner set scores">
+            <select id="s1w" class="tight-num score-dd" aria-label="Winner Set 1"><option value="">S1</option></select>
+            <select id="s2w" class="tight-num score-dd" aria-label="Winner Set 2"><option value="">S2</option></select>
+            <div id="s3wWrap" class="tight-num slot" aria-label="Winner Set 3 (full set or TB)">
+              <select id="s3wSel" class="score-dd" aria-label="Winner Set 3 (full set)"><option value="">S3</option></select>
+              <input id="s3w" type="number" min="0" max="50" inputmode="numeric" placeholder="TB" class="hidden" aria-label="Winner Match TB" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Opponent row -->
+        <div class="scores-row">
+          <div id="opponentLabel" class="who">
+            <span class="rank-badge"><span class="dot"></span>
+              <span id="opponentNameText">Opponent</span>
+            </span>
+            <select id="opponentSelect" class="hidden" style="max-width:280px;">
+              <option value="">Select opponent…</option>
+            </select>
+          </div>
+          <div class="triple" aria-label="Opponent set scores">
+            <select id="s1o" class="tight-num score-dd" aria-label="Opponent Set 1"><option value="">S1</option></select>
+            <select id="s2o" class="tight-num score-dd" aria-label="Opponent Set 2"><option value="">S2</option></select>
+            <div id="s3oWrap" class="tight-num slot" aria-label="Opponent Set 3 (full set or TB)">
+              <select id="s3oSel" class="score-dd" aria-label="Opponent Set 3 (full set)"><option value="">S3</option></select>
+              <input id="s3o" type="number" min="0" max="50" inputmode="numeric" placeholder="TB" class="hidden" aria-label="Opponent Match TB" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tie-break row -->
+        <div class="scores-row">
+          <div class="who"><b>Set tiebreak</b> <span class="muted" style="margin-left:6px;">(loser's score)</span></div>
+          <div class="triple" aria-label="Tie-breaks">
+            <input id="s1tb" class="tight-num disabled-like" type="number" min="0" inputmode="numeric" placeholder="S1 TB" disabled />
+            <input id="s2tb" class="tight-num disabled-like" type="number" min="0" inputmode="numeric" placeholder="S2 TB" disabled />
+            <input id="s3tb" class="tight-num disabled-like" type="number" min="0" inputmode="numeric" placeholder="S3 TB" disabled />
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </section>
+
+  <!-- Step 3: Review & Submit -->
+  <section class="card" id="previewCard" style="display:none;">
+    <div class="step-label">Step 3 — Review &amp; Submit</div>
+    <div id="previewText" class="preview-text"></div>
+  </section>
+
+  <div class="submit-bar">
+    <button id="submitBtn" disabled>Submit Score</button>
+    <span id="ok" class="success" style="display:none;">Submitted. Thanks!</span>
+    <div id="msg" class="error" role="alert" aria-live="polite" style="margin-top:0;"></div>
+  </div>
+</div>
+
+<!-- Submitting Overlay -->
+<div id="submittingOverlay" class="overlay" aria-hidden="true">
+  <div class="overlay-card" role="status" aria-live="polite">
+    <div class="overlay-top">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="overlay-title" id="overlayTitle">Submitting scores…</div>
+    </div>
+    <div class="overlay-text" id="overlayText">
+      Please keep this page open while we submit your score and send email confirmations.
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <div class="modal-title" id="successTitle">✅ Score Submitted</div>
+    <div class="modal-body">
+      Scores have been submitted and you should receive an email confirmation.<br>
+      Please allow up to 5 minutes for the standings website to show your score.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="closeSuccess">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- EmailJS (Browser SDK) -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+/*** ======= CONFIG ======= ***/
+// Pull RoundNumber and EndDate from a tiny CSV (row 2 under columns "Current Round" and "End Date")
+const CURRENT_ROUND_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQVvOJ0QcM4OuUYeUYCTr9KSULN5PUf0KeTGT5iQcxvOy6G9W8KmiZGneahPmpVLiTuOgDCL42aTjb/pub?gid=972964638&single=true&output=csv';
+
+let RoundNumber = 1; // fallback until CSV loads
+let RoundEndDate = null; // Date object (midnight end of that day, local time) or null
+
+async function fetchRoundNumber(){
+  try{
+    const res = await fetch(CURRENT_ROUND_CSV, { cache:'no-store' });
+    const text = await res.text();
+    const lines = text.replace(/^\uFEFF/,'').trim().split(/\r?\n/);
+    const headers = (lines[0]||'').split(',').map(h => h.trim());
+    const firstData = (lines[1]||'').split(',').map(v => v.trim());
+
+    // Current Round
+    const rIdx = headers.findIndex(h => h.toLowerCase().replace(/\s+/g,'') === 'currentround');
+    const raw = rIdx >= 0 ? firstData[rIdx] : firstData[0];
+    const n = Number(raw);
+    if (!Number.isNaN(n) && n >= 1) RoundNumber = n;
+
+    // End Date — look for "End Date" or "EndDate" column
+    const dIdx = headers.findIndex(h => h.toLowerCase().replace(/\s+/g,'') === 'enddate');
+    if (dIdx >= 0 && firstData[dIdx]) {
+      // Parse the date string robustly — handles "5/17/2026", "05/17/2026", "2026-05-17"
+      const raw = firstData[dIdx].trim();
+      console.log('[Deadline] Raw End Date from CSV:', raw);
+      let yr, mo, dy;
+      const slashMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      const dashMatch  = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (slashMatch) {
+        mo = parseInt(slashMatch[1], 10) - 1; // 0-based month
+        dy = parseInt(slashMatch[2], 10);
+        yr = parseInt(slashMatch[3], 10);
+      } else if (dashMatch) {
+        yr = parseInt(dashMatch[1], 10);
+        mo = parseInt(dashMatch[2], 10) - 1;
+        dy = parseInt(dashMatch[3], 10);
+      }
+      if (yr !== undefined) {
+        // Deadline = midnight at the START of the day AFTER the end date (local time)
+        RoundEndDate = new Date(yr, mo, dy + 1, 0, 0, 0, 0);
+        console.log('[Deadline] Parsed RoundEndDate (midnight after end day):', RoundEndDate.toString());
+      } else {
+        console.warn('[Deadline] Could not parse End Date:', raw);
+      }
+    } else {
+      console.warn('[Deadline] End Date column not found. Headers:', headers, '| Data:', firstData);
+    }
+  }catch(err){
+    console.warn('Using fallback RoundNumber=1; CSV read failed:', err);
+  }
+}
+
+/**
+ * Format a Date object as a friendly string like "Saturday, May 17"
+ */
+function fmtDeadlineDate(d){
+  // d is midnight of the *next* day, so subtract 1ms to get the actual deadline day
+  const day = new Date(d.getTime() - 1);
+  return day.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+}
+
+/**
+ * Show deadline banner and (if past deadline) disable submit.
+ * Called after fetchRoundNumber() resolves.
+ */
+function applyDeadline(){
+  const banner = document.getElementById('deadlineBanner');
+  const btn    = document.getElementById('submitBtn');
+
+  if (!RoundEndDate) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const now = new Date();
+  const label = fmtDeadlineDate(RoundEndDate);
+
+  if (now >= RoundEndDate) {
+    // Past midnight — deadline expired
+    banner.textContent = `⛔ The deadline for Round ${RoundNumber} score submission was ${label} at midnight. No further scores are being accepted for this round.`;
+    banner.className = 'deadline-banner expired';
+    banner.style.display = 'block';
+    btn.disabled = true;
+    btn.title = 'Score submission deadline has passed.';
+    // Store flag so init() won't re-enable the button
+    window._deadlineExpired = true;
+  } else {
+    // Before midnight — show informational notice
+    banner.textContent = `📅 Scores for Round ${RoundNumber} are due by midnight on ${label}.`;
+    banner.className = 'deadline-banner warn';
+    banner.style.display = 'block';
+    window._deadlineExpired = false;
+  }
+}
+
+const PLAYERS_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQVvOJ0QcM4OuUYeUYCTr9KSULN5PUf0KeTGT5iQcxvOy6G9W8KmiZGneahPmpVLiTuOgDCL42aTjb/pub?gid=0&single=true&output=csv';
+const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQVvOJ0QcM4OuUYeUYCTr9KSULN5PUf0KeTGT5iQcxvOy6G9W8KmiZGneahPmpVLiTuOgDCL42aTjb/pub?gid=1596015267&single=true&output=csv';
+const SUBMIT_ENDPOINT  = 'https://script.google.com/macros/s/AKfycbwfs7OO_tAXSjAaoiFTp_ySQJbiaXWw3u37F7YJYZ2-kS-AHoLfaeVPfnkLUnoUW3DeDA/exec';
+
+const STANDINGS_LINK   = 'https://wrathofmath85.github.io/IndyTennisLadder/2026SinglesStandings';
+const UPDATE_NOTE      = 'Please give the website up to 5 minutes to update before contacting Dan with concerns';
+
+// EmailJS config (fill these in)
+const EMAILJS_PUBLIC_KEY = 'YB5J-75APa-V6Giku';
+const EMAILJS_SERVICE_ID = 'service_erw700i';
+const EMAILJS_TEMPLATE_ID = 'template_gt6skt4';
+
+// who always gets the email
+const ADMIN_EMAIL = 'IndyTennisLadder@gmail.com';
+/*** ======================= ***/
+
+/**
+ * CHANGE: We no longer compute ranks from points/percent.
+ * We use the Players CSV field: R[x]Rank where x is RoundNumber.
+ */
+let players = [];             // {name, email, roundStart, roundEnd, rank, sEligible, cEligible}
+let nameByRank = new Map();   // rank -> name
+let rankByName = new Map();   // name -> rank
+let emailByName = new Map();  // name -> email
+let scheduleMap = new Map();  // rank -> opponentRank for RoundNumber
+let status = 'Completed';
+
+const norm = s => (s||'').toLowerCase().replace(/^\uFEFF/,'');
+const normKey = k => norm(k).replace(/[\s_]/g,'');
+
+// "Not Played" detector (treat blank as not played too)
+const isNotPlayed = v => {
+  const t = String(v ?? '').trim();
+  return t === '' || /^not\s*played$/i.test(t);
+};
+
+/* ---------- overlay/modal helpers ---------- */
+function showOverlay(title, text){
+  const o = document.getElementById('submittingOverlay');
+  document.getElementById('overlayTitle').textContent = title || 'Submitting…';
+  document.getElementById('overlayText').textContent  = text  || 'Please keep this page open.';
+  o.classList.add('show');
+  o.setAttribute('aria-hidden','false');
+}
+function hideOverlay(){
+  const o = document.getElementById('submittingOverlay');
+  o.classList.remove('show');
+  o.setAttribute('aria-hidden','true');
+}
+function showSuccessModal(){
+  const m = document.getElementById('successModal');
+  m.classList.add('show');
+  m.setAttribute('aria-hidden','false');
+}
+function hideSuccessModal(){
+  const m = document.getElementById('successModal');
+  m.classList.remove('show');
+  m.setAttribute('aria-hidden','true');
+}
+
+document.getElementById('closeSuccess').addEventListener('click', hideSuccessModal);
+document.getElementById('successModal').addEventListener('click', (e)=>{
+  if (e.target.id === 'successModal') hideSuccessModal();
+});
+
+/* CSV parser (robust) */
+function parseCSV(text){
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows=[]; let cur=[]; let field=''; let inQuotes=false;
+  for (let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else { inQuotes=false; } }
+      else field+=c;
+    }else{
+      if(c==='"') inQuotes=true;
+      else if(c===','){ cur.push(field); field='';
+      } else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n') i++; cur.push(field); field=''; rows.push(cur); cur=[]; }
+      else field+=c;
+    }
+  }
+  if(field!==''||cur.length){ cur.push(field); rows.push(cur); }
+  const headers = (rows[0]||[]).map((h,i)=> (i===0? String(h||'').replace(/^\uFEFF/,''):String(h||'')).trim());
+  const outRows = rows.slice(1).filter(r=>r.length>1|| (r.length===1&&r[0]!=='')) .map(cols=>{
+    const o={};
+    headers.forEach((h,idx)=>{ o[h]=(cols[idx]??'').toString().trim(); });
+    return o;
+  });
+  return {headers, rows: outRows};
+}
+
+/* helpers for flexible column lookup */
+function getVal(entries, ...candidates){
+  for (const c of candidates){
+    const tgt = normKey(c);
+    for (const k of Object.keys(entries)){
+      if (normKey(k) === tgt) return entries[k];
+    }
+  }
+  return '';
+}
+function findHeaderIndex(headers, target){
+  const tgt = normKey(target);
+  for (let i=0;i<headers.length;i++){
+    if (normKey(headers[i])===tgt) return i;
+  }
+  return -1;
+}
+
+/* Populate 0–7 options for dropdowns */
+function fillScoreDropdown(sel){
+  if (!sel) return;
+  if (sel.options.length > 1) return;
+  for (let i=0;i<=7;i++){
+    const opt=document.createElement('option');
+    opt.value=String(i); opt.textContent=String(i);
+    sel.appendChild(opt);
+  }
+}
+
+/* ---------- Data loading ---------- */
+async function loadPlayers(){
+  const errEl = document.getElementById('playersError');
+  errEl.style.display='none';
+  try{
+    const res = await fetch(PLAYERS_CSV_URL,{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const {rows} = parseCSV(text);
+
+    const mapped = rows.map(r=>{
+      const entries = Object.fromEntries(Object.entries(r).map(([k,v])=>[k, v]));
+
+      const name = getVal(entries, 'Participant', 'Participant Name', 'Name', 'Player');
+
+      // email (supports a few common column names)
+      const email = getVal(entries, 'Email', 'Email Address', 'EmailAddress', 'E-mail', 'E-mail Address');
+
+      const roundStart = Number(getVal(entries, 'RStart', 'RoundStart', 'Round Start', 'Round_Start') || 0);
+      const roundEnd   = Number(getVal(entries, 'REnd',   'RoundEnd',   'Round End',   'Round_End') || 0);
+
+      // Scheduled eligibility: R#SPts == "Not Played"
+      const sPts = getVal(entries, `R${RoundNumber}SPts`, `R${RoundNumber} S Pts`, `Round${RoundNumber}SPts`, `Round ${RoundNumber} SPts`);
+
+      // Challenge eligibility: eligible if either slot is "Not Played"
+      const cPts1 = getVal(entries, `R${RoundNumber}CPts`,   `R${RoundNumber} C Pts`,   `Round${RoundNumber}CPts`,   `Round ${RoundNumber} CPts`);
+      const cPts2 = getVal(entries, `R${RoundNumber}CPts_2`, `R${RoundNumber} C Pts 2`, `R${RoundNumber}CPts2`, `Round${RoundNumber}CPts_2`, `Round ${RoundNumber} CPts 2`);
+
+      /**
+       * NEW: rank is sourced directly from Players CSV:
+       * R[x]Rank (also supports "R x Rank" variants)
+       */
+      const rankRaw = getVal(
+        entries,
+        `R${RoundNumber}Rank`,
+        `R${RoundNumber} Rank`,
+        `Round${RoundNumber}Rank`,
+        `Round ${RoundNumber} Rank`
+      );
+      const rank = Number(rankRaw);
+
+      return {
+        name,
+        email,
+        roundStart, roundEnd,
+        rank: Number.isFinite(rank) ? rank : null,
+        sEligible: isNotPlayed(sPts),
+        cEligible: isNotPlayed(cPts1) || isNotPlayed(cPts2),
+      };
+    }).filter(p=>p.name);
+
+    if (!mapped.length) throw new Error('No player names found.');
+
+    // only include players active for the current round
+    const inRound = mapped.filter(p=>p.roundStart<=RoundNumber && p.roundEnd>=RoundNumber);
+
+    /**
+     * NEW: build rank maps from the explicit R[x]Rank values.
+     * - Ignore missing/invalid ranks.
+     * - If duplicates happen, the first encountered keeps the spot (and we warn in console).
+     */
+    players = inRound;
+
+    nameByRank.clear(); rankByName.clear(); emailByName.clear();
+
+    // Preload emails map (independent of ranks)
+    inRound.forEach(p=>{
+      if (p.email) emailByName.set(p.name, p.email);
+    });
+
+    // Build nameByRank / rankByName from explicit ranks
+    const usedRanks = new Set();
+    const badRankPlayers = [];
+
+    // Sort for stable behavior: by rank asc, then name
+    const ranked = inRound
+      .filter(p=>Number.isFinite(p.rank) && p.rank>0)
+      .slice()
+      .sort((a,b)=> (a.rank - b.rank) || a.name.localeCompare(b.name));
+
+    ranked.forEach(p=>{
+      if (usedRanks.has(p.rank)){
+        console.warn(`Duplicate rank ${p.rank} found. Keeping first; ignoring rank for: ${p.name}`);
+        return;
+      }
+      usedRanks.add(p.rank);
+      nameByRank.set(p.rank, p.name);
+      rankByName.set(p.name, p.rank);
+    });
+
+    // Track players with missing/invalid rank (for debugging)
+    inRound.forEach(p=>{
+      if (!Number.isFinite(p.rank) || p.rank<=0){
+        badRankPlayers.push(p.name);
+      }
+    });
+    if (badRankPlayers.length){
+      console.warn(`Players missing/invalid R${RoundNumber}Rank (they will still appear as winners, but Challenge +/-5 and Scheduled opponent lookup may fail for them):`, badRankPlayers);
+    }
+
+    refreshWinnerOptions();
+
+  }catch(e){
+    console.error('loadPlayers error:', e);
+    const w=document.getElementById('winner');
+    if (w) w.innerHTML = '<option value="">Could not load players</option>';
+    errEl.textContent = 'Could not load players. Please check the Google Sheet publish settings and headers.';
+    errEl.style.display = 'block';
+  }
+}
+
+async function loadScheduleForRound(){
+  const res = await fetch(SCHEDULE_CSV_URL,{cache:'no-store'});
+  if (!res.ok) throw new Error('Schedule HTTP ' + res.status);
+  const text = await res.text();
+  const {headers,rows}=parseCSV(text);
+
+  const idxRanking = findHeaderIndex(headers, 'Ranking');
+  const idxRound   = (()=> {
+    let i = findHeaderIndex(headers, `Round ${RoundNumber}`);
+    if (i===-1) i = findHeaderIndex(headers, `Round${RoundNumber}`);
+    if (i===-1 && RoundNumber===1) i = findHeaderIndex(headers, 'R1');
+    return i;
+  })();
+
+  if (idxRanking===-1||idxRound===-1) throw new Error(`Schedule CSV must have headers "Ranking" and "Round ${RoundNumber}"`);
+
+  scheduleMap.clear();
+  rows.forEach(r=>{
+    const rank  = Number(r[headers[idxRanking]]);
+    const opp   = Number(r[headers[idxRound]]);
+    if(!Number.isNaN(rank)&&!Number.isNaN(opp)) scheduleMap.set(rank,opp);
+  });
+}
+
+/* ---------- Match type chips ---------- */
+function getMatchType(){
+  const chips = document.querySelectorAll('#matchTypeChips .chip');
+  for (const c of chips){ if (c.classList.contains('active')) return c.dataset.type; }
+  return 'Scheduled';
+}
+function setMatchTypeChip(type){
+  document.querySelectorAll('#matchTypeChips .chip').forEach(c=>{
+    c.classList.toggle('active', c.dataset.type===type);
+  });
+}
+
+/* ---------- UI helpers ---------- */
+function setStatusChip(newStatus){
+  status=newStatus;
+  for (const id of ['chip-completed','chip-retired','chip-walkover']){
+    const el=document.getElementById(id);
+    if (el.dataset.status===newStatus) el.classList.add('active'); else el.classList.remove('active');
+  }
+  const disabled=(newStatus==='Walkover');
+  ['s1w','s1o','s2w','s2o','s3w','s3o','s3wSel','s3oSel','s1tb','s2tb','s3tb','isTb']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=disabled; });
+  document.getElementById('msg').textContent='';
+}
+
+function toggleTBUI(isTB){
+  document.getElementById('col3Header').textContent = isTB ? 'Match TB' : 'Scores';
+  document.getElementById('s3w').classList.toggle('hidden', !isTB);
+  document.getElementById('s3o').classList.toggle('hidden', !isTB);
+  document.getElementById('s3wSel').classList.toggle('hidden', isTB);
+  document.getElementById('s3oSel').classList.toggle('hidden', isTB);
+  if (isTB){ document.getElementById('s3wSel').value=''; document.getElementById('s3oSel').value=''; }
+  else { document.getElementById('s3w').value=''; document.getElementById('s3o').value=''; }
+  document.getElementById('s3tb').parentElement.classList.toggle('hidden', isTB);
+  refreshTBEnabled();
+}
+
+function refreshTBEnabled(){
+  const isTB = document.getElementById('isTb').checked;
+  const sets=[1,2,3];
+  sets.forEach(k=>{
+    const wEl = document.getElementById(k===3 ? (isTB?'s3w':'s3wSel') : `s${k}w`);
+    const oEl = document.getElementById(k===3 ? (isTB?'s3o':'s3oSel') : `s${k}o`);
+    const tb=document.getElementById(`s${k}tb`);
+    if (!wEl || !oEl || !tb) return;
+
+    if (k===3 && isTB){
+      tb.value=''; tb.disabled=true; tb.classList.add('disabled-like');
+      return;
+    }
+    const a = parseNum(wEl.value), b = parseNum(oEl.value);
+    const need = (a===7&&b===6) || (a===6&&b===7);
+    tb.disabled = !need;
+    tb.classList.toggle('disabled-like', !need);
+    if(!need) tb.value='';
+  });
+}
+
+function clearInvalids(){
+  document.querySelectorAll('.invalid').forEach(el=>{
+    el.classList.remove('invalid');
+    el.removeAttribute('aria-invalid');
+  });
+}
+function markInvalidActive(id){
+  if (id==='s3w' || id==='s3o'){
+    const wrapId = id==='s3w' ? 's3wWrap' : 's3oWrap';
+    const wrap = document.getElementById(wrapId);
+    if (wrap){ wrap.classList.add('invalid'); wrap.setAttribute('aria-invalid','true'); return wrap; }
+  }
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('invalid');
+  el.setAttribute('aria-invalid','true');
+  return el;
+}
+function focusFirstInvalid(){
+  const first = document.querySelector('.invalid');
+  if (first){
+    first.focus({preventScroll:false});
+    first.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+/* Opponent helpers */
+function getOpponentValue(){
+  const mode = getMatchType();
+  if (mode==='Challenge'){
+    return document.getElementById('opponentSelect').value || '';
+  } else {
+    return document.getElementById('opponentNameText').textContent || '';
+  }
+}
+function setOpponentValue(val){
+  const mode = getMatchType();
+  if (mode==='Challenge'){
+    document.getElementById('opponentSelect').value = val || '';
+  } else {
+    document.getElementById('opponentNameText').textContent = val || '';
+  }
+}
+function updateRowLabels(){
+  const oName = getOpponentValue();
+  document.getElementById('opponentNameText').textContent = oName || (getMatchType()==='Challenge' ? '' : 'Opponent');
+}
+
+/* eligibility-dependent dropdown fills */
+function eligibleNamesFor(type){
+  const list = players.filter(p=>{
+    if (!(p.roundStart<=RoundNumber && p.roundEnd>=RoundNumber)) return false;
+    return (type==='Scheduled') ? p.sEligible : p.cEligible;
+  }).map(p=>p.name);
+  list.sort((a,b)=>a.localeCompare(b));
+  return list;
+}
+function refreshWinnerOptions(){
+  const sel=document.getElementById('winner');
+  const type=getMatchType();
+  const current = sel.value;
+  const names = eligibleNamesFor(type);
+  if (names.length===0){
+    sel.innerHTML = '<option value="">No eligible players</option>';
+    sel.value='';
+  }else{
+    sel.innerHTML = '<option value="">Select winner…</option>' + names.map(n=>`<option value="${n}">${n}</option>`).join('');
+    if (current && names.includes(current)) sel.value=current; else sel.value='';
+  }
+}
+
+/* Scheduled vs Challenge opponent */
+function recomputeOpponentForMode(){
+  const winner=document.getElementById('winner').value;
+  setOpponentValue('');
+  const mode = getMatchType();
+
+  const oppNameText = document.getElementById('opponentNameText');
+  const oppSelect   = document.getElementById('opponentSelect');
+
+  if (!winner){
+    oppSelect.classList.add('hidden');
+    oppNameText.textContent = 'Opponent';
+    updateRowLabels();
+    return;
+  }
+
+  const wRank = rankByName.get(winner);
+
+  if (!Number.isFinite(wRank) || wRank<=0){
+    // Winner has no rank -> cannot safely compute +/-5 or scheduled opponent
+    if (mode==='Challenge'){
+      oppSelect.classList.remove('hidden');
+      oppSelect.innerHTML = '<option value="">Select opponent…</option><option value="" disabled>Winner has no R'+RoundNumber+'Rank</option>';
+      oppNameText.textContent = '';
+    } else {
+      oppSelect.classList.add('hidden');
+      oppNameText.textContent = 'No opponent found';
+    }
+    updateRowLabels();
+    return;
+  }
+
+  if (mode==='Challenge'){
+    oppSelect.classList.remove('hidden');
+    const minR = Math.max(1, wRank - 5);
+    const maxR = wRank + 5;
+    const options = ['<option value="">Select opponent…</option>'];
+    for (let r=minR; r<=maxR; r++){
+      if (r===wRank) continue;
+      const name = nameByRank.get(r);
+      if (!name) continue;
+      const p = players.find(x=>x.name===name);
+      if (!p || !p.cEligible) continue;
+      options.push(`<option value="${name}">${name}</option>`);
+    }
+    if (options.length===1) options.push('<option value="" disabled>No eligible opponents</option>');
+    oppSelect.innerHTML = options.join('');
+    oppNameText.textContent = '';
+  } else {
+    oppSelect.classList.add('hidden');
+    const oppRank = scheduleMap.get(wRank);
+    const oppName = nameByRank.get(oppRank) || 'No opponent found';
+    oppNameText.textContent = oppName;
+  }
+
+  updateRowLabels();
+}
+
+/* -------- Reading / validation -------- */
+function parseNum(v){
+  if (v==='' || v==null) return '';
+  const n = Number(v);
+  return Number.isNaN(n) ? '' : n;
+}
+function readScore(id){
+  if (id==='s3w' || id==='s3o'){
+    const isTB = document.getElementById('isTb').checked;
+    const activeId = isTB ? id : id+'Sel';
+    const el = document.getElementById(activeId);
+    return parseNum(el ? el.value.trim() : '');
+  }
+  const el = document.getElementById(id);
+  return parseNum(el ? el.value.trim() : '');
+}
+function isAllowedWinnerPair(win, lose){
+  if (win===6 && lose>=0 && lose<=4) return true;
+  if (win===7 && (lose===5 || lose===6)) return true;
+  return false;
+}
+function validateSetPair(a,b,setName, topId, bottomId){
+  if (a==='' || b===''){
+    markInvalidActive(topId); markInvalidActive(bottomId);
+    return {ok:false, msg:`Enter both scores for ${setName}.`};
+  }
+  if (a===b){
+    markInvalidActive(topId); markInvalidActive(bottomId);
+    return {ok:false, msg:`${setName}: ties are not allowed.`};
+  }
+  const topWins = a>b;
+  const win = topWins ? a : b;
+  const lose = topWins ? b : a;
+  if (!isAllowedWinnerPair(win, lose)){
+    markInvalidActive(topId); markInvalidActive(bottomId);
+    return {ok:false, msg:`${setName}: invalid tennis score.`};
+  }
+  const needTB = (win===7 && lose===6);
+  return {ok:true, winnerIsTop: topWins, needTB};
+}
+
+function validateScores(){
+  clearInvalids();
+  const msg=document.getElementById('msg'); msg.textContent='';
+  if (status==='Walkover') return true;
+
+  const matchType = getMatchType();
+  const winner = document.getElementById('winner').value;
+  const opponent = getOpponentValue();
+
+  if (!winner){ msg.textContent='Pick a winner.'; markInvalidActive('winner'); focusFirstInvalid(); return false; }
+
+  // NEW: give clearer error if winner has no rank (affects both match types)
+  const wRank = rankByName.get(winner);
+  if (!Number.isFinite(wRank) || wRank<=0){
+    msg.textContent = `Winner is missing R${RoundNumber}Rank in the Players CSV. Please fix that rank and try again.`;
+    markInvalidActive('winner');
+    focusFirstInvalid();
+    return false;
+  }
+
+  if (matchType==='Challenge'){
+    if (!opponent){ msg.textContent='Pick an opponent for the Challenge Match.'; markInvalidActive('opponentSelect'); focusFirstInvalid(); return false; }
+    if (opponent === winner){ msg.textContent='Opponent cannot be the same as the winner.'; markInvalidActive('opponentSelect'); focusFirstInvalid(); return false; }
+  } else {
+    if (!opponent || /not found|no opponent/i.test(opponent)){
+      msg.textContent='Opponent not found yet.';
+      markInvalidActive('winner');
+      focusFirstInvalid();
+      return false;
+    }
+  }
+
+  const isTB=document.getElementById('isTb').checked;
+
+  const s1w=readScore('s1w'), s1o=readScore('s1o');
+  const s2w=readScore('s2w'), s2o=readScore('s2o');
+  const s3w=readScore('s3w'), s3o=readScore('s3o');
+
+  const s1tb=readScore('s1tb'), s2tb=readScore('s2tb'), s3tb=readScore('s3tb');
+
+  if (status==='Retired'){
+    if (s1w!==''||s1o!==''||s2w!==''||s2o!==''||s3w!==''||s3o!==''){
+      return true;
+    }
+    msg.textContent='Please enter whatever score progress existed before retirement.';
+    markInvalidActive('s1w'); markInvalidActive('s1o'); markInvalidActive('s2w'); markInvalidActive('s2o');
+    focusFirstInvalid();
+    return false;
+  }
+
+  const v1 = validateSetPair(s1w,s1o,'Set 1','s1w','s1o'); if(!v1.ok){ msg.textContent=v1.msg; focusFirstInvalid(); return false; }
+  const v2 = validateSetPair(s2w,s2o,'Set 2','s2w','s2o'); if(!v2.ok){ msg.textContent=v2.msg; focusFirstInvalid(); return false; }
+
+  if (v1.needTB && s1tb===''){ msg.textContent='Enter tie-break points for Set 1.'; markInvalidActive('s1tb'); focusFirstInvalid(); return false; }
+  if (v2.needTB && s2tb===''){ msg.textContent='Enter tie-break points for Set 2.'; markInvalidActive('s2tb'); focusFirstInvalid(); return false; }
+
+  let won=0, lost=0;
+  won += v1.winnerIsTop ? 1 : 0; lost+= v1.winnerIsTop ? 0 : 1;
+  won += v2.winnerIsTop ? 1 : 0; lost+= v2.winnerIsTop ? 0 : 1;
+
+  if (won===2){
+    if (s3w!=='' || s3o!=='' || s3tb!==''){
+      msg.textContent='Leave Set 3 blank when the match ends in two sets.';
+      markInvalidActive('s3w'); markInvalidActive('s3o');
+      if (s3tb!=='') markInvalidActive('s3tb');
+      focusFirstInvalid();
+      return false;
+    }
+    return true;
+  }
+
+  if (won===1 && lost===1){
+    if (isTB){
+      if (s3w==='' || s3o===''){
+        msg.textContent='Enter the match tiebreak score in the Set 3 boxes.';
+        markInvalidActive('s3w'); markInvalidActive('s3o'); focusFirstInvalid(); return false;
+      }
+      const w = Number(s3w), o = Number(s3o);
+      if (w < 10 || (w - o) < 2){
+        msg.textContent='Match tiebreak must be at least 10 and win by 2 for the winner.';
+        markInvalidActive('s3w'); markInvalidActive('s3o'); focusFirstInvalid(); return false;
+      }
+      if (document.getElementById('s3tb').value !== ''){
+        msg.textContent='Do not fill the Set 3 tiebreak box when using a match tiebreak.';
+        markInvalidActive('s3tb'); focusFirstInvalid(); return false;
+      }
+      return true;
+    } else {
+      const v3 = validateSetPair(s3w,s3o,'Set 3','s3w','s3o'); if(!v3.ok){ msg.textContent=v3.msg; focusFirstInvalid(); return false; }
+      if (!v3.winnerIsTop){
+        msg.textContent='Winner must win Set 3.';
+        markInvalidActive('s3w'); markInvalidActive('s3o'); focusFirstInvalid(); return false;
+      }
+      if (v3.needTB && s3tb===''){
+        msg.textContent='Enter tie-break points for Set 3.';
+        markInvalidActive('s3tb'); focusFirstInvalid(); return false;
+      }
+      return true;
+    }
+  }
+
+  msg.textContent='Scores must reflect the selected winner (two sets to one).';
+  markInvalidActive('s1w'); markInvalidActive('s1o'); markInvalidActive('s2w'); markInvalidActive('s2o');
+  focusFirstInvalid();
+  return false;
+}
+
+/* ===== Email body formatting ===== */
+function fmtSet(label, w, o, tb){
+  if (w==='' || o==='') return '';
+  if (tb!=='' && tb!=null) return `${label} ${w}-${o}(${tb})`;
+  return `${label} ${w}-${o}`;
+}
+function buildScoreLine(payload){
+  const parts = [];
+  const s1 = fmtSet('', payload.S1_W, payload.S1_O, payload.Set1_T);
+  const s2 = fmtSet('', payload.S2_W, payload.S2_O, payload.Set2_T);
+  const s3 = fmtSet('', payload.S3_W, payload.S3_O, payload.Set3_T);
+
+  if (s1) parts.push(s1.trim());
+  if (s2) parts.push(s2.trim());
+  if (s3) parts.push(s3.trim());
+
+  if (payload.TB_W!=='' && payload.TB_O!==''){
+    parts.push(`(${payload.TB_W}-${payload.TB_O})`);
+  }
+
+  return `${payload.Winner} defeats ${payload.Opponent}${parts.length ? ' ' + parts.join(' ') : ''}`.trim();
+}
+
+function buildEmailBody(payload){
+  const scoreLine = buildScoreLine(payload);
+  return [
+    `Timestamp: ${payload.Timestamp}`,
+    `Round: ${payload.Round}`,
+    `Status: ${payload.Status}`,
+    `MatchType: ${payload.MatchType}`,
+    ``,
+    scoreLine,
+    ``,
+    `Standings: ${STANDINGS_LINK}`,
+    UPDATE_NOTE
+  ].join('\n');
+}
+
+function safeEmailOf(name){
+  const e = (emailByName.get(name) || '').trim();
+  if (!e || !e.includes('@')) return '';
+  return e;
+}
+
+async function sendEmailConfirmation(payload){
+  if (!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.startsWith('REPLACE_')) return {skipped:true};
+  if (!EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID.startsWith('REPLACE_')) return {skipped:true};
+  if (!EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID.startsWith('REPLACE_')) return {skipped:true};
+
+  const winnerEmail = safeEmailOf(payload.Winner);
+  const opponentEmail = safeEmailOf(payload.Opponent);
+
+  const ccList = [winnerEmail, opponentEmail].filter(Boolean).join(',');
+
+  const params = {
+    subject: `Round ${payload.Round} Score Submission`,
+    to_email: ADMIN_EMAIL,
+    cc_emails: ccList,
+    winner_name: payload.Winner,
+    opponent_name: payload.Opponent,
+    message: buildEmailBody(payload),
+    standings_link: STANDINGS_LINK,
+    update_note: UPDATE_NOTE
+  };
+
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+}
+
+async function submitForm(){
+  // Extra guard: re-check deadline at submit time
+  if (window._deadlineExpired) {
+    document.getElementById('msg').textContent = 'The score submission deadline has passed for this round.';
+    return;
+  }
+
+  const btn=document.getElementById('submitBtn');
+  const ok=document.getElementById('ok');
+  const msg=document.getElementById('msg');
+  msg.textContent=''; ok.style.display='none';
+
+  if (!validateScores()) return;
+
+  const matchType = getMatchType();
+  const winner = document.getElementById('winner').value;
+  const opponent = getOpponentValue(); // LOSER
+  const isTB = document.getElementById('isTb').checked;
+
+  const s1w = readScore('s1w'), s1o = readScore('s1o');
+  const s2w = readScore('s2w'), s2o = readScore('s2o');
+  const s3w = readScore('s3w'), s3o = readScore('s3o');
+
+  const set1_t = readScore('s1tb');
+  const set2_t = readScore('s2tb');
+  const set3_t = readScore('s3tb');
+
+  // WinnerRank/OpponentRank now also come from the Players CSV R[x]Rank mapping
+  const winnerRank = rankByName.get(winner) || '';
+  const opponentRank = (matchType==='Scheduled')
+    ? (scheduleMap.get(winnerRank) || '')
+    : (rankByName.get(opponent) || '');
+
+  const payload = {
+    Timestamp: new Date().toISOString(),
+    Round: RoundNumber,
+    Status: status,
+    MatchType: matchType,
+    Winner: winner,
+    Opponent: opponent,
+    WinnerRank: winnerRank,
+    OpponentRank: opponentRank,
+    IsTiebreakThird: isTB,
+
+    ScoresSheetName: `Round ${RoundNumber} Scores`,
+
+    S1_W: (status==='Walkover') ? '' : s1w,
+    S1_O: (status==='Walkover') ? '' : s1o,
+    S2_W: (status==='Walkover') ? '' : s2w,
+    S2_O: (status==='Walkover') ? '' : s2o,
+
+    S3_W: (status==='Walkover') ? '' : (isTB ? '' : s3w),
+    S3_O: (status==='Walkover') ? '' : (isTB ? '' : s3o),
+
+    Set1_T: (status==='Walkover') ? '' : set1_t,
+    Set2_T: (status==='Walkover') ? '' : set2_t,
+    Set3_T: (status==='Walkover') ? '' : (isTB ? '' : set3_t),
+
+    TB_W: (status==='Walkover') ? '' : (isTB ? s3w : ''),
+    TB_O: (status==='Walkover') ? '' : (isTB ? s3o : '')
+  };
+
+  btn.disabled=true;
+  const oldBtnText = btn.textContent;
+  btn.textContent = 'Submitting…';
+
+  showOverlay(
+    'Submitting scores…',
+    'Submitting to Google Sheets and sending email confirmations. Please keep this page open.'
+  );
+
+  try{
+    const submitUrl = `${SUBMIT_ENDPOINT}?round=${encodeURIComponent(RoundNumber)}`;
+
+    await fetch(submitUrl,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(payload),
+      mode:'no-cors'
+    });
+
+    try{
+      await sendEmailConfirmation(payload);
+    }catch(emailErr){
+      console.warn('EmailJS failed:', emailErr);
+      msg.textContent = 'Score submitted, but email confirmation failed to send. If this continues, contact Dan.';
+    }
+
+    ok.style.display='inline';
+    ['s1w','s1o','s2w','s2o','s1tb','s2tb','s3tb','s3w','s3o','s3wSel','s3oSel'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    clearInvalids();
+    refreshTBEnabled();
+    updatePreview();
+
+    showSuccessModal();
+
+  }catch(e){
+    msg.textContent='Could not submit: '+e.message;
+  }finally{
+    hideOverlay();
+    btn.disabled=false;
+    btn.textContent = oldBtnText;
+    // Re-disable if deadline expired during submission
+    if (window._deadlineExpired) btn.disabled = true;
+  }
+}
+
+/*** wiring ***/
+['s1w','s1o','s2w','s2o','s3wSel','s3oSel'].forEach(id=>{
+  const el = document.getElementById(id);
+  if (el && el.tagName==='SELECT') fillScoreDropdown(el);
+});
+
+/* ===== Score preview ===== */
+function updatePreview(){
+  const card = document.getElementById('previewCard');
+  const el   = document.getElementById('previewText');
+  const winner   = document.getElementById('winner').value;
+  const opponent = getOpponentValue();
+  if (!winner || !opponent || /not found|no opponent/i.test(opponent)){
+    card.style.display='none';
+    el.innerHTML='';
+    return;
+  }
+  card.style.display='';
+
+  const isTB  = document.getElementById('isTb').checked;
+  const s1w = readScore('s1w'), s1o = readScore('s1o');
+  const s2w = readScore('s2w'), s2o = readScore('s2o');
+  const s3w = readScore('s3w'), s3o = readScore('s3o');
+
+  const fmtSet = (w, o) => (w !== '' && o !== '') ? `${w}–${o}` : null;
+  const sets = [fmtSet(s1w,s1o), fmtSet(s2w,s2o)].filter(Boolean);
+  if (s3w !== '' && s3o !== '') sets.push(isTB ? `[${s3w}–${s3o}]` : fmtSet(s3w,s3o));
+
+  const scoreStr = sets.length ? sets.join(', ') : '';
+  const matchType = getMatchType();
+
+  if (status === 'Walkover'){
+    el.innerHTML = `<span class="pre-winner">${winner}</span> wins by walkover over ${opponent} <span class="pre-score">(${matchType})</span>`;
+  } else if (status === 'Retired'){
+    el.innerHTML = `<span class="pre-winner">${winner}</span> def. ${opponent}${scoreStr ? ` <span class="pre-score">${scoreStr} Ret.</span>` : ''} <span class="pre-score">(${matchType})</span>`;
+  } else {
+    el.innerHTML = `<span class="pre-winner">${winner}</span> def. ${opponent}${scoreStr ? ` <span class="pre-score">${scoreStr}</span>` : ' <span class="pre-empty">— enter scores above</span>'} <span class="pre-score">(${matchType})</span>`;
+  }
+}
+
+document.querySelectorAll('#matchTypeChips .chip').forEach(ch=>{
+  ch.addEventListener('click', ()=>{
+    setMatchTypeChip(ch.dataset.type);
+    const prevWinner = document.getElementById('winner').value;
+    refreshWinnerOptions();
+    if (document.getElementById('winner').value !== prevWinner) setOpponentValue('');
+    recomputeOpponentForMode();
+    clearInvalids();
+    updatePreview();
+  });
+});
+
+document.getElementById('isTb').addEventListener('change', e=>{
+  toggleTBUI(e.target.checked); clearInvalids(); updatePreview();
+});
+['chip-completed','chip-retired','chip-walkover'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', e=>{ setStatusChip(e.target.dataset.status); clearInvalids(); updatePreview(); });
+});
+
+['s1w','s1o','s2w','s2o','s3w','s3o','s3wSel','s3oSel'].forEach(id=>{
+  const el=document.getElementById(id);
+  if (el){
+    const ev = el.tagName==='SELECT' ? 'change' : 'input';
+    el.addEventListener(ev, ()=>{ refreshTBEnabled(); updatePreview(); });
+  }
+});
+
+['s1w','s1o','s2w','s2o','s3w','s3o','s3wSel','s3oSel','s1tb','s2tb','s3tb','winner','opponentSelect','s3wWrap','s3oWrap'].forEach(id=>{
+  const el=document.getElementById(id);
+  if (el){
+    el.addEventListener('input', ()=>{ el.classList.remove('invalid'); el.removeAttribute('aria-invalid'); });
+    el.addEventListener('change', ()=>{ el.classList.remove('invalid'); el.removeAttribute('aria-invalid'); });
+  }
+});
+
+document.getElementById('winner').addEventListener('change', ()=>{
+  recomputeOpponentForMode();
+  updateRowLabels();
+  updatePreview();
+});
+
+document.getElementById('opponentSelect').addEventListener('change', ()=>{
+  const name = document.getElementById('opponentSelect').value;
+  document.getElementById('opponentNameText').textContent = name || '';
+  updateRowLabels();
+  updatePreview();
+});
+
+document.getElementById('submitBtn').addEventListener('click', submitForm);
+
+// init (fetch RoundNumber first)
+(async function init(){
+  try{
+    await fetchRoundNumber();
+
+    document.getElementById('titleH1').textContent = `Round ${RoundNumber} Score Submission`;
+    document.title = `Indy Tennis Ladder – Round ${RoundNumber} Score Entry`;
+
+    // Apply deadline banner (and disable submit if past deadline)
+    applyDeadline();
+
+    try{
+      if (EMAILJS_PUBLIC_KEY && !EMAILJS_PUBLIC_KEY.startsWith('REPLACE_')){
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+      }
+    }catch(e){
+      console.warn('EmailJS init warning:', e);
+    }
+
+    await Promise.all([loadPlayers(), loadScheduleForRound()]);
+    setMatchTypeChip('Scheduled');
+    refreshWinnerOptions();
+    recomputeOpponentForMode();
+    updateRowLabels();
+    toggleTBUI(false);
+    setStatusChip('Completed');
+    refreshTBEnabled();
+    // Only enable submit if deadline has not passed
+    if (!window._deadlineExpired) {
+      document.getElementById('submitBtn').disabled=false;
+    }
+  }catch(e){
+    console.error('init error:', e);
+    document.getElementById('msg').textContent='Setup error: '+e.message;
+  }
+})();
+
+/* Re-load player/schedule data when user returns to this tab after being away,
+   so the winner dropdown and opponent list never go stale. */
+let _lastVisibleSS = Date.now();
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'hidden') { _lastVisibleSS = Date.now(); return; }
+  const away = Date.now() - _lastVisibleSS;
+  if (away < 60000) return; // skip if away less than 60 s
+  _lastVisibleSS = Date.now();
+  const prevRound = RoundNumber;
+  await fetchRoundNumber();
+  if (RoundNumber !== prevRound){
+    document.getElementById('titleH1').textContent = `Round ${RoundNumber} Score Submission`;
+    document.title = `Indy Tennis Ladder – Round ${RoundNumber} Score Entry`;
+  }
+  // Re-evaluate deadline on tab return
+  applyDeadline();
+  await Promise.all([loadPlayers(), loadScheduleForRound()]);
+  refreshWinnerOptions();
+  recomputeOpponentForMode();
+  updateRowLabels();
+});
+</script>
+</body>
+</html>
