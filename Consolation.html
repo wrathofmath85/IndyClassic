@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Indy Classic – Consolation</title>
+  <title>2026 Indy Classic – Consolation</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,14 +69,15 @@
     .logoMark{
       width:56px;height:56px;
       border-radius:14px;
-      background:linear-gradient(135deg,var(--accent),rgba(56,189,248,.4));
-      display:flex;align-items:center;justify-content:center;
-      font-family:'Bebas Neue',sans-serif;
-      font-size:28px;letter-spacing:.02em;
-      color:#fff;
+      overflow:hidden;
       border:1px solid rgba(56,189,248,.4);
       box-shadow:0 0 28px rgba(56,189,248,.25);
       flex-shrink:0;
+      background:#fff;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .logoMark img{
+      width:100%;height:100%;object-fit:contain;
     }
     .titleBlock{}
     .titleBlock .eyebrow{
@@ -197,6 +198,11 @@
       font-size:11px;color:#fbbf24;font-weight:600;
       margin-top:5px;
     }
+    /* opens-at note for closed events */
+    .opensAt{
+      font-size:11px;color:var(--muted);font-weight:600;
+      margin-top:5px;
+    }
 
     /* skeleton loading */
     .skeletonGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
@@ -277,6 +283,17 @@
       color:rgba(255,255,255,.8);font-size:13.5px;
       min-height:46px;display:flex;align-items:center;
     }
+
+    /* partner info box */
+    .partnerBox{
+      padding:13px 14px;border-radius:14px;
+      background:rgba(56,189,248,.08);
+      border:1px solid rgba(56,189,248,.25);
+      color:rgba(255,255,255,.85);font-size:13.5px;
+      display:none;
+    }
+    .partnerBox.visible{display:flex;align-items:center;gap:10px;}
+    .partnerBox .partnerLabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-right:4px;}
 
     .btn{
       width:100%;padding:14px 18px;
@@ -423,9 +440,11 @@
   <div class="banner">
     <div class="bannerInner">
       <div class="logoBlock">
-        <div class="logoMark">IC</div>
+        <div class="logoMark">
+          <img src="profile.jpg.png" alt="2026 Indy Classic" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Bebas Neue,sans-serif;font-size:22px;color:#09090f;letter-spacing:.02em;\'>IC</span>'">
+        </div>
         <div class="titleBlock">
-          <div class="eyebrow">2026 Indy Classic Tennis Tournament</div>
+          <div class="eyebrow">2026 Indy Classic</div>
           <h1>Consolation</h1>
           <div class="sub">Sign-up &amp; Draws Hub</div>
         </div>
@@ -495,18 +514,16 @@
 ============================================================ -->
 <script>
 // ── CONFIGURATION ─────────────────────────────────────────────
-// Events sheet: columns Event | Status
+// Events sheet: columns Event | Date | Open | Close
 // Published CSV of your events/status tab
 const EVENTS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=994514669&single=true&output=csv";
 
-// Players / entry list: columns Name | Firstname | Entry Info | Include (Y/N)
+// Players / entry list: columns Name | Firstname | Entry Info | Doubles Partner | Include Singles (Y/N) | Include Doubles (Y/N)
 const ENTRY_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
 
 // Per-event submissions: columns Name | Firstname | Event | Number
-// This is one consolidated sheet that stores sign-ups for ALL events.
-// The Apps Script should accept an "event" field and record it here.
 const SUBMISSIONS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
@@ -515,6 +532,9 @@ const APPS_SCRIPT_URL =
 
 // How often to auto-refresh the hub (ms). 90 seconds.
 const AUTO_REFRESH_MS = 90_000;
+
+// Eastern Time zone identifier
+const EASTERN_TZ = "America/New_York";
 // ── END CONFIGURATION ─────────────────────────────────────────
 
 const tidy  = v => (v == null ? "" : String(v).trim());
@@ -539,47 +559,182 @@ async function parseCSV(url){
   });
 }
 
-// ── Status parsing ─────────────────────────────────────────
-// Status meanings:
-//   "Closed"              → closed, no link
-//   "Open"                → open indefinitely (show sign-up link)
-//   "10AM", "2PM", "4:30PM" → open until that time today (then auto-shows draw link)
-//   "Draw" / "Draws"      → show draw link
-//   anything else          → treat as closed / coming soon
-const TIME_RE = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i;
+// ── Doubles event detection ─────────────────────────────────
+function isDoublesEvent(eventName){
+  return /doubles/i.test(eventName);
+}
 
-function parseTimeStatus(raw){
-  const m = tidy(raw).match(TIME_RE);
+// ── Entry Info parser ───────────────────────────────────────
+// Entry Info column contains lines like:
+//   "B Doubles Josh Chang ()"
+//   "B 40+ Singles"
+// We parse each newline-separated entry and check if it matches the event name.
+// Match logic: the event line should start with a token matching the event name.
+// e.g. event "B Doubles" matches line "B Doubles Josh Chang ()" 
+// e.g. event "B 40+ Singles" matches line "B 40+ Singles"
+function entryInfoMatchesEvent(entryInfo, eventName){
+  if(!entryInfo || !eventName) return false;
+  const lines = entryInfo.split(/\n|\r\n|\r/);
+  const evUp = upper(eventName);
+  for(const line of lines){
+    const lineUp = upper(line.trim());
+    // Check if the line starts with the event name
+    // (the line may have partner name appended after the event name)
+    if(lineUp === evUp) return true;
+    if(lineUp.startsWith(evUp + " ")) return true;
+    if(lineUp.startsWith(evUp + "(")) return true;
+  }
+  return false;
+}
+
+// Parse the doubles partner name from Entry Info for a given event
+// e.g. "B Doubles Josh Chang ()" → for event "B Doubles" → partner = "Josh Chang"
+function parsePartnerFromEntryInfo(entryInfo, eventName){
+  if(!entryInfo || !eventName) return "";
+  const lines = entryInfo.split(/\n|\r\n|\r/);
+  const evUp = upper(eventName);
+  for(const line of lines){
+    const trimmed = line.trim();
+    const lineUp = upper(trimmed);
+    if(lineUp.startsWith(evUp)){
+      // Extract the part after the event name
+      const rest = trimmed.slice(eventName.length).trim();
+      // Remove trailing () or (numbers)
+      const cleaned = rest.replace(/\s*\(\d*\)\s*$/, "").replace(/\s*\(\s*\)\s*$/, "").trim();
+      return cleaned;
+    }
+  }
+  return "";
+}
+
+// ── Date/Time helpers for Eastern Time ─────────────────────
+// Parse "M/D/YYYY" date string
+function parseDateString(dateStr){
+  if(!dateStr) return null;
+  const parts = dateStr.split("/");
+  if(parts.length < 3) return null;
+  const m = parseInt(parts[0], 10);
+  const d = parseInt(parts[1], 10);
+  const y = parseInt(parts[2], 10);
+  if(isNaN(m)||isNaN(d)||isNaN(y)) return null;
+  return { year: y, month: m, day: d };
+}
+
+// Parse time string like "7:00 AM", "12:00 PM", "9:00 AM"
+function parseTimeString(timeStr){
+  if(!timeStr) return null;
+  const m = tidy(timeStr).match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if(!m) return null;
-  let h = parseInt(m[1],10);
-  const min = parseInt(m[2]||"0",10);
+  let h = parseInt(m[1], 10);
+  const min = parseInt(m[2]||"0", 10);
   const ampm = m[3].toUpperCase();
   if(ampm==="PM" && h!==12) h+=12;
   if(ampm==="AM" && h===12) h=0;
-  return { h, min, display: tidy(raw).toUpperCase() };
+  return { h, min };
 }
 
-function classifyStatus(rawStatus){
+// Build a Date object for a given date+time in Eastern Time
+// Uses the Intl API approach: construct an ISO string and adjust offset
+function buildEasternDate(dateObj, timeObj){
+  if(!dateObj || !timeObj) return null;
+  // Format: "YYYY-MM-DDTHH:MM:00" in Eastern timezone
+  // We create the date in ET by using a string that the browser interprets correctly
+  // Use Intl to find the ET offset at roughly that moment
+  const approxUtc = new Date(Date.UTC(dateObj.year, dateObj.month-1, dateObj.day, timeObj.h, timeObj.min, 0));
+  // Get ET offset at that moment
+  const etStr = approxUtc.toLocaleString("en-US", { timeZone: EASTERN_TZ, hour12: false,
+    year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  // etStr is like "05/30/2026, 07:00:00"
+  // We want to find offset = UTC - ET
+  const etParsed = new Date(etStr.replace(",",""));
+  const offsetMs = approxUtc - etParsed; // ms offset (ET is behind UTC, so positive)
+  // The actual UTC time for the desired ET time
+  return new Date(approxUtc.getTime() + offsetMs);
+}
+
+// Format time nicely for display
+function formatTimeDisplay(timeStr){
+  if(!timeStr) return "";
+  return tidy(timeStr).toUpperCase();
+}
+
+// ── Status classification using Date + Open + Close columns ─
+function classifyEventStatus(row){
+  const eventName = tidy(row["Event"]);
+  const dateStr   = tidy(row["Date"]);
+  const openStr   = tidy(row["Open"]);
+  const closeStr  = tidy(row["Close"]);
+
+  // If no date/open/close columns, fall back to old Status column
+  if(!dateStr && !openStr && !closeStr){
+    return classifyLegacyStatus(tidy(row["Status"]), eventName);
+  }
+
+  const dateParsed  = parseDateString(dateStr);
+  const openTime    = parseTimeString(openStr);
+  const closeTime   = parseTimeString(closeStr);
+
+  if(!dateParsed){
+    return { type:"closed" };
+  }
+
+  const now = new Date();
+
+  // Build ET-based open and close timestamps
+  const openDate  = openTime  ? buildEasternDate(dateParsed, openTime)  : null;
+  const closeDate = closeTime ? buildEasternDate(dateParsed, closeTime) : null;
+
+  // If close time has passed → show draw
+  if(closeDate && now >= closeDate){
+    return { type:"draws" };
+  }
+
+  // If open time hasn't come yet → show closed with opens-at info
+  if(openDate && now < openDate){
+    const opensDisplay = openStr ? formatTimeDisplay(openStr) : "";
+    return { type:"closed", opensAt: openDate, opensDisplay };
+  }
+
+  // We're between open and close → open for signup
+  if(closeDate){
+    const msLeft  = closeDate - now;
+    const minsLeft = Math.floor(msLeft / 60000);
+    return {
+      type:"open",
+      closesAt: closeDate,
+      closesDisplay: formatTimeDisplay(closeStr),
+      minsLeft
+    };
+  }
+
+  // No close time specified, just open
+  return { type:"open" };
+}
+
+// Legacy fallback for Status column (keep backward compat)
+const TIME_RE = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i;
+function classifyLegacyStatus(rawStatus){
   const s = tidy(rawStatus);
   const up = upper(s);
-
   if(!s || up==="CLOSED") return { type:"closed" };
   if(up==="OPEN")         return { type:"open" };
   if(up==="DRAW" || up==="DRAWS") return { type:"draws" };
-
-  const t = parseTimeStatus(s);
-  if(t){
-    // Deadline is today at h:min
+  const m = s.match(TIME_RE);
+  if(m){
+    let h = parseInt(m[1],10);
+    const min = parseInt(m[2]||"0",10);
+    const ampm = m[3].toUpperCase();
+    if(ampm==="PM" && h!==12) h+=12;
+    if(ampm==="AM" && h===12) h=0;
     const now = new Date();
     const deadline = new Date(now);
-    deadline.setHours(t.h, t.min, 0, 0);
+    deadline.setHours(h, min, 0, 0);
     if(now >= deadline){
-      return { type:"draws", closedAt: t.display };
+      return { type:"draws" };
     }else{
-      return { type:"open", closesAt: deadline, closesDisplay: t.display };
+      return { type:"open", closesAt: deadline, closesDisplay: s.toUpperCase() };
     }
   }
-
   return { type:"closed" };
 }
 
@@ -589,7 +744,7 @@ async function loadSubmissions(){
   return rows.map(r=>({
     name:     tidy(r["Name"]),
     firstname:tidy(r["Firstname"]),
-    event:    tidy(r["Event"] || r["Singles"]),  // support old "Singles" column
+    event:    tidy(r["Event"] || r["Singles"]),
     number:   Number(tidy(r["Number"]))
   })).filter(p=>(p.firstname||p.name)&&p.event);
 }
@@ -789,28 +944,33 @@ async function loadHub(showSkeleton=true){
 
   const cards = rows.map(row=>{
     const eventName = tidy(row["Event"]);
-    const rawStatus = tidy(row["Status"]);
-    const s = classifyStatus(rawStatus);
+    const s = classifyEventStatus(row);
 
     // Track earliest upcoming deadline for smart re-render
     if(s.type==="open" && s.closesAt){
       if(!earliestDeadline || s.closesAt < earliestDeadline) earliestDeadline=s.closesAt;
     }
+    if(s.type==="closed" && s.opensAt){
+      if(!earliestDeadline || s.opensAt < earliestDeadline) earliestDeadline=s.opensAt;
+    }
 
     let badgeHtml="";
-    let closingSoonHtml="";
+    let sublineHtml="";
 
     if(s.type==="closed"){
       badgeHtml=`<div class="badge closed">Closed</div>`;
+      if(s.opensDisplay){
+        sublineHtml=`<div class="opensAt">Opens ${s.opensDisplay} ET</div>`;
+      }
     }else if(s.type==="open"){
       const msLeft = s.closesAt ? (s.closesAt - now) : Infinity;
       const minsLeft = Math.floor(msLeft/60000);
-      const closingLabel = s.closesDisplay ? `Sign Up · Closes ${s.closesDisplay}` : "Sign Up";
+      const closingLabel = s.closesDisplay ? `Sign Up · Closes ${s.closesDisplay} ET` : "Sign Up";
       badgeHtml=`<div class="badge open" data-event="${esc(eventName)}" data-action="signup">
         <span class="dot green"></span>${closingLabel}
       </div>`;
       if(s.closesAt && minsLeft<60 && minsLeft>=0){
-        closingSoonHtml=`<div class="closingSoon">Closes in ~${minsLeft} min</div>`;
+        sublineHtml=`<div class="closingSoon">Closes in ~${minsLeft} min</div>`;
       }
     }else if(s.type==="draws"){
       badgeHtml=`<div class="badge draws" data-event="${esc(eventName)}" data-action="draw">
@@ -821,7 +981,7 @@ async function loadHub(showSkeleton=true){
     return `<div class="eventCard">
       <div>
         <div class="eventName">${esc(eventName)}</div>
-        ${closingSoonHtml}
+        ${sublineHtml}
       </div>
       ${badgeHtml}
     </div>`;
@@ -849,7 +1009,7 @@ async function loadHub(showSkeleton=true){
     if(msUntil>0 && msUntil<AUTO_REFRESH_MS){
       clearTimeout(refreshTimer);
       refreshTimer=setTimeout(()=>{ loadHub(false); }, msUntil);
-      return; // will reschedule after
+      return;
     }
   }
   scheduleRefresh();
@@ -863,6 +1023,8 @@ async function openSignup(eventName){
   clearToast();
   signupPanel.innerHTML=`<div class="loadMsg"><span class="spinner"></span> Loading player list…</div>`;
 
+  const isDoubles = isDoublesEvent(eventName);
+
   let entryRows=[], submissions=[];
   try{ entryRows = await parseCSV(ENTRY_CSV); }catch(e){
     signupPanel.innerHTML=`<div class="errMsg">Could not load the player list. (${e.message})</div>`;
@@ -870,25 +1032,52 @@ async function openSignup(eventName){
   }
   try{ submissions = await loadSubmissions(); }catch(_){}
 
-  // Players eligible for this event:
-  // Entry Info column (col C) must match eventName, Include (col E) must be Y
-  const eligible = entryRows
+  // Determine which Include column to use
+  // For doubles: "Include Doul" or "Include Doubles"; for singles: "Include Sing" or "Include Singles" or "Include"
+  function getInclude(r){
+    if(isDoubles){
+      const v = tidy(r["Include Doul"] || r["Include Doubles"] || r["Include"]);
+      return v;
+    }else{
+      const v = tidy(r["Include Sing"] || r["Include Singles"] || r["Include"]);
+      return v;
+    }
+  }
+
+  // Build player list from Entry Info column
+  // Entry Info has multiple lines — we check if any line matches the event
+  const allPlayers = entryRows
     .map(r=>({
-      name:      tidy(r["Name"]),
-      firstname: tidy(r["Firstname"]),
-      entryInfo: tidy(r["Entry Info"] || r["Singles"]),
-      include:   upper(r["Include"])
+      name:         tidy(r["Name"]),
+      firstname:    tidy(r["Firstname"]),
+      entryInfo:    tidy(r["Entry Info"] || r["Singles"]),
+      doublesPartner: tidy(r["Doubles Par"] || r["Doubles Partner"] || r["DoublesPar"]),
+      include:      upper(getInclude(r))
     }))
-    .filter(p=> p.include==="Y" && (p.name||p.firstname) &&
-                upper(p.entryInfo)===upper(eventName))
+    .filter(p=> p.include==="Y" && (p.name||p.firstname));
+
+  const eligible = allPlayers
+    .filter(p=> entryInfoMatchesEvent(p.entryInfo, eventName))
     .sort((a,b)=>(a.firstname+" "+a.name).localeCompare(b.firstname+" "+b.name));
+
+  // For doubles: build a lookup of partner name → player record
+  // so we can also find the partner's row and remove them from list
+  const playerByFullName = new Map();
+  for(const p of allPlayers){
+    const fullName = (p.firstname+" "+p.name).trim().toLowerCase();
+    playerByFullName.set(fullName, p);
+  }
 
   const signedUp = new Set(
     submissions.filter(s=>upper(s.event)===upper(eventName))
                .map(s=>canonKey(s.firstname,s.name))
   );
 
-  // Build summary of current signups for this event
+  // For doubles, also mark people whose partner is already signed up
+  // (since partner signs up for them too)
+  // We'll do this check dynamically in the select population
+
+  // Build summary of current signups
   const currentNames = submissions
     .filter(s=>upper(s.event)===upper(eventName))
     .map(s=>`${s.firstname} ${s.name}`.trim())
@@ -907,14 +1096,18 @@ async function openSignup(eventName){
   if(!eligible.length){
     signupPanel.innerHTML=`
       <div class="notice"><strong>No eligible players found for "${esc(eventName)}".</strong><br>
-      Make sure the Entry Info column in the players sheet matches the event name exactly, and Include is Y.</div>
+      Make sure the Entry Info column in the players sheet includes this event name, and Include is Y.</div>
       ${summaryHtml}`;
     return;
   }
 
+  const noticeText = isDoubles
+    ? `Select your name to enter the consolation draw for ${esc(eventName)}. Your doubles partner will also be registered.`
+    : `Select your name to enter the consolation draw for ${esc(eventName)}.`;
+
   signupPanel.innerHTML=`
     <div class="notice">
-      <strong>Select your name to enter the consolation draw for ${esc(eventName)}.</strong>
+      <strong>${noticeText}</strong>
     </div>
     <div class="form">
       <div>
@@ -923,6 +1116,10 @@ async function openSignup(eventName){
           <option value="">— Select your name —</option>
         </select>
       </div>
+      ${isDoubles ? `<div class="partnerBox" id="partnerBox">
+        <span class="partnerLabel">Partner:</span>
+        <span id="partnerName">—</span>
+      </div>` : ""}
       <button class="btn" id="signupSubmitBtn" disabled>Submit Entry</button>
     </div>
     <div id="signupSummary">${summaryHtml}</div>
@@ -931,22 +1128,61 @@ async function openSignup(eventName){
   const sel = document.getElementById("playerSel");
   const btn = document.getElementById("signupSubmitBtn");
   const summaryDiv = document.getElementById("signupSummary");
+  const partnerBox = isDoubles ? document.getElementById("partnerBox") : null;
+  const partnerNameEl = isDoubles ? document.getElementById("partnerName") : null;
 
   for(const p of eligible){
     const label=`${p.firstname} ${p.name}`.trim();
     const k=canonKey(p.firstname,p.name);
+
+    // For doubles: also check if partner is already signed up (meaning this person is too)
+    let alreadyIn = signedUp.has(k);
+    if(!alreadyIn && isDoubles && p.doublesPartner){
+      // Check if partner is in signedUp by parsing partner name
+      const partnerFullLower = p.doublesPartner.trim().toLowerCase();
+      // Look up partner in allPlayers to get their canon key
+      const partnerPlayer = playerByFullName.get(partnerFullLower);
+      if(partnerPlayer){
+        const pk = canonKey(partnerPlayer.firstname, partnerPlayer.name);
+        if(signedUp.has(pk)) alreadyIn = true;
+      } else {
+        // Try to match by just checking submissions directly
+        const pLower = partnerFullLower;
+        for(const s of submissions){
+          if(upper(s.event)===upper(eventName)){
+            const sName = (s.firstname+" "+s.name).trim().toLowerCase();
+            if(sName === pLower){ alreadyIn = true; break; }
+          }
+        }
+      }
+    }
+
     const opt=document.createElement("option");
     opt.value=label;
-    opt.textContent=signedUp.has(k)?`${label} ✓ Already entered`:label;
+    opt.textContent=alreadyIn?`${label} ✓ Already entered`:label;
     opt.dataset.firstname=p.firstname;
     opt.dataset.name=p.name;
     opt.dataset.event=eventName;
-    if(signedUp.has(k)) opt.disabled=true;
+    opt.dataset.partner=isDoubles ? (p.doublesPartner||"") : "";
+    if(alreadyIn) opt.disabled=true;
     sel.appendChild(opt);
   }
 
   sel.addEventListener("change",()=>{
     clearToast();
+    const opt = sel.selectedOptions[0];
+    const partner = opt?.dataset?.partner || "";
+
+    if(isDoubles && partnerBox && partnerNameEl){
+      if(sel.value && partner){
+        partnerNameEl.textContent = partner;
+        partnerBox.classList.add("visible");
+      } else {
+        partnerBox.classList.remove("visible");
+        partnerNameEl.textContent = "—";
+      }
+    }
+
     btn.disabled=!sel.value;
   });
 
@@ -956,6 +1192,7 @@ async function openSignup(eventName){
     const fn=opt?.dataset?.firstname||"";
     const ln=opt?.dataset?.name||"";
     const ev=opt?.dataset?.event||"";
+    const partner=opt?.dataset?.partner||"";
     if(!fn||!ln){ setToast("err","Please select your name."); return; }
 
     const k=canonKey(fn,ln);
@@ -972,6 +1209,7 @@ async function openSignup(eventName){
         opt.disabled=true;
         sel.value="";
         btn.disabled=true;
+        if(partnerBox) partnerBox.classList.remove("visible");
         return;
       }
     }catch(_){}
@@ -986,25 +1224,68 @@ async function openSignup(eventName){
         sub2.filter(s=>upper(s.event)===upper(ev))
             .forEach(s=>{ if(Number.isFinite(s.number)) used.add(s.number); });
       }catch(_){}
+
       const num=pickUnique(used);
       if(num==null) throw new Error("All numbers 1–1000 used.");
 
+      // Submit primary player
       const fd=new FormData();
       fd.append("firstname",fn);
       fd.append("name",ln);
-      fd.append("singles",ev);  // keep "singles" for Apps Script compatibility
+      fd.append("singles",ev);
       fd.append("event",ev);
       fd.append("number",String(num));
 
       await fetch(APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",body:fd});
 
-      setToast("ok",`✓ Submitted! Welcome to the ${ev} consolation draw.`);
+      // For doubles: also submit the partner
+      if(isDoubles && partner){
+        // Parse partner firstname/lastname
+        // Partner may be stored as "Firstname Lastname" — split on first space
+        const partnerParts = partner.trim().split(/\s+/);
+        const partnerFn = partnerParts[0] || partner;
+        const partnerLn = partnerParts.slice(1).join(" ") || "";
+
+        // Pick a different number for partner
+        used.add(num);
+        const partnerNum = pickUnique(used);
+
+        if(partnerNum != null){
+          const fd2=new FormData();
+          fd2.append("firstname", partnerFn);
+          fd2.append("name", partnerLn);
+          fd2.append("singles", ev);
+          fd2.append("event", ev);
+          fd2.append("number", String(partnerNum));
+          await fetch(APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",body:fd2});
+        }
+      }
+
+      const successMsg = isDoubles && partner
+        ? `✓ Submitted! You and ${partner} are entered in the ${ev} consolation draw.`
+        : `✓ Submitted! Welcome to the ${ev} consolation draw.`;
+
+      setToast("ok", successMsg);
 
       // Update the entry list to show as signed up
       opt.textContent=`${fn} ${ln} ✓ Already entered`;
       opt.disabled=true;
+
+      // Also mark partner as entered in dropdown if doubles
+      if(isDoubles && partner){
+        const partnerLower = partner.trim().toLowerCase();
+        for(const o of sel.options){
+          const oName = (o.dataset.firstname+" "+o.dataset.name).trim().toLowerCase();
+          if(oName === partnerLower){
+            o.textContent = `${o.dataset.firstname} ${o.dataset.name} ✓ Already entered`;
+            o.disabled = true;
+          }
+        }
+      }
+
       sel.value="";
       btn.disabled=true;
+      if(partnerBox) partnerBox.classList.remove("visible");
 
       // Reload summary after a brief pause for the sheet to update
       setTimeout(async()=>{
