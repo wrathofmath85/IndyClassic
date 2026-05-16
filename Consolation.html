@@ -528,7 +528,7 @@ const SUBMISSIONS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
 
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxQe4RiJJDFs4Ed1McY67vPdpIQjf5K4TWimgGCO3KENiyYXEcbt_5xkW0AuJGaFpBjJA/exec";
+  "https://script.google.com/macros/s/AKfycbzc0SA72lx_70KFFkoy4PPQywxjg78g5efwkDF1h55-Y_VBaGNVLoHslXrC5B7OFDDpPw/exec";
 
 // How often to auto-refresh the hub (ms). 90 seconds.
 const AUTO_REFRESH_MS = 90_000;
@@ -631,10 +631,11 @@ function parseDateString(dateStr){
   return { year: y, month: m, day: d };
 }
 
-// Parse time string like "7:00 AM", "12:00 PM", "9:00 AM"
+// Parse time string like "7:00 AM", "9:45 AM", "9:45:00 AM" (Google Sheets exports with seconds)
 function parseTimeString(timeStr){
   if(!timeStr) return null;
-  const m = tidy(timeStr).match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  // Allow optional minutes and optional seconds, e.g. "9 AM", "9:45 AM", "9:45:00 AM"
+  const m = tidy(timeStr).match(/^(\d{1,2})(?::(\d{2})(?::\d{2})?)?\s*(AM|PM)$/i);
   if(!m) return null;
   let h = parseInt(m[1], 10);
   const min = parseInt(m[2]||"0", 10);
@@ -1233,81 +1234,46 @@ async function openSignup(eventName){
 
     const k=canonKey(fn,ln);
 
-    // Re-check for duplicates before submitting
-    try{
-      const latest=await loadSubmissions();
-      const latestSet=new Set(
-        latest.filter(s=>upper(s.event)===upper(ev)).map(s=>canonKey(s.firstname,s.name))
-      );
-      if(latestSet.has(k)){
-        setToast("err","You are already entered in this event.");
-        opt.textContent=`${fn} ${ln} ✓ Already entered`;
-        opt.disabled=true;
-        sel.value="";
-        btn.disabled=true;
-        if(partnerBox) partnerBox.classList.remove("visible");
-        return;
-      }
-    }catch(_){}
-
     btn.disabled=true;
     btn.innerHTML=`<span class="spinner"></span>Submitting…`;
 
     try{
-      const used=new Set();
-      try{
-        const sub2=await loadSubmissions();
-        sub2.filter(s=>upper(s.event)===upper(ev))
-            .forEach(s=>{ if(Number.isFinite(s.number)) used.add(s.number); });
-      }catch(_){}
+      // ── Helper: POST one entry, returns parsed JSON from Apps Script ──
+      async function postEntry(fields){
+        const fd = new FormData();
+        for(const [k,v] of Object.entries(fields)) fd.append(k, v);
+        const r = await fetch(APPS_SCRIPT_URL, { method:"POST", mode:"cors", body:fd });
+        if(!r.ok) throw new Error(`Server error ${r.status}`);
+        return r.json();
+      }
 
-      const num=pickUnique(used);
-      if(num==null) throw new Error("All numbers 1–1000 used.");
+      // Submit primary player — Apps Script returns JSON with updated entries list
+      const result = await postEntry({
+        firstname: fn, name: ln,
+        singles: ev, event: ev
+        // number omitted — let the script assign it server-side
+      });
 
-      // Submit primary player
-      const fd=new FormData();
-      fd.append("firstname",fn);
-      fd.append("name",ln);
-      fd.append("singles",ev);
-      fd.append("event",ev);
-      fd.append("number",String(num));
+      if(result.status === "error") throw new Error(result.message || "Submission failed.");
 
-      await fetch(APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",body:fd});
-
-      // For doubles: also submit the partner
+      // For doubles: also submit the partner (fire-and-forget; server assigns number)
       if(isDoubles && partner){
-        // Parse partner firstname/lastname
-        // Partner may be stored as "Firstname Lastname" — split on first space
         const partnerParts = partner.trim().split(/\s+/);
         const partnerFn = partnerParts[0] || partner;
         const partnerLn = partnerParts.slice(1).join(" ") || "";
-
-        // Pick a different number for partner
-        used.add(num);
-        const partnerNum = pickUnique(used);
-
-        if(partnerNum != null){
-          const fd2=new FormData();
-          fd2.append("firstname", partnerFn);
-          fd2.append("name", partnerLn);
-          fd2.append("singles", ev);
-          fd2.append("event", ev);
-          fd2.append("number", String(partnerNum));
-          await fetch(APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",body:fd2});
-        }
+        // Don't await — partner write can happen in background
+        postEntry({ firstname: partnerFn, name: partnerLn, singles: ev, event: ev })
+          .catch(()=>{});
       }
 
       const successMsg = isDoubles && partner
         ? `✓ Submitted! You and ${partner} are entered in the ${ev} consolation draw.`
         : `✓ Submitted! Welcome to the ${ev} consolation draw.`;
-
       setToast("ok", successMsg);
 
-      // Update the entry list to show as signed up
+      // Disable the submitted player (and partner) in the dropdown immediately
       opt.textContent=`${fn} ${ln} ✓ Already entered`;
       opt.disabled=true;
-
-      // Also mark partner as entered in dropdown if doubles
       if(isDoubles && partner){
         const partnerLower = partner.trim().toLowerCase();
         for(const o of sel.options){
@@ -1318,30 +1284,39 @@ async function openSignup(eventName){
           }
         }
       }
-
       sel.value="";
       btn.disabled=true;
       if(partnerBox) partnerBox.classList.remove("visible");
 
-      // Reload summary after a brief pause for the sheet to update
-      setTimeout(async()=>{
-        try{
-          const refreshed=await loadSubmissions();
-          const newNames=refreshed
-            .filter(s=>upper(s.event)===upper(ev))
-            .map(s=>`${s.firstname} ${s.name}`.trim())
-            .sort((a,b)=>a.localeCompare(b));
-          summaryDiv.innerHTML=newNames.length
-            ?`<div class="divCard" style="margin-top:20px;">
-               <div class="divTop">
-                 <div class="divName">Current Entries</div>
-                 <div class="badge closed" style="font-size:11px;padding:5px 10px;">${newNames.length}</div>
-               </div>
-               <ul class="nameList">${newNames.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("")}</ul>
-              </div>`
-            :summaryDiv.innerHTML;
-        }catch(_){}
-      }, 3500);
+      // ── Update the Current Entries list ──
+      // Prefer the fresh list returned by the script; fall back to CSV if not present.
+      function renderSummary(names){
+        if(!names.length) return;
+        summaryDiv.innerHTML=`<div class="divCard" style="margin-top:20px;">
+          <div class="divTop">
+            <div class="divName">Current Entries</div>
+            <div class="badge closed" style="font-size:11px;padding:5px 10px;">${names.length}</div>
+          </div>
+          <ul class="nameList">${names.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("")}</ul>
+        </div>`;
+      }
+
+      if(result.entries && Array.isArray(result.entries)){
+        // Script returned the live list — update instantly, no wait needed
+        renderSummary(result.entries.sort((a,b)=>a.localeCompare(b)));
+      } else {
+        // Fallback: wait a moment then re-fetch CSV (old behaviour)
+        setTimeout(async()=>{
+          try{
+            const refreshed = await loadSubmissions();
+            const newNames = refreshed
+              .filter(s=>upper(s.event)===upper(ev))
+              .map(s=>`${s.firstname} ${s.name}`.trim())
+              .sort((a,b)=>a.localeCompare(b));
+            renderSummary(newNames);
+          }catch(_){}
+        }, 3500);
+      }
 
     }catch(e){
       setToast("err",e.message||"Submission failed. Please try again.");
