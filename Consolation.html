@@ -571,19 +571,15 @@
 ============================================================ -->
 <script>
 // ── CONFIGURATION ─────────────────────────────────────────────
-// Events are now fetched live from the Apps Script (doGet) so that
-// changes to dates/times appear immediately without CSV cache delay.
-// ENTRY_CSV and SUBMISSIONS_CSV still use published CSVs (player list
-// changes rarely; submissions are handled via doPost + JSON response).
+// All live data (events, submissions) is fetched directly from the Apps Script
+// (doGet) so changes appear immediately with no CDN cache delay.
+// ENTRY_CSV still uses a published CSV — player roster changes rarely.
 
 const ENTRY_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=552112433&single=true&output=csv";
 
-const SUBMISSIONS_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vStQmNzT7R_NGV3fDuU3WZxxU30qtFW_EgDtrzalrUUolTFpBIybSVIcUO_pOTEUVVgohgiWx4hjNSY/pub?gid=742310415&single=true&output=csv";
-
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxfXYq-ozPRhmyNLsWnH7VbCOlAWg9289uLYvBiHKOXyb1lph0gZKnKmgpeRXxwPcU1RA/exec";
+  "https://script.google.com/macros/s/AKfycbxESzxN_693vik7P1FbBBpyUKiDynx9aE2OGnqM3PtgoxOUNUcHMPScWCoA4iQIsgPdtg/exec";
 
 // How often to auto-refresh the hub (ms). 90 seconds.
 const AUTO_REFRESH_MS = 90_000;
@@ -832,13 +828,17 @@ function classifyLegacyStatus(rawStatus){
 
 // ── Submissions helpers ─────────────────────────────────────
 async function loadSubmissions(){
-  const rows = await parseCSV(SUBMISSIONS_CSV);
-  return rows.map(r=>({
-    name:     tidy(r["Name"]),
-    firstname:tidy(r["Firstname"]),
-    event:    tidy(r["Event"] || r["Singles"]),
-    number:   Number(tidy(r["Number"])),
-    partner:  tidy(r["Partner"] || "")   // doubles partner display name; blank for singles
+  // Fetch live from Apps Script (?type=submissions) — no CDN cache delay
+  const r = await fetch(APPS_SCRIPT_URL + "?type=submissions", { cache:"no-store" });
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const json = await r.json();
+  if(json.status === "error") throw new Error(json.message);
+  return (json.submissions || []).map(s=>({
+    name:     tidy(s.name),
+    firstname:tidy(s.firstname),
+    event:    tidy(s.event),
+    number:   Number(s.number),
+    partner:  tidy(s.partner || "")
   })).filter(p=>(p.firstname||p.name)&&p.event);
 }
 
