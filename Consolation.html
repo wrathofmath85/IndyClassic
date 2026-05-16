@@ -356,6 +356,7 @@
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.05);color:rgba(255,255,255,.82);
     }
+    .nameChip .sep{color:var(--muted);margin:0 4px;font-weight:400;}
 
     /* ── draws bracket ── */
     .drawControls{
@@ -1149,7 +1150,7 @@ async function openSignup(eventName){
           // Find the partner's full display name in the names list (case-insensitive)
           const partnerInList = names.find(n => n.toLowerCase() === partnerDisplay.toLowerCase());
           const partnerLabel  = partnerInList || partnerDisplay;
-          teams.push(`${esc(name)} / ${esc(partnerLabel)}`);
+          teams.push(`${esc(name)}<span class="sep">/</span>${esc(partnerLabel)}`);
           paired.add(name.toLowerCase());
           paired.add(partnerLabel.toLowerCase());
         } else {
@@ -1344,14 +1345,8 @@ async function openSignup(eventName){
       // ── Update the Current Entries list ──
       // Prefer the fresh list returned by the script; fall back to CSV if not present.
       function renderSummary(names){
-        if(!names.length) return;
-        summaryDiv.innerHTML=`<div class="divCard" style="margin-top:20px;">
-          <div class="divTop">
-            <div class="divName">Current Entries</div>
-            <div class="badge closed" style="font-size:11px;padding:5px 10px;">${names.length}</div>
-          </div>
-          <ul class="nameList">${names.map(n=>`<li class="nameChip">${esc(n)}</li>`).join("")}</ul>
-        </div>`;
+        const html = buildSummaryHtml(names.slice().sort((a,b)=>a.localeCompare(b)));
+        summaryDiv.innerHTML = html;
       }
 
       if(result.entries && Array.isArray(result.entries)){
