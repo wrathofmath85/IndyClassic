@@ -722,16 +722,16 @@
 
     // ── Google Sheets ISO timestamp anchored to 1899-12-30 ──
     // e.g. "1899-12-30T14:56:56.000Z"
-    // The UTC time component IS the match start time (in UTC).
-    // We place that UTC h/m/s onto today's LOCAL date so duration = now - that time.
+    // Treat the HH:MM:SS component as already being local wall-clock time.
+    // Do NOT convert from UTC — that introduces a timezone offset shift
+    // that can cause the duration to be off by an hour (especially around DST).
     const sheetsISO = str.match(/^1899-12-30T(\d{2}):(\d{2}):(\d{2})/);
     if(sheetsISO){
-      const utcH=parseInt(sheetsISO[1],10), utcM=parseInt(sheetsISO[2],10), utcS=parseInt(sheetsISO[3],10);
-      // Convert UTC time to local time by using the actual Date object's local offset
-      const probe = new Date(`1899-12-30T${sheetsISO[1]}:${sheetsISO[2]}:${sheetsISO[3]}Z`);
-      const localH = probe.getHours(), localM = probe.getMinutes(), localS = probe.getSeconds();
+      const h = parseInt(sheetsISO[1], 10);
+      const m = parseInt(sheetsISO[2], 10);
+      const s = parseInt(sheetsISO[3], 10);
       const n = new Date();
-      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), localH, localM, localS, 0);
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
     }
 
     // ── Fractional day (0 to <1), just in case
