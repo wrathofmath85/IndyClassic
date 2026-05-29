@@ -708,30 +708,32 @@
 
   /* ─────────────────────────────────────────────────────────────
      parseTimeColumn: parses the "Time" column.
-     The Time column contains the wall-clock time when the match
-     actually started, stored as HH:MM:SS (24-hour) or H:MM:SS or
-     similar time-of-day strings (e.g. "9:56:56", "14:03:00").
-     We interpret it as today's date at that clock time so that
-     "now minus time" gives the correct elapsed duration.
+     The Time column shows wall-clock time like "3:55:57 PM" in
+     the sheet, which Google Apps Script serializes to JSON as an
+     ISO string anchored to 1899-12-30 in UTC, e.g.
+     "1899-12-30T20:55:57.000Z" (3:55 PM EST → 20:55 UTC).
 
-     Also handles Google Sheets serial numbers and 12-hour format
-     just in case.
+     We extract the UTC hour/minute/second from that string and
+     place them onto TODAY's date using Date.UTC(). The resulting
+     Date represents the correct moment in time regardless of how
+     the browser interprets historical 1899 timezones (which is
+     where the desktop vs mobile +1 hour discrepancy came from —
+     iOS Safari and other mobile browsers can apply different
+     historical offsets than desktop browsers).
   ───────────────────────────────────────────────────────────── */
   function parseTimeColumn(s){
     const str=tidy(s); if(!str) return null;
 
     // ── Google Sheets ISO timestamp anchored to 1899-12-30 ──
-    // e.g. "1899-12-30T14:56:56.000Z"
-    // Treat the HH:MM:SS component as already being local wall-clock time.
-    // Do NOT convert from UTC — that introduces a timezone offset shift
-    // that can cause the duration to be off by an hour (especially around DST).
     const sheetsISO = str.match(/^1899-12-30T(\d{2}):(\d{2}):(\d{2})/);
     if(sheetsISO){
-      const h = parseInt(sheetsISO[1], 10);
-      const m = parseInt(sheetsISO[2], 10);
-      const s = parseInt(sheetsISO[3], 10);
+      const utcH = parseInt(sheetsISO[1], 10);
+      const utcM = parseInt(sheetsISO[2], 10);
+      const utcS = parseInt(sheetsISO[3], 10);
       const n = new Date();
-      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
+      // Build today's date at the exact UTC time given. This sidesteps
+      // any browser-specific historical timezone handling for 1899.
+      return new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate(), utcH, utcM, utcS, 0));
     }
 
     // ── Fractional day (0 to <1), just in case
