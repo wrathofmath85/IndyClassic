@@ -707,44 +707,64 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     parseTimeColumn: parses the "Time" column, which contains a
-     wall-clock time-of-day like "3:55:57 PM" in the sheet. Apps
-     Script may serialize this in several formats:
-
+     parseTimeColumn: parses the "Time" column, which represents a
+     wall-clock time-of-day. The serialization can come through in
+     several formats:
        • "3:55:57 PM"                                 (display string)
        • "1899-12-30T20:55:57.000Z"                    (ISO, Sheets epoch)
        • "Sat Dec 30 1899 15:55:57 GMT-0500 (...)"     (RFC date string)
 
-     Strategy: try specific time-only patterns first. If none match,
-     fall back to native Date parsing. If the resulting date is
-     pre-1970, it's a time-of-day on a placeholder epoch — extract
-     the UTC h/m/s and place them on TODAY's date using Date.UTC().
-     This is consistent across all browsers and avoids the
-     historical-timezone quirks (which is what caused the original
-     +1 hour mobile bug).
+     The output is a JS Date pointing at the SAME wall-clock time on
+     today's date (or yesterday, if rolling over midnight).
+
+     Key gotchas this implementation handles:
+
+     1) Browsers disagree about historical (1899) timezone offsets.
+        Chrome/V8 uses the current zone offset, iOS Safari may use
+        LMT/historical offsets — that mismatch caused the original
+        desktop-vs-mobile +1h drift. We never call getHours() on a
+        1899 date; we use getUTCHours() (timezone-independent) and
+        do the UTC→local conversion ourselves using TODAY's offset.
+
+     2) A late-night local time (e.g. 11:30 PM EDT) becomes early-
+        morning UTC the NEXT day (03:30 UTC). Naïvely placing the UTC
+        hour on today's date lands a full day off (the "23h immediately"
+        bug). We compute the local hour/minute from the UTC values
+        using today's offset, then place that on today.
+
+     3) If the computed "today" time is in the future (e.g. now is
+        1 AM and the cell says 11:30 PM), the match was actually
+        started yesterday by the local clock — roll back 24 hours.
+        A 5-minute grace prevents clock-skew false positives when a
+        match was placed seconds ago.
   ───────────────────────────────────────────────────────────── */
   function parseTimeColumn(s){
     const str = tidy(s); if(!str) return null;
     const n = new Date();
 
+    // Build a Date at h:m:s LOCAL on today's date.
     const todayAtLocal = (h, m, sec) =>
       new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, sec, 0);
 
-    const todayAtUTC = (h, m, sec) =>
-      new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate(), h, m, sec, 0));
+    // If a constructed "today" time is more than 5 minutes in the
+    // future, assume it actually came from yesterday — roll back 24h.
+    const fixDay = (d) =>
+      (d && (d.getTime() - n.getTime()) > 5 * 60000)
+        ? new Date(d.getTime() - 86400000)
+        : d;
 
     // ── 1. 24-hour with seconds: "9:56:56" or "14:03:00" ──
     let m = str.match(/^(\d{1,2}):(\d{2}):(\d{2})(?:\.\d+)?$/);
     if(m){
       const h=+m[1], mn=+m[2], sec=+m[3];
-      if(h<24 && mn<60 && sec<60) return todayAtLocal(h, mn, sec);
+      if(h<24 && mn<60 && sec<60) return fixDay(todayAtLocal(h, mn, sec));
     }
 
     // ── 2. 24-hour without seconds: "9:56" or "14:03" ──
     m = str.match(/^(\d{1,2}):(\d{2})$/);
     if(m){
       const h=+m[1], mn=+m[2];
-      if(h<24 && mn<60) return todayAtLocal(h, mn, 0);
+      if(h<24 && mn<60) return fixDay(todayAtLocal(h, mn, 0));
     }
 
     // ── 3. 12-hour: "3:55:57 PM" or "9:56 AM" ──
@@ -754,14 +774,14 @@
       const ap=m[4].toLowerCase();
       if(h===12) h=0;
       if(ap==='pm') h+=12;
-      return todayAtLocal(h, mn, sec);
+      return fixDay(todayAtLocal(h, mn, sec));
     }
 
     // ── 4. Fractional day (0 to <1) ──
     const numVal = Number(str);
     if(!isNaN(numVal) && numVal >= 0 && numVal < 1){
       const midnight = todayAtLocal(0, 0, 0);
-      return new Date(midnight.getTime() + Math.round(numVal * 86400000));
+      return fixDay(new Date(midnight.getTime() + Math.round(numVal * 86400000)));
     }
 
     // ── 5. Google Sheets full date serial (5-digit integer or decimal) ──
@@ -772,23 +792,25 @@
     }
 
     // ── 6. Anything else: try generic Date parse ──
-    //   Catches ISO strings ("1899-12-30T20:55:57.000Z") and
-    //   RFC strings ("Sat Dec 30 1899 15:55:57 GMT-0500"), plus
-    //   any other native-parseable format.
+    //   Catches ISO ("1899-12-30T20:55:57.000Z") and
+    //   RFC ("Sat Dec 30 1899 15:55:57 GMT-0500") forms.
     const parsed = new Date(str);
     if(!isNaN(parsed.getTime())){
       // Pre-1970 = a time-of-day stored on a placeholder epoch.
-      // Extract its UTC h/m/s and apply to today. Using UTC (not local)
-      // sidesteps browser differences in how 1899 timezones are
-      // interpreted (Chrome uses modern offset, iOS Safari may use
-      // historical LMT), which is what caused the desktop-vs-mobile
-      // hour-shift in the original code.
+      // Convert its UTC time-of-day to local using TODAY's timezone
+      // offset (NOT 1899's, which is where browser disagreement lives).
       if(parsed.getUTCFullYear() < 1970){
-        return todayAtUTC(
-          parsed.getUTCHours(),
-          parsed.getUTCMinutes(),
-          parsed.getUTCSeconds()
-        );
+        const utcH = parsed.getUTCHours();
+        const utcM = parsed.getUTCMinutes();
+        const utcS = parsed.getUTCSeconds();
+        const todayOffsetMin = n.getTimezoneOffset(); // minutes west of UTC
+        const totalUtcMin    = utcH * 60 + utcM;
+        let localTotalMin    = totalUtcMin - todayOffsetMin;
+        // Wrap into [0, 1440)
+        localTotalMin = ((localTotalMin % 1440) + 1440) % 1440;
+        const localH = Math.floor(localTotalMin / 60);
+        const localM = localTotalMin % 60;
+        return fixDay(todayAtLocal(localH, localM, utcS));
       }
       return parsed;
     }
