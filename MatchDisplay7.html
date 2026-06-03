@@ -592,7 +592,7 @@
   /* ═══════════════════════════════
      CONFIG
   ═══════════════════════════════ */
-  const JSON_URL       = "https://script.google.com/macros/s/AKfycbzxL9GdxhHHpYX6pwvzqP6UQeSDmq2dO4nouemq6j5EEyA65rxOLJ05bXEWk8p6BWKU/exec";
+  const JSON_URL       = "https://script.google.com/macros/s/AKfycbwFfpnNnMLbu7cjsyvQIgUnsbhJvXxqGI9miZupsSacZlBFQK_OksJv0p7HsKRtX_To/exec";
   const NUM_COURTS     = 16;
   const UPCOMING_COUNT = 5;
   const REFRESH_MS     = 30000;
@@ -1082,8 +1082,8 @@
         const cls      = hot?'hot':'live';
         const badgeTxt = hot?'2h+ 🔥':'Live';
         const evTxt    = [row.event,row.round].filter(Boolean).join(' · ');
-        const durStarted = row.time ? `data-started="${row.time.getTime() + 3600000}"` : '';
-        const durTxt   = row.time ? formatDuration(new Date(row.time.getTime() + 3600000)) : '—';
+        const durStarted = row.time ? `data-started="${row.time.getTime()}"` : '';
+        const durTxt   = row.time ? formatDuration(row.time) : '—';
 
         const makeMobNames=(display,dbl)=>{
           if(!dbl||!display.includes(' / ')){
