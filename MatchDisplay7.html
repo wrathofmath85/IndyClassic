@@ -619,11 +619,9 @@
      CLOCK
   ═══════════════════════════════ */
   function fmtClock(d){
-    // Always display in Eastern Time regardless of device timezone
-    return d.toLocaleString('en-US',{
-      timeZone:'America/New_York',
-      hour:'numeric', minute:'2-digit', hour12:true
-    });
+    let h=d.getHours(); const m=d.getMinutes();
+    const ap=h>=12?'PM':'AM'; h=h%12||12;
+    return `${h}:${String(m).padStart(2,'0')} ${ap}`;
   }
   function tickClock(){
     const now=new Date();
@@ -738,45 +736,102 @@
       );
     }
 
-    // Plain HH:MM:SS (new Apps Script format)
-    const tm = str.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-    if(tm){
-      const h=parseInt(tm[1],10),mn=parseInt(tm[2],10),sc=parseInt(tm[3],10);
-      const n=new Date();
-      return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,mn,sc,0);
-    }
     // Last resort
     const d=new Date(str); if(!isNaN(d.getTime())) return d;
     return null;
   }
 
   /* ─────────────────────────────────────────────────────────────
-     parseTimeColumn: "14:16:10" → Date anchored to Eastern Time.
-     The Apps Script sends HH:MM:SS where the digits are the ET clock
-     time the user entered. We convert to the correct UTC instant so
-     that elapsed duration math (Date.now() - result) is always right,
-     and fmtClock(result) always shows the correct ET time.
+     parseTimeColumn: parses the "Time" column.
+     The Time column contains the wall-clock time when the match
+     actually started, stored as HH:MM:SS (24-hour) or H:MM:SS or
+     similar time-of-day strings (e.g. "9:56:56", "14:03:00").
+     We interpret it as today's date at that clock time so that
+     "now minus time" gives the correct elapsed duration.
+
+     Also handles Google Sheets serial numbers and 12-hour format
+     just in case.
   ───────────────────────────────────────────────────────────── */
   function parseTimeColumn(s){
-    const str = tidy(s); if(!str) return null;
-    const m = str.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-    if(!m) return null;
-    const h=parseInt(m[1],10), min=parseInt(m[2],10), sec=parseInt(m[3],10);
-    if(h<0||h>23||min<0||min>59||sec<0||sec>59) return null;
-    // Use formatToParts — no regex, guaranteed cross-browser.
-    const now = new Date();
-    const fmt = new Intl.DateTimeFormat("en-US", {
-      timeZone:"America/New_York",
-      year:"numeric", month:"2-digit", day:"2-digit",
-      hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false
-    });
-    const p = {};
-    fmt.formatToParts(now).forEach(({type,value}) => { p[type]=+value; });
-    // p.year, p.month (1-based), p.day, p.hour, p.minute, p.second  all in ET
-    const etNowMs  = Date.UTC(p.year, p.month-1, p.day, p.hour, p.minute, p.second);
-    const offsetMs = etNowMs - now.getTime();   // negative for US Eastern
-    const etTargetMs = Date.UTC(p.year, p.month-1, p.day, h, min, sec);
-    return new Date(etTargetMs - offsetMs);
+    const str=tidy(s); if(!str) return null;
+
+    // ── Google Sheets ISO timestamp anchored to 1899-12-30 ──
+    // e.g. "1899-12-30T14:56:56.000Z"
+    // The UTC time component IS the match start time (in UTC).
+    // We place that UTC h/m/s onto today's LOCAL date so duration = now - that time.
+    const sheetsISO = str.match(/^1899-12-30T(\d{2}):(\d{2}):(\d{2})/);
+    if(sheetsISO){
+      // Apps Script serializes time-only cells (Ctrl+Shift+;) anchored to 1899-12-30.
+      // The UTC H:M:S in the ISO string ARE the literal local hours the user entered —
+      // Apps Script runs in UTC so no timezone shift was applied when serializing.
+      // Use them directly as local time; do NOT convert via getHours() (that subtracts
+      // the browser UTC offset and produces a wrong time).
+      const h=parseInt(sheetsISO[1],10), m=parseInt(sheetsISO[2],10), s=parseInt(sheetsISO[3],10);
+      const n = new Date();
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
+    }
+
+    // ── Fractional day (0 to <1), just in case
+    const numVal = Number(str);
+    if(!isNaN(numVal) && numVal >= 0 && numVal < 1){
+      const n = new Date();
+      const midnight = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0);
+      return new Date(midnight.getTime() + Math.round(numVal * 86400000));
+    }
+
+    // Google Sheets full date serial (5-digit integer or decimal like 46000.375)
+    if(/^\d{5}(\.\d+)?$/.test(str)){
+      const days=Number(str);
+      const base=new Date(Date.UTC(1899,11,30));
+      return new Date(base.getTime()+days*86400000);
+    }
+
+    // 24-hour with seconds: "9:56:56" or "14:03:00"
+    let m=str.match(/^(\d{1,2}):(\d{2}):(\d{2})(\.\d+)?$/);
+    if(m){
+      const h=parseInt(m[1],10), min=parseInt(m[2],10), sec=parseInt(m[3],10);
+      if(h>=0&&h<24&&min>=0&&min<60&&sec>=0&&sec<60){
+        const n=new Date();
+        return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,min,sec,0);
+      }
+    }
+
+    // 24-hour without seconds: "9:56" or "14:03"
+    m=str.match(/^(\d{1,2}):(\d{2})$/);
+    if(m){
+      const h=parseInt(m[1],10), min=parseInt(m[2],10);
+      if(h>=0&&h<24&&min>=0&&min<60){
+        const n=new Date();
+        return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,min,0,0);
+      }
+    }
+
+    // 12-hour: "9:56:56 AM" or "9:56 AM"
+    m=str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]m)$/i);
+    if(m){
+      let h=parseInt(m[1],10);
+      const min=parseInt(m[2],10), sec=m[3]?parseInt(m[3],10):0;
+      const ap=m[4].toLowerCase();
+      if(h===12) h=0; if(ap==='pm') h+=12;
+      const n=new Date();
+      return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,min,sec,0);
+    }
+
+    // Full UTC ISO string produced by JSON.stringify(date) when Apps Script
+    // serializes a time cell value via getValues().
+    // e.g. '2026-06-03T18:16:10.000Z'  — the UTC hours equal the local hours
+    // the user entered (Apps Script reads the cell value in the sheet timezone,
+    // which should match the user's local time).
+    // We extract the UTC H:M:S and place them onto today's local date.
+    const fullISO = str.match(/(\d{4}-\d{2}-\d{2}T)(\d{2}):(\d{2}):(\d{2})/);
+    if(fullISO){
+      const h=parseInt(fullISO[2],10), m=parseInt(fullISO[3],10), s=parseInt(fullISO[4],10);
+      const n=new Date();
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
+    }
+
+    // Last resort
+    const d=new Date(str); return isNaN(d.getTime())?null:d;
   }
 
   function formatTime(dt){
@@ -846,7 +901,7 @@
   function processRows(rows){
     return rows.map((r,idx)=>{
       const startRaw  = tidy(r['Start Time']);
-      const timeRaw   = tidy(r['Time'])||tidy(r['CNTL+SHIFT+;']);
+      const timeRaw   = tidy(r['Time']);
       const courtRaw  = tidy(r['Court'])||tidy(r['Court #']);
       const rawT1     = tidy(r['Team 1'])||tidy(r['Team1']);
       const rawT2     = tidy(r['Team 2'])||tidy(r['Team2']);
@@ -1027,7 +1082,7 @@
         const cls      = hot?'hot':'live';
         const badgeTxt = hot?'2h+ 🔥':'Live';
         const evTxt    = [row.event,row.round].filter(Boolean).join(' · ');
-        const durStarted = row.time ? `data-started="${row.time.getTime()}"` : '';
+        const durStarted = row.time ? `data-started="${row.time.getTime() - 3600000}"` : '';
         const durTxt   = row.time ? formatDuration(row.time) : '—';
 
         const makeMobNames=(display,dbl)=>{
