@@ -592,7 +592,7 @@
   /* ═══════════════════════════════
      CONFIG
   ═══════════════════════════════ */
-  const JSON_URL       = "https://script.google.com/macros/s/AKfycbwv9yiFvW1VBrY_iL9T5ZvhUH_2ygptxukgt8dj5ZaEFSw63fQopzcAfIwETaTx5WJ7/exec";
+  const JSON_URL       = "https://script.google.com/macros/s/AKfycby_ld1RUg2tSSkV5ItDEMQ5Au_Wu7VRxxsHc_VbEyztYEF5-A6b5iIGj4fwv2tHFk_t/exec";
   const NUM_COURTS     = 16;
   const UPCOMING_COUNT = 5;
   const REFRESH_MS     = 30000;
@@ -636,12 +636,12 @@
   /* Duration live-tick + hot upgrade */
   setInterval(()=>{
     document.querySelectorAll('.dur-val[data-started], .dval[data-started]').forEach(el=>{
-      el.textContent=formatDuration(new Date(el.dataset.started));
+      el.textContent=formatDuration(new Date(+el.dataset.started));
     });
     /* TV hot upgrade */
     document.querySelectorAll('.court.live').forEach(card=>{
       const d=card.querySelector('.dur-val[data-started]'); if(!d) return;
-      if((new Date()-new Date(d.dataset.started))/60000>=HOT_MINUTES){
+      if((new Date()-new Date(+d.dataset.started))/60000>=HOT_MINUTES){
         card.classList.remove('live'); card.classList.add('hot');
         const b=card.querySelector('[data-badge]');
         if(b){b.textContent='2h+ 🔥';b.className='court-badge hot';}
@@ -650,7 +650,7 @@
     /* Mobile hot upgrade */
     document.querySelectorAll('.mob-court.live').forEach(card=>{
       const d=card.querySelector('.dval[data-started]'); if(!d) return;
-      if((new Date()-new Date(d.dataset.started))/60000>=HOT_MINUTES){
+      if((new Date()-new Date(+d.dataset.started))/60000>=HOT_MINUTES){
         card.classList.remove('live'); card.classList.add('hot');
         const b=card.querySelector('.mob-badge');
         if(b){b.textContent='2h+ 🔥';b.className='mob-badge hot';}
@@ -702,6 +702,41 @@
   ───────────────────────────────────────────────────────────── */
   function parseStartTime(s){
     const str=tidy(s); if(!str) return null;
+
+    // Apps Script 1899-12-30 ISO for time-only cells — treat UTC H:M:S as literal local time
+    const sheetsISO = str.match(/^1899-12-30T(\d{2}):(\d{2}):(\d{2})/);
+    if(sheetsISO){
+      const h=parseInt(sheetsISO[1],10), m=parseInt(sheetsISO[2],10), sv=parseInt(sheetsISO[3],10);
+      const n=new Date();
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, sv, 0);
+    }
+
+    // 'Friday 5/29/2026 8:00 AM' or 'Saturday 4/25/2026 8:00 AM'
+    // Strip optional leading day-of-week, then parse M/D/YYYY H:MM AM/PM as local
+    const stripped = str.replace(/^\w+\s+/,'');
+    const dtm = stripped.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]m)?$/i);
+    if(dtm){
+      let h=parseInt(dtm[4],10);
+      const mo=parseInt(dtm[1],10)-1, dy=parseInt(dtm[2],10), yr=parseInt(dtm[3],10);
+      const mn=parseInt(dtm[5],10), sc=dtm[6]?parseInt(dtm[6],10):0;
+      const ap=(dtm[7]||'').toLowerCase();
+      if(ap==='am'&&h===12) h=0;
+      if(ap==='pm'&&h!==12) h+=12;
+      return new Date(yr, mo, dy, h, mn, sc, 0);
+    }
+
+    // ISO string (with or without Z) from JSON.stringify(date) via Apps Script getValues().
+    // Extract the date+time components directly as local — Apps Script reads cell values
+    // in the sheet timezone, which equals the user's local time.
+    const anyISO = str.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    if(anyISO){
+      return new Date(
+        parseInt(anyISO[1],10), parseInt(anyISO[2],10)-1, parseInt(anyISO[3],10),
+        parseInt(anyISO[4],10), parseInt(anyISO[5],10), parseInt(anyISO[6],10), 0
+      );
+    }
+
+    // Last resort
     const d=new Date(str); if(!isNaN(d.getTime())) return d;
     return null;
   }
@@ -726,12 +761,14 @@
     // We place that UTC h/m/s onto today's LOCAL date so duration = now - that time.
     const sheetsISO = str.match(/^1899-12-30T(\d{2}):(\d{2}):(\d{2})/);
     if(sheetsISO){
-      const utcH=parseInt(sheetsISO[1],10), utcM=parseInt(sheetsISO[2],10), utcS=parseInt(sheetsISO[3],10);
-      // Convert UTC time to local time by using the actual Date object's local offset
-      const probe = new Date(`1899-12-30T${sheetsISO[1]}:${sheetsISO[2]}:${sheetsISO[3]}Z`);
-      const localH = probe.getHours(), localM = probe.getMinutes(), localS = probe.getSeconds();
+      // Apps Script serializes time-only cells (Ctrl+Shift+;) anchored to 1899-12-30.
+      // The UTC H:M:S in the ISO string ARE the literal local hours the user entered —
+      // Apps Script runs in UTC so no timezone shift was applied when serializing.
+      // Use them directly as local time; do NOT convert via getHours() (that subtracts
+      // the browser UTC offset and produces a wrong time).
+      const h=parseInt(sheetsISO[1],10), m=parseInt(sheetsISO[2],10), s=parseInt(sheetsISO[3],10);
       const n = new Date();
-      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), localH, localM, localS, 0);
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
     }
 
     // ── Fractional day (0 to <1), just in case
@@ -780,7 +817,20 @@
       return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,min,sec,0);
     }
 
-    // ISO / other fallback
+    // Full UTC ISO string produced by JSON.stringify(date) when Apps Script
+    // serializes a time cell value via getValues().
+    // e.g. '2026-06-03T18:16:10.000Z'  — the UTC hours equal the local hours
+    // the user entered (Apps Script reads the cell value in the sheet timezone,
+    // which should match the user's local time).
+    // We extract the UTC H:M:S and place them onto today's local date.
+    const fullISO = str.match(/(\d{4}-\d{2}-\d{2}T)(\d{2}):(\d{2}):(\d{2})/);
+    if(fullISO){
+      const h=parseInt(fullISO[2],10), m=parseInt(fullISO[3],10), s=parseInt(fullISO[4],10);
+      const n=new Date();
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
+    }
+
+    // Last resort
     const d=new Date(str); return isNaN(d.getTime())?null:d;
   }
 
@@ -936,7 +986,7 @@
       const durEl = card.querySelector('[data-dur]');
       if(row.time){
         durEl.textContent = formatDuration(row.time);
-        durEl.dataset.started = row.time.toISOString();
+        durEl.dataset.started = row.time.getTime();
       } else {
         durEl.textContent = '—';
         delete durEl.dataset.started;
@@ -1032,8 +1082,8 @@
         const cls      = hot?'hot':'live';
         const badgeTxt = hot?'2h+ 🔥':'Live';
         const evTxt    = [row.event,row.round].filter(Boolean).join(' · ');
-        const durStarted = row.time ? `data-started="${row.time.toISOString()}"` : '';
-        const durTxt   = row.time ? formatDuration(row.time) : '—';
+        const durStarted = row.time ? `data-started="${row.time.getTime() + 3600000}"` : '';
+        const durTxt   = row.time ? formatDuration(new Date(row.time.getTime() + 3600000)) : '—';
 
         const makeMobNames=(display,dbl)=>{
           if(!dbl||!display.includes(' / ')){
