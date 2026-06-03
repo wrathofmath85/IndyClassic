@@ -763,22 +763,19 @@
     if(!m) return null;
     const h=parseInt(m[1],10), min=parseInt(m[2],10), sec=parseInt(m[3],10);
     if(h<0||h>23||min<0||min>59||sec<0||sec>59) return null;
-    // Find the current ET offset vs UTC by asking Intl what time it is in NY right now.
-    // e.g. if UTC is 18:00 and ET shows 14:00, offset = -4h = -240 min.
+    // Use formatToParts — no regex, guaranteed cross-browser.
     const now = new Date();
-    const etParts = now.toLocaleString("en-US",{
+    const fmt = new Intl.DateTimeFormat("en-US", {
       timeZone:"America/New_York",
-      year:"numeric",month:"2-digit",day:"2-digit",
-      hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false
-    }).match(/(\d+)\/(\d+)\/(\d+),\s*(\d+):(\d+):(\d+)/);
-    // etParts: [full, mo, dy, yr, hh, mm, ss]
-    const etY=+etParts[3], etMo=+etParts[1]-1, etD=+etParts[2];
-    // Build a UTC Date for h:min:sec on today's ET date
-    // by offsetting from a known UTC<->ET mapping.
-    const utcNow = now.getTime();
-    const etNowMs = Date.UTC(etY, etMo, etD, +etParts[4], +etParts[5], +etParts[6]);
-    const offsetMs = etNowMs - utcNow;  // ET_displayed - UTC = offset (negative for US)
-    const etTargetMs = Date.UTC(etY, etMo, etD, h, min, sec);
+      year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false
+    });
+    const p = {};
+    fmt.formatToParts(now).forEach(({type,value}) => { p[type]=+value; });
+    // p.year, p.month (1-based), p.day, p.hour, p.minute, p.second  all in ET
+    const etNowMs  = Date.UTC(p.year, p.month-1, p.day, p.hour, p.minute, p.second);
+    const offsetMs = etNowMs - now.getTime();   // negative for US Eastern
+    const etTargetMs = Date.UTC(p.year, p.month-1, p.day, h, min, sec);
     return new Date(etTargetMs - offsetMs);
   }
 
