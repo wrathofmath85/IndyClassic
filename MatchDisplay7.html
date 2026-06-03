@@ -725,12 +725,14 @@
       return new Date(yr, mo, dy, h, mn, sc, 0);
     }
 
-    // ISO without Z — already local, parse as local components
-    const isoNoZ = str.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/);
-    if(isoNoZ){
+    // ISO string (with or without Z) from JSON.stringify(date) via Apps Script getValues().
+    // Extract the date+time components directly as local — Apps Script reads cell values
+    // in the sheet timezone, which equals the user's local time.
+    const anyISO = str.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    if(anyISO){
       return new Date(
-        parseInt(isoNoZ[1],10), parseInt(isoNoZ[2],10)-1, parseInt(isoNoZ[3],10),
-        parseInt(isoNoZ[4],10), parseInt(isoNoZ[5],10), parseInt(isoNoZ[6],10), 0
+        parseInt(anyISO[1],10), parseInt(anyISO[2],10)-1, parseInt(anyISO[3],10),
+        parseInt(anyISO[4],10), parseInt(anyISO[5],10), parseInt(anyISO[6],10), 0
       );
     }
 
@@ -815,7 +817,20 @@
       return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,min,sec,0);
     }
 
-    // ISO / other fallback
+    // Full UTC ISO string produced by JSON.stringify(date) when Apps Script
+    // serializes a time cell value via getValues().
+    // e.g. '2026-06-03T18:16:10.000Z'  — the UTC hours equal the local hours
+    // the user entered (Apps Script reads the cell value in the sheet timezone,
+    // which should match the user's local time).
+    // We extract the UTC H:M:S and place them onto today's local date.
+    const fullISO = str.match(/(\d{4}-\d{2}-\d{2}T)(\d{2}):(\d{2}):(\d{2})/);
+    if(fullISO){
+      const h=parseInt(fullISO[2],10), m=parseInt(fullISO[3],10), s=parseInt(fullISO[4],10);
+      const n=new Date();
+      return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, s, 0);
+    }
+
+    // Last resort
     const d=new Date(str); return isNaN(d.getTime())?null:d;
   }
 
