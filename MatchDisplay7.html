@@ -592,7 +592,7 @@
   /* ═══════════════════════════════
      CONFIG
   ═══════════════════════════════ */
-  const JSON_URL       = "https://script.google.com/macros/s/AKfycbzxL9GdxhHHpYX6pwvzqP6UQeSDmq2dO4nouemq6j5EEyA65rxOLJ05bXEWk8p6BWKU/exec";
+  const JSON_URL       = "https://script.google.com/macros/s/AKfycby_ld1RUg2tSSkV5ItDEMQ5Au_Wu7VRxxsHc_VbEyztYEF5-A6b5iIGj4fwv2tHFk_t/exec";
   const NUM_COURTS     = 16;
   const UPCOMING_COUNT = 5;
   const REFRESH_MS     = 30000;
@@ -619,9 +619,11 @@
      CLOCK
   ═══════════════════════════════ */
   function fmtClock(d){
-    let h=d.getHours(); const m=d.getMinutes();
-    const ap=h>=12?'PM':'AM'; h=h%12||12;
-    return `${h}:${String(m).padStart(2,'0')} ${ap}`;
+    // Always display in Eastern Time
+    const s = d.toLocaleString("en-US", {
+      timeZone:"America/New_York", hour:"numeric", minute:"2-digit", hour12:true
+    });
+    return s.replace(/\s*(AM|PM)/, " $1");
   }
   function tickClock(){
     const now=new Date();
@@ -700,45 +702,42 @@
      Eastern-time "now" helper
      Returns {year, month0, day, hours, minutes, seconds} in ET.
   ───────────────────────────────────────────────────────────── */
-  function nowET(){
-    const s = new Date().toLocaleString("en-US", {timeZone:"America/New_York",
-      year:"numeric", month:"2-digit", day:"2-digit",
-      hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false});
-    // s ~ "06/03/2026, 14:16:10"
-    const [datePart, timePart] = s.split(", ");
-    const [mo, dy, yr]  = datePart.split("/").map(Number);
-    const [hh, mm, ss]  = timePart.split(":").map(Number);
-    return {yr, mo0: mo-1, dy, hh, mm, ss};
-  }
-
   /* ─────────────────────────────────────────────────────────────
-     parseHHMMSS: converts "HH:MM:SS" or "H:MM:SS" string
-     (as sent by the updated Apps Script) into a Date object
-     representing that clock time on today's Eastern date.
-     All timezone math is done in Eastern time throughout.
+     parseHHMMSS: converts "HH:MM:SS" string from Apps Script into a
+     Date object. Duration = Date.now() - result.getTime(), which is
+     purely elapsed milliseconds and needs no timezone math at all.
+     We anchor the time to today's UTC date at the given UTC hours so
+     that the elapsed diff is always correct regardless of browser TZ.
   ───────────────────────────────────────────────────────────── */
   function parseHHMMSS(str){
     if(!str) return null;
-    // "14:16:10" or "9:56:56"
     const m = str.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
     if(!m) return null;
     const h=parseInt(m[1],10), min=parseInt(m[2],10), sec=parseInt(m[3],10);
     if(h<0||h>23||min<0||min>59||sec<0||sec>59) return null;
-    // Build an ET-local Date: find what UTC instant corresponds to
-    // h:min:sec Eastern time today.
-    const {yr, mo0, dy} = nowET();
-    // Construct via a locale string round-trip to stay in ET
-    const candidate = new Date(
-      `${yr}-${String(mo0+1).padStart(2,"0")}-${String(dy).padStart(2,"0")}` +
-      `T${String(h).padStart(2,"0")}:${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`);
-    // The above parses as LOCAL time (browser). If browser is in ET, done.
-    // If browser is in a different TZ, adjust: find the ET offset at that moment.
-    const etStr = candidate.toLocaleString("en-US", {timeZone:"America/New_York",
-      hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false});
-    const [eh, em, es] = etStr.split(":").map(Number);
-    const diffMs = ((h-eh)*3600 + (min-em)*60 + (sec-es)) * 1000;
-    return new Date(candidate.getTime() + diffMs);
+    // Get the Eastern offset at this moment (e.g. -4h for EDT)
+    // by comparing UTC to what ET says "now" is.
+    const now = new Date();
+    const etNowStr = now.toLocaleString("en-US", {
+      timeZone:"America/New_York", hour:"2-digit", minute:"2-digit", hour12:false
+    });
+    const [etH, etM] = etNowStr.split(":").map(Number);
+    const utcH = now.getUTCHours(), utcM = now.getUTCMinutes();
+    // ET offset in minutes (e.g. -240 for EDT)
+    let offsetMin = (etH * 60 + etM) - (utcH * 60 + utcM);
+    if(offsetMin > 720)  offsetMin -= 1440;  // wrap around midnight
+    if(offsetMin < -720) offsetMin += 1440;
+    // The Apps Script HH:MM:SS is Eastern time. Convert to UTC for storage.
+    const etMinutes = h * 60 + min;
+    const utcMinutes = etMinutes - offsetMin;
+    const utcHour = Math.floor(((utcMinutes % 1440) + 1440) % 1440 / 60);
+    const utcMin  = ((utcMinutes % 60) + 60) % 60;
+    // Build a UTC Date for today at that UTC h:m:s
+    const d = new Date();
+    d.setUTCHours(utcHour, utcMin, sec, 0);
+    return d;
   }
+
 
   /* ─────────────────────────────────────────────────────────────
      parseStartTime: parses the Start Time display column.
