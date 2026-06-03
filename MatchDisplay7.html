@@ -636,12 +636,12 @@
   /* Duration live-tick + hot upgrade */
   setInterval(()=>{
     document.querySelectorAll('.dur-val[data-started], .dval[data-started]').forEach(el=>{
-      el.textContent=formatDuration(new Date(el.dataset.started));
+      el.textContent=formatDuration(new Date(+el.dataset.started));
     });
     /* TV hot upgrade */
     document.querySelectorAll('.court.live').forEach(card=>{
       const d=card.querySelector('.dur-val[data-started]'); if(!d) return;
-      if((new Date()-new Date(d.dataset.started))/60000>=HOT_MINUTES){
+      if((new Date()-new Date(+d.dataset.started))/60000>=HOT_MINUTES){
         card.classList.remove('live'); card.classList.add('hot');
         const b=card.querySelector('[data-badge]');
         if(b){b.textContent='2h+ 🔥';b.className='court-badge hot';}
@@ -650,7 +650,7 @@
     /* Mobile hot upgrade */
     document.querySelectorAll('.mob-court.live').forEach(card=>{
       const d=card.querySelector('.dval[data-started]'); if(!d) return;
-      if((new Date()-new Date(d.dataset.started))/60000>=HOT_MINUTES){
+      if((new Date()-new Date(+d.dataset.started))/60000>=HOT_MINUTES){
         card.classList.remove('live'); card.classList.add('hot');
         const b=card.querySelector('.mob-badge');
         if(b){b.textContent='2h+ 🔥';b.className='mob-badge hot';}
@@ -936,7 +936,7 @@
       const durEl = card.querySelector('[data-dur]');
       if(row.time){
         durEl.textContent = formatDuration(row.time);
-        durEl.dataset.started = row.time.toISOString();
+        durEl.dataset.started = row.time.getTime();
       } else {
         durEl.textContent = '—';
         delete durEl.dataset.started;
@@ -1032,7 +1032,7 @@
         const cls      = hot?'hot':'live';
         const badgeTxt = hot?'2h+ 🔥':'Live';
         const evTxt    = [row.event,row.round].filter(Boolean).join(' · ');
-        const durStarted = row.time ? `data-started="${row.time.toISOString()}"` : '';
+        const durStarted = row.time ? `data-started="${row.time.getTime()}"` : '';
         const durTxt   = row.time ? formatDuration(row.time) : '—';
 
         const makeMobNames=(display,dbl)=>{
