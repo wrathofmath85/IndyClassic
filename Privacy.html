@@ -3,268 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indy Classic 2026 | SMS Privacy Policy & Terms</title>
-  <meta name="description" content="Indy Classic 2026 SMS Privacy Policy and Terms & Conditions" />
+  <title>Indy Classic 2027 | SMS Privacy Policy & Terms</title>
+  <meta name="description" content="Indy Classic 2027 SMS Privacy Policy and Terms & Conditions" />
+
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg-1:#081226;
-      --bg-2:#0f1d3a;
-      --bg-3:#14274d;
-      --glass:rgba(255,255,255,0.12);
-      --glass-strong:rgba(255,255,255,0.16);
-      --border:rgba(255,255,255,0.22);
-      --text:#f8fbff;
-      --muted:#c9d7ea;
-      --accent:#7dd3fc;
-      --accent-2:#86efac;
-      --shadow:0 18px 50px rgba(0,0,0,0.28);
-      --maxw:1100px;
-      --radius-xl:28px;
-      --radius-lg:22px;
-      --radius-pill:999px;
+      --ink:#0a0f1a; --ink-2:#0d1424; --ink-3:#111a2d;
+      --line:rgba(255,255,255,.09); --line-soft:rgba(255,255,255,.06);
+      --text:rgba(236,242,251,.94); --muted:rgba(236,242,251,.62); --faint:rgba(236,242,251,.38);
+      --accent:#38bdf8; --accent-2:#7dd3fc; --on-accent:#04121b;
+      --radius:16px; --radius-lg:20px; --shadow:0 24px 60px rgba(0,0,0,.45);
+      --maxw:820px;
     }
-
-    *{box-sizing:border-box}
-
-    html{
-      scroll-behavior:smooth;
-    }
-
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
     body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      color:var(--text);
-      line-height:1.65;
-      background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.22), transparent 24%),
-        radial-gradient(circle at top right, rgba(134,239,172,0.14), transparent 22%),
-        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
-      min-height:100vh;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text);line-height:1.65;background:var(--ink);min-height:100vh;
+      padding:32px 24px 60px;overflow-x:hidden;position:relative;
     }
+    a{color:var(--accent);}
 
-    a{
-      color:var(--accent);
-    }
+    .court{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .court::before{content:"";position:absolute;top:-260px;left:50%;width:820px;height:620px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(56,189,248,.16),transparent 70%);filter:blur(8px);}
+    .court-lines{position:absolute;inset:0;opacity:.5;}
+    .court-lines line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+    .court-lines .net{stroke:rgba(56,189,248,.10);}
 
-    .container{
-      width:min(var(--maxw), calc(100% - 28px));
-      margin:0 auto;
-      padding:28px 0 60px;
-    }
+    .container{width:min(var(--maxw),100%);margin:0 auto;position:relative;z-index:1;}
 
-    .hero{
-      text-align:center;
-      padding:10px 0 8px;
+    .back-link{
+      display:inline-flex;align-items:center;gap:6px;color:var(--muted);
+      font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.04em;
+      text-decoration:none;margin-bottom:14px;padding:8px 14px;border-radius:999px;
+      background:var(--ink-3);border:1px solid var(--line);transition:color .18s,border-color .18s;
+      -webkit-tap-highlight-color:transparent;
     }
+    .back-link:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
 
-    .logo-wrap{
-      display:flex;
-      justify-content:center;
-      margin:0 0 18px;
-    }
-
-    .logo-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px 18px;
-      border:1px solid var(--border);
-      border-radius:26px;
-      background:rgba(255,255,255,0.08);
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      box-shadow:var(--shadow);
-    }
-
-    .logo{
-      display:block;
-      width:min(340px, 82vw);
-      max-height:170px;
-      object-fit:contain;
-    }
+    .hero{text-align:center;padding:6px 0 4px;}
+    .logo-wrap{display:flex;justify-content:center;margin:0 0 18px;}
+    .logo-chip{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border:1px solid rgba(255,255,255,.6);border-radius:16px;background:#fff;box-shadow:0 10px 28px rgba(0,0,0,.35);}
+    .logo{display:block;width:min(300px,78vw);max-height:160px;object-fit:contain;}
 
     .eyebrow{
-      display:inline-block;
-      margin-bottom:12px;
-      padding:8px 14px;
-      border-radius:var(--radius-pill);
-      border:1px solid rgba(255,255,255,0.18);
-      background:rgba(255,255,255,0.08);
-      color:var(--muted);
-      font-size:0.92rem;
-      font-weight:700;
-      letter-spacing:.02em;
+      display:inline-block;margin-bottom:14px;padding:8px 15px;border-radius:999px;
+      border:1px solid rgba(56,189,248,.24);background:rgba(56,189,248,.10);
+      color:var(--accent-2);font-family:'Space Grotesk',sans-serif;
+      font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
     }
+    h1{margin:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.05;letter-spacing:-0.02em;}
+    .subtitle{max-width:640px;margin:14px auto 0;color:var(--muted);font-size:1rem;}
 
-    h1{
-      margin:0;
-      font-size:clamp(2.2rem, 5vw, 4rem);
-      line-height:1.05;
-      letter-spacing:-0.03em;
-    }
-
-    .subtitle{
-      max-width:760px;
-      margin:14px auto 0;
-      color:var(--muted);
-      font-size:1.05rem;
-    }
-
-    .nav-pills{
-      display:flex;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:12px;
-      margin:28px 0 6px;
-    }
-
+    .nav-pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:26px 0 6px;}
     .nav-pills a{
-      text-decoration:none;
-      color:var(--text);
-      font-weight:700;
-      padding:12px 18px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--border);
-      background:rgba(255,255,255,0.10);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-      transition:transform .18s ease, background .18s ease, border-color .18s ease;
+      text-decoration:none;color:var(--text);font-weight:700;font-size:.92rem;
+      padding:11px 18px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      transition:transform .18s,background .18s,border-color .18s;-webkit-tap-highlight-color:transparent;
     }
-
-    .nav-pills a:hover{
-      transform:translateY(-2px);
-      background:rgba(255,255,255,0.15);
-      border-color:rgba(255,255,255,0.28);
-    }
+    .nav-pills a:hover{transform:translateY(-2px);background:rgba(255,255,255,.08);border-color:rgba(56,189,248,.35);}
 
     .section{
-      margin-top:26px;
-      padding:30px 26px;
-      border-radius:var(--radius-xl);
-      border:1px solid var(--border);
-      background:var(--glass);
-      backdrop-filter:blur(18px);
-      -webkit-backdrop-filter:blur(18px);
-      box-shadow:var(--shadow);
+      margin-top:22px;padding:30px 26px;border-radius:var(--radius-lg);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 120px),var(--ink-2);
+      box-shadow:var(--shadow);position:relative;overflow:hidden;
     }
+    .section::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);}
 
-    .section-head{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom:8px;
-      flex-wrap:wrap;
-    }
-
+    .section-head{display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
     .section-number{
-      width:44px;
-      height:44px;
-      border-radius:50%;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:800;
-      color:#062033;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      box-shadow:0 8px 24px rgba(125,211,252,0.28);
-      flex:0 0 auto;
+      width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+      font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--accent-2);
+      background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);flex:0 0 auto;
     }
+    h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:700;line-height:1.15;letter-spacing:-0.01em;}
 
-    h2{
-      margin:0;
-      font-size:clamp(1.5rem, 3vw, 2.2rem);
-      line-height:1.15;
-      letter-spacing:-0.02em;
-    }
+    .effective{margin:0 0 22px;color:var(--faint);font-size:.95rem;}
 
-    .effective{
-      margin:0 0 22px;
-      color:var(--muted);
-      font-size:0.98rem;
-    }
+    h3{margin:24px 0 8px;font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;line-height:1.3;color:var(--text);}
+    p{margin:0 0 12px;color:var(--muted);}
+    ul{margin:8px 0 14px;padding-left:22px;}
+    li{margin:6px 0;color:var(--muted);}
+    li::marker{color:var(--accent);}
+    strong{color:var(--text);}
 
-    h3{
-      margin:24px 0 8px;
-      font-size:1.08rem;
-      line-height:1.3;
-    }
+    .callout{margin-top:18px;padding:16px 18px;border-radius:var(--radius);border:1px solid var(--line-soft);background:rgba(255,255,255,.035);color:var(--muted);}
 
-    p{
-      margin:0 0 12px;
-    }
+    .top-link{display:inline-block;margin-top:18px;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem;}
 
-    ul{
-      margin:8px 0 14px;
-      padding-left:22px;
-    }
-
-    li{
-      margin:6px 0;
-      color:var(--muted);
-    }
-
-    strong{
-      color:#fff;
-    }
-
-    .callout{
-      margin-top:18px;
-      padding:16px 18px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,0.14);
-      background:rgba(255,255,255,0.08);
-      color:var(--muted);
-    }
-
-    .top-link{
-      display:inline-block;
-      margin-top:18px;
-      text-decoration:none;
-      font-weight:800;
-    }
-
-    .footer{
-      text-align:center;
-      color:var(--muted);
-      margin-top:28px;
-      font-size:0.95rem;
-    }
+    .footer{text-align:center;color:var(--faint);margin-top:28px;font-family:'Space Grotesk',sans-serif;font-size:.85rem;letter-spacing:.06em;}
 
     @media (max-width:700px){
-      .container{
-        width:min(calc(100% - 18px), var(--maxw));
-        padding-top:18px;
-      }
-
-      .section{
-        padding:22px 18px;
-        border-radius:22px;
-      }
-
-      .logo-chip{
-        padding:12px 14px;
-        border-radius:22px;
-      }
-
-      .logo{
-        width:min(290px, 82vw);
-        max-height:140px;
-      }
+      body{padding:20px 16px 40px;}
+      .section{padding:22px 18px;border-radius:18px;}
+      .logo{width:min(260px,80vw);max-height:130px;}
     }
+    @media (prefers-reduced-motion:reduce){.back-link,.nav-pills a{transition:none;}}
   </style>
 </head>
 <body>
+  <div class="court" aria-hidden="true">
+    <svg class="court-lines" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid slice">
+      <line x1="120" y1="120" x2="880" y2="120"/><line x1="120" y1="1280" x2="880" y2="1280"/>
+      <line x1="200" y1="120" x2="200" y2="1280"/><line x1="800" y1="120" x2="800" y2="1280"/>
+      <line x1="200" y1="440" x2="800" y2="440"/><line x1="200" y1="960" x2="800" y2="960"/>
+      <line x1="500" y1="440" x2="500" y2="960"/><line class="net" x1="120" y1="700" x2="880" y2="700"/>
+    </svg>
+  </div>
+
   <div class="container" id="top">
+
+    <a href="index.html" class="back-link">← Home</a>
 
     <section class="hero">
       <div class="logo-wrap">
         <div class="logo-chip">
-          <img src="profile.jpg" alt="Indy Classic 2026 logo" class="logo" />
+          <img src="profile.jpg.png" alt="Indy Classic 2027 logo" class="logo" />
         </div>
       </div>
 
       <div class="eyebrow">Official SMS Policy Page</div>
-      <h1>Indy Classic 2026</h1>
+      <h1>Indy Classic 2027</h1>
       <p class="subtitle">
         SMS Privacy Policy and Terms &amp; Conditions for tournament-related text messaging.
         These terms apply to players who opt in during registration.
@@ -282,10 +150,11 @@
         <h2>Privacy Policy</h2>
       </div>
 
-      <p class="effective"><strong>Effective Date:</strong> February 28, 2026</p>
+      <!-- TODO 2027: confirm effective date -->
+      <p class="effective"><strong>Effective Date:</strong> February 28, 2027</p>
 
       <p>
-        Indy Classic 2026 (“we,” “our,” or “us”) respects your privacy and is committed to
+        Indy Classic 2027 (“we,” “our,” or “us”) respects your privacy and is committed to
         protecting the personal information you provide when registering for the tournament.
       </p>
 
@@ -304,13 +173,13 @@
         <li>Register you for the tournament</li>
         <li>Send tournament-related communications via SMS and/or email</li>
         <li>Provide event details, scheduling updates, announcements, and important notifications</li>
-        <li>Communicate information relevant to your participation in Indy Classic 2026</li>
+        <li>Communicate information relevant to your participation in Indy Classic 2027</li>
       </ul>
 
       <h3>SMS Communications</h3>
       <p>
         By providing your phone number during registration and opting in, you consent to receive
-        SMS messages related to Indy Classic 2026. These messages may include a welcome letter,
+        SMS messages related to Indy Classic 2027. These messages may include a welcome letter,
         tournament updates, day-one recap information, announcements such as when lunch has arrived,
         and a thank-you message at the conclusion of the tournament.
       </p>
@@ -364,16 +233,17 @@
         <h2>Terms &amp; Conditions</h2>
       </div>
 
-      <p class="effective"><strong>Effective Date:</strong> February 28, 2026</p>
+      <!-- TODO 2027: confirm effective date -->
+      <p class="effective"><strong>Effective Date:</strong> February 28, 2027</p>
 
       <p>
-        By registering for Indy Classic 2026 and opting in to SMS messaging, you agree to the
+        By registering for Indy Classic 2027 and opting in to SMS messaging, you agree to the
         following terms and conditions related to tournament text communications.
       </p>
 
       <h3>SMS Messaging Service</h3>
       <p>
-        Users who opt in may receive tournament-related SMS messages from Indy Classic 2026,
+        Users who opt in may receive tournament-related SMS messages from Indy Classic 2027,
         including:
       </p>
       <ul>
@@ -404,14 +274,14 @@
 
       <h3>End of Messaging</h3>
       <p>
-        Tournament-related messaging will end after the conclusion of Indy Classic 2026. Users
+        Tournament-related messaging will end after the conclusion of Indy Classic 2027. Users
         will not receive additional messages after the event unless they separately opt in again
         for a future tournament or communication program.
       </p>
 
       <h3>Liability</h3>
       <p>
-        Indy Classic 2026 is not responsible for delayed or undelivered messages caused by carrier
+        Indy Classic 2027 is not responsible for delayed or undelivered messages caused by carrier
         issues, technical failures, or circumstances outside our reasonable control.
       </p>
 
@@ -430,9 +300,8 @@
       <a class="top-link" href="#top">↑ Back to top</a>
     </section>
 
-    <div class="footer">
-      © 2026 Indy Classic
-    </div>
+    <div class="footer">© 2027 Indy Classic</div>
+
   </div>
 </body>
 </html>
