@@ -3,368 +3,116 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Banquet – 2026 Indy Classic</title>
+<title>Banquet – 2027 Indy Classic</title>
 
 <!-- Favicon: tennis ball emoji -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg1:#0f172a;
-  --bg2:#1e293b;
-  --text: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.70);
-  --glass: rgba(255,255,255,.10);
-  --glassBorder: rgba(255,255,255,.18);
-  --shadow: 0 18px 50px rgba(0,0,0,.35);
-  --radius: 22px;
+  --ink:#0a0f1a; --ink-2:#0d1424; --ink-3:#111a2d;
+  --line:rgba(255,255,255,.09); --line-soft:rgba(255,255,255,.06);
+  --text:rgba(236,242,251,.94); --muted:rgba(236,242,251,.56); --faint:rgba(236,242,251,.38);
+  --accent:#38bdf8; --accent-2:#7dd3fc; --on-accent:#04121b;
+  --radius:16px; --radius-lg:20px; --shadow:0 24px 60px rgba(0,0,0,.45);
 }
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-html, body { height: auto; min-height: 100%; }
-
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
 body{
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color: var(--text);
-  background:
-    radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
-    radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
-    linear-gradient(135deg, var(--bg1), var(--bg2));
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 24px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text); background:var(--ink); min-height:100vh;
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:32px 24px 40px; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative;
 }
+.court{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.court::before{content:"";position:absolute;top:-260px;left:50%;width:820px;height:620px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(56,189,248,.16),transparent 70%);filter:blur(8px);}
+.court-lines{position:absolute;inset:0;opacity:.5;}
+.court-lines line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+.court-lines .net{stroke:rgba(56,189,248,.10);}
 
-.blob {
-  position: fixed;
-  width: 420px;
-  height: 420px;
-  border-radius: 999px;
-  filter: blur(45px);
-  opacity: .22;
-  z-index: 0;
-  pointer-events: none;
+.outer{width:min(720px,100%);position:relative;z-index:1;display:flex;flex-direction:column;}
+
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;color:var(--muted);
+  font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.04em;
+  text-decoration:none;margin-bottom:14px;padding:8px 14px;border-radius:999px;
+  background:var(--ink-3);border:1px solid var(--line);transition:color .18s,border-color .18s;
+  -webkit-tap-highlight-color:transparent;align-self:flex-start;
 }
-.blob.b1 { top: -140px; left: -140px; background: rgba(56,189,248,.9); }
-.blob.b2 { bottom: -180px; right: -140px; background: rgba(168,85,247,.9); }
+.back-link:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
 
-/* ── OUTER WRAPPER ── */
-.outer {
-  width: min(720px, 100%);
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
+.card{
+  width:100%;padding:34px 28px 0;border-radius:var(--radius-lg);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 130px),var(--ink-2);
+  border:1px solid var(--line);box-shadow:var(--shadow);text-align:center;overflow:hidden;position:relative;
 }
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);}
 
-/* ── BACK LINK ── */
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: rgba(255,255,255,.55);
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  margin-bottom: 14px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.12);
-  transition: color .18s ease, background .18s ease;
-  -webkit-tap-highlight-color: transparent;
-  align-self: flex-start;
+.logo-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+.logo-box{width:min(100%,230px);padding:11px;border-radius:16px;background:#fff;border:1px solid rgba(255,255,255,.6);box-shadow:0 10px 28px rgba(0,0,0,.35);}
+.logo{width:100%;max-width:208px;height:auto;display:block;object-fit:contain;}
+
+h1{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px;}
+.subtitle{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:26px;}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;margin-bottom:12px;}
+.tile{border-radius:var(--radius);background:rgba(255,255,255,.035);border:1px solid var(--line-soft);padding:15px 16px;}
+.label{font-family:'Space Grotesk',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:7px;}
+.value{font-size:14.5px;font-weight:700;line-height:1.4;}
+.value a{color:var(--accent);text-decoration:none;font-weight:700;}
+.value a:hover{text-decoration:underline;}
+.value-sub{font-size:12.5px;font-weight:600;color:var(--faint);margin-top:4px;}
+
+.note{margin-bottom:12px;padding:15px 16px;border-radius:var(--radius);background:rgba(255,255,255,.035);border:1px solid var(--line-soft);text-align:left;font-size:13.5px;line-height:1.5;color:var(--text);}
+.note strong{color:var(--text);}
+
+.callout{
+  margin-bottom:12px;padding:16px 18px;border-radius:var(--radius);text-align:left;
+  display:flex;align-items:flex-start;gap:14px;
+  background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(56,189,248,.05));
+  border:1px solid rgba(56,189,248,.28);
 }
-.back-link:hover {
-  color: rgba(255,255,255,.90);
-  background: rgba(255,255,255,.12);
+.callout-icon{font-size:26px;flex-shrink:0;line-height:1;margin-top:2px;}
+.callout-title{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--accent-2);margin-bottom:8px;}
+.callout-body{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.55;}
+
+.raffle{margin-bottom:22px;text-align:left;padding:18px;border-radius:var(--radius);background:rgba(255,255,255,.035);border:1px solid var(--line-soft);}
+.raffle-title{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.18em;color:var(--faint);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.raffle-title::before{content:"";width:14px;height:2px;border-radius:2px;background:var(--accent);opacity:.85;}
+.raffle-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;}
+.raffle-list li{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:11px;line-height:1.4;}
+.raffle-list li .ri{font-size:16px;flex-shrink:0;}
+.raffle-more{margin-top:12px;font-size:12.5px;font-style:italic;color:var(--faint);padding-top:12px;border-top:1px solid var(--line-soft);}
+
+.banquet-image{width:100%;display:block;margin-top:4px;border-radius:0 0 var(--radius-lg) var(--radius-lg);object-fit:cover;max-height:440px;}
+.banquet-image-wrap{margin-top:4px;min-height:0;}
+
+footer{margin-top:16px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.06em;color:var(--faint);text-align:center;}
+
+@media (max-width:640px){.grid{grid-template-columns:1fr;}}
+@media (max-width:480px){
+  body{padding:20px 16px 32px;}
+  .card{padding:26px 18px 0;}
+  .logo-box{width:min(100%,190px);padding:9px;} .logo{max-width:172px;}
+  h1{font-size:26px;} .callout{gap:10px;} .callout-icon{font-size:22px;}
 }
-
-/* ── MAIN CARD ── */
-.card {
-  width: 100%;
-  padding: 40px 30px 0 30px;
-  border-radius: var(--radius);
-  background: var(--glass);
-  border: 1px solid var(--glassBorder);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  overflow: hidden;
-  /* Fallback bottom padding if image fails to load */
-  padding-bottom: 0;
-}
-
-/* ── LOGO ── */
-.logo-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.logo-box {
-  width: min(100%, 240px);
-  padding: 10px;
-  border-radius: 18px;
-  background: rgba(255,255,255,.96);
-  border: 1px solid rgba(255,255,255,.35);
-  box-shadow: 0 14px 30px rgba(0,0,0,.30);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo {
-  width: 100%;
-  max-width: 220px;
-  height: auto;
-  display: block;
-  object-fit: contain;
-}
-
-/* ── HEADINGS ── */
-h1 {
-  font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 6px;
-  letter-spacing: -0.02em;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 24px;
-}
-
-/* ── INFO GRID ── */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  text-align: left;
-  margin-bottom: 14px;
-}
-
-.tile {
-  border-radius: 16px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  padding: 14px;
-}
-
-.label {
-  font-size: 11.5px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.55);
-  margin-bottom: 6px;
-}
-
-.value {
-  font-size: 14.5px;
-  font-weight: 700;
-  line-height: 1.40;
-}
-
-.value a {
-  color: #38bdf8;
-  text-decoration: none;
-  font-weight: 800;
-}
-.value a:hover { text-decoration: underline; }
-
-.value-sub {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: rgba(255,255,255,.55);
-  margin-top: 4px;
-}
-
-/* ── CATERING NOTE ── */
-.catering-note {
-  margin-bottom: 14px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.12);
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: rgba(255,255,255,.85);
-}
-
-.catering-note .note-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.catering-note strong {
-  color: rgba(255,255,255,.95);
-  white-space: nowrap;
-}
-
-/* ── COCKTAIL CALLOUT ── */
-.cocktail-callout {
-  margin-bottom: 14px;
-  padding: 15px 16px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(168,85,247,.16), rgba(99,102,241,.16));
-  border: 1px solid rgba(168,85,247,.32);
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.cocktail-icon {
-  font-size: 28px;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.cocktail-text {
-  flex: 1;
-}
-
-.cocktail-title {
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: rgba(216,180,254,.80);
-  margin-bottom: 5px;
-}
-
-.cocktail-drinks {
-  font-size: 14px;
-  font-weight: 700;
-  color: rgba(240,230,255,.92);
-  line-height: 1.5;
-}
-
-/* ── RAFFLE ── */
-.raffle {
-  margin-bottom: 20px;
-  text-align: left;
-  padding: 16px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-}
-
-.raffle-title {
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: rgba(255,255,255,.55);
-  margin-bottom: 12px;
-}
-
-.raffle-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.raffle-list li {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255,255,255,.88);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  line-height: 1.4;
-}
-
-.raffle-list li .ri {
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.raffle-more {
-  margin-top: 10px;
-  font-size: 12.5px;
-  font-style: italic;
-  color: rgba(255,255,255,.45);
-  padding-top: 10px;
-  border-top: 1px solid rgba(255,255,255,.08);
-}
-
-/* ── BOTTOM PHOTO ── */
-.banquet-image {
-  width: 100%;
-  display: block;
-  margin-top: 4px;
-  border-radius: 0 0 var(--radius) var(--radius);
-  object-fit: cover;
-  max-height: 440px;
-}
-
-/* Image error fallback — show padding so card doesn't end abruptly */
-.banquet-image-wrap {
-  margin-top: 4px;
-  min-height: 0;
-}
-
-/* ── FOOTER ── */
-footer {
-  margin-top: 16px;
-  padding: 14px;
-  font-size: 12.5px;
-  color: rgba(255,255,255,.35);
-  text-align: center;
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 640px) {
-  .grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 480px) {
-  body { padding: 16px; }
-  .card { padding: 28px 20px 0 20px; }
-
-  .logo-box {
-    width: min(100%, 200px);
-    padding: 8px;
-  }
-  .logo { max-width: 184px; }
-
-  h1 { font-size: 24px; }
-  .subtitle { font-size: 13px; }
-  .cocktail-callout { gap: 10px; }
-  .cocktail-icon { font-size: 24px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .back-link { transition: none; }
-}
+@media (prefers-reduced-motion:reduce){.back-link{transition:none;}}
 </style>
 </head>
-
 <body>
 
-<div class="blob b1"></div>
-<div class="blob b2"></div>
+<div class="court" aria-hidden="true">
+  <svg class="court-lines" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid slice">
+    <line x1="120" y1="120" x2="880" y2="120"/><line x1="120" y1="1280" x2="880" y2="1280"/>
+    <line x1="200" y1="120" x2="200" y2="1280"/><line x1="800" y1="120" x2="800" y2="1280"/>
+    <line x1="200" y1="440" x2="800" y2="440"/><line x1="200" y1="960" x2="800" y2="960"/>
+    <line x1="500" y1="440" x2="500" y2="960"/><line class="net" x1="120" y1="700" x2="880" y2="700"/>
+  </svg>
+</div>
 
 <div class="outer">
 
@@ -374,97 +122,82 @@ footer {
 
     <div class="logo-wrap">
       <div class="logo-box">
-        <img src="profile.jpg.png" alt="2026 Indy Classic Logo" class="logo">
+        <img src="profile.jpg.png" alt="2027 Indy Classic Logo" class="logo">
       </div>
     </div>
 
     <h1>Player's Banquet</h1>
-    <div class="subtitle">2026 Indy Classic &nbsp;·&nbsp; Saturday, May 30th</div>
+    <div class="subtitle">2027 Indy Classic · Saturday, June 5th</div>
 
-    <!-- Info grid -->
     <div class="grid">
-
       <div class="tile">
         <div class="label">Time</div>
         <div class="value">7:00 PM – 10:00 PM</div>
         <div class="value-sub">Dinner served at 8:00 PM</div>
       </div>
-
       <div class="tile">
         <div class="label">Catering</div>
         <div class="value">Sahm's Catering</div>
       </div>
-
-      <div class="tile" style="grid-column: 1 / -1;">
+      <div class="tile" style="grid-column:1 / -1;">
         <div class="label">Location</div>
         <div class="value">
           Radius &nbsp;—&nbsp;
-          <a href="https://www.google.com/maps?q=723+S+Capitol+Ave,+Indianapolis,+IN+46225"
-             target="_blank" rel="noopener noreferrer">
+          <a href="https://www.google.com/maps?q=723+S+Capitol+Ave,+Indianapolis,+IN+46225" target="_blank" rel="noopener noreferrer">
             723 S Capitol Ave, Indianapolis, IN 46225 ↗
           </a>
         </div>
       </div>
-
     </div>
 
-    <!-- Dietary note -->
-    <div class="catering-note">
-      <div class="note-row">
-        <span>🌱</span>
-        <span><strong>Vegan?</strong> Please let us know ahead of time so we can accommodate you!</span>
-      </div>
+    <div class="note">
+      🌱 &nbsp;<strong>Vegan?</strong> Please let us know ahead of time so we can accommodate you!
     </div>
 
-    <!-- Signature cocktails callout -->
-    <div class="cocktail-callout">
-      <div class="cocktail-icon">🍹</div>
-      <div class="cocktail-text">
-        <div class="cocktail-title">Signature Cocktails</div>
-        <div class="cocktail-drinks">
-          The BJ (Blueberry Juice) - Vodka, Blueberry Syrup, Lemon Juice, Soda Water, Lemon Garnish<br>
-          The Juicy Peach - Tequila, Peach Syrup, Lime Juice, Soda Water, Lime Garnish <br><br>
-	  Ask for a "Double Fault" to make it a double!
+    <div class="callout">
+      <div class="callout-icon">🍹</div>
+      <div>
+        <div class="callout-title">Signature Cocktails</div>
+        <div class="callout-body">
+          The BJ (Blueberry Juice) — Vodka, Blueberry Syrup, Lemon Juice, Soda Water, Lemon Garnish<br>
+          The Juicy Peach — Tequila, Peach Syrup, Lime Juice, Soda Water, Lime Garnish<br><br>
+          Ask for a "Double Fault" to make it a double!
         </div>
       </div>
     </div>
 
-    <!-- Raffle -->
+    <!-- TODO 2027: confirm/refresh raffle prize list & years (carried over from 2026) -->
     <div class="raffle">
       <div class="raffle-title">🎟️ Raffle Items</div>
       <ul class="raffle-list">
         <li><span class="ri">🎾</span> Wilson Tennis Racquet (of your choice)</li>
-	<li><span class="ri">🏫</span> Free Lesson with Lucas Waak (IRC Pro) </li>
+        <li><span class="ri">🏫</span> Free Lesson with Lucas Waak (IRC Pro)</li>
         <li><span class="ri">🏆</span> 2027 Indy Classic Free Entry</li>
         <li><span class="ri">🍊</span> 2027 Orange Blossom (Orlando) Free Entry</li>
-	<li><span class="ri">🌴</span> 2026 Citrus Classic (Tampa Bay) Free Entry</li>
-	<li><span class="ri">⚙️</span> 2027 Motor City Classic (Detroit) Free Entry</li>
-	<li><span class="ri">🤠</span> 2027 Heart of Texas (Austin) Free Entry</li>
-	<li><span class="ri">🌰</span> 2027 Columbus Classic Free Entry</li>
-	<li><span class="ri">🌊</span> 2027 San Diego Open Free Entry</li>
-	<li><span class="ri">🌸</span> 2026 Capital Classic (DC) Free Entry</li>
-	<li><span class="ri">🌞</span> 2027 California Open Classic (Los Angeles) Free Entry</li>
-	<li><span class="ri">🍑</span> 2026 Peach Championships (Atlanta) Free Entry</li>
-	<li><span class="ri">🍁</span> 2027 Canadian Gay Open (Toronto) Free Entry</li>
-	<li><span class="ri">🎸</span> 2026 Nashville Open Free Entry</li>
-
+        <li><span class="ri">🌴</span> 2026 Citrus Classic (Tampa Bay) Free Entry</li>
+        <li><span class="ri">⚙️</span> 2027 Motor City Classic (Detroit) Free Entry</li>
+        <li><span class="ri">🤠</span> 2027 Heart of Texas (Austin) Free Entry</li>
+        <li><span class="ri">🌰</span> 2027 Columbus Classic Free Entry</li>
+        <li><span class="ri">🌊</span> 2027 San Diego Open Free Entry</li>
+        <li><span class="ri">🌸</span> 2026 Capital Classic (DC) Free Entry</li>
+        <li><span class="ri">🌞</span> 2027 California Open Classic (Los Angeles) Free Entry</li>
+        <li><span class="ri">🍑</span> 2026 Peach Championships (Atlanta) Free Entry</li>
+        <li><span class="ri">🍁</span> 2027 Canadian Gay Open (Toronto) Free Entry</li>
+        <li><span class="ri">🎸</span> 2026 Nashville Open Free Entry</li>
       </ul>
       <div class="raffle-more">More items being added — check back soon!</div>
     </div>
 
-    <!-- Full-bleed bottom photo -->
     <div class="banquet-image-wrap">
-      <img src="banquet.png"
-           alt="Player's Banquet at Radius"
-           class="banquet-image"
+      <img src="banquet.png" alt="Player's Banquet at Radius" class="banquet-image"
            onerror="this.closest('.banquet-image-wrap').style.paddingBottom='28px'">
     </div>
 
-  </div><!-- /card -->
+  </div>
 
-  <footer>© 2026 Indy Classic</footer>
+  <footer>© 2027 Indy Classic</footer>
 
-</div><!-- /outer -->
+</div>
 
 </body>
 </html>
