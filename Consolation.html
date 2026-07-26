@@ -3,26 +3,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>2026 Indy Classic – Consolation</title>
+  <title>2027 Indy Classic – Consolation</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
     :root{
-      --bg1:#09090f;
-      --bg2:#0f0f1a;
+      --bg1:#0a0f1a;
+      --bg2:#0d1424;
       --accent:#38bdf8;
+      --accent-2:#7dd3fc;
       --accent2:#22c55e;
       --gold:#f59e0b;
-      --text:rgba(255,255,255,.93);
-      --muted:rgba(255,255,255,.55);
-      --glass:rgba(255,255,255,.06);
-      --glassBorder:rgba(255,255,255,.12);
-      --shadow:0 20px 60px rgba(0,0,0,.5);
-      --radius:20px;
+      --text:rgba(236,242,251,.94);
+      --muted:rgba(236,242,251,.56);
+      --faint:rgba(236,242,251,.38);
+      --glass:rgba(255,255,255,.035);
+      --glassBorder:rgba(255,255,255,.09);
+      --shadow:0 24px 60px rgba(0,0,0,.45);
+      --radius:18px;
       --ok:rgba(34,197,94,.15);
       --okBorder:rgba(34,197,94,.35);
       --warn:rgba(245,158,11,.15);
@@ -35,21 +39,20 @@
     *{box-sizing:border-box;margin:0;padding:0;}
     html,body{min-height:100%;}
     body{
-      font-family:'DM Sans',system-ui,sans-serif;
+      font-family:'Inter',system-ui,sans-serif;
       color:var(--text);
-      background:
-        radial-gradient(ellipse 1100px 600px at 10% 0%, rgba(56,189,248,.12), transparent 60%),
-        radial-gradient(ellipse 800px 500px at 90% 60%, rgba(34,197,94,.08), transparent 55%),
-        linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 100%);
+      background:var(--bg1);
       min-height:100vh;
       padding:0 0 60px;
       overflow-x:hidden;
     }
 
-    /* ── decorative blobs ── */
-    .blob{position:fixed;border-radius:999px;filter:blur(70px);opacity:.12;z-index:0;pointer-events:none;}
-    .blob1{width:520px;height:520px;top:-200px;left:-150px;background:rgba(56,189,248,.9);}
-    .blob2{width:420px;height:420px;bottom:-160px;right:-120px;background:rgba(168,85,247,.9);}
+    /* ── signature: court hairlines + soft glow ── */
+    .court{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .court::before{content:"";position:absolute;top:-260px;left:50%;width:820px;height:620px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(56,189,248,.16),transparent 70%);filter:blur(8px);}
+    .court-lines{position:absolute;inset:0;opacity:.5;}
+    .court-lines line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+    .court-lines .net{stroke:rgba(56,189,248,.10);}
 
     /* ── top banner ── */
     .banner{
@@ -86,7 +89,7 @@
       color:var(--accent);margin-bottom:4px;
     }
     .titleBlock h1{
-      font-family:'Bebas Neue',sans-serif;
+      font-family:'Space Grotesk',sans-serif;
       font-size:clamp(26px,5vw,42px);
       letter-spacing:.04em;line-height:1;color:#fff;
     }
@@ -116,7 +119,7 @@
 
     /* ── events grid (main hub) ── */
     .sectionTitle{
-      font-family:'Bebas Neue',sans-serif;
+      font-family:'Space Grotesk',sans-serif;
       font-size:22px;letter-spacing:.06em;
       color:rgba(255,255,255,.6);
       margin-bottom:18px;
@@ -239,7 +242,7 @@
     }
     .backBtn:hover{background:rgba(255,255,255,.12);}
     .subTitle{
-      font-family:'Bebas Neue',sans-serif;
+      font-family:'Space Grotesk',sans-serif;
       font-size:clamp(20px,4vw,32px);
       letter-spacing:.05em;line-height:1;
     }
@@ -271,7 +274,7 @@
       border:1px solid rgba(255,255,255,.16);
       background:rgba(9,9,15,.6);
       color:var(--text);outline:none;
-      font-family:'DM Sans',sans-serif;font-size:14px;
+      font-family:'Inter',sans-serif;font-size:14px;
       cursor:pointer;
     }
     select:focus{border-color:rgba(56,189,248,.4);}
@@ -300,7 +303,7 @@
       border-radius:14px;
       border:1px solid rgba(56,189,248,.35);
       background:rgba(56,189,248,.14);
-      color:#fff;font-family:'DM Sans',sans-serif;font-size:14.5px;font-weight:800;
+      color:#fff;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:800;
       cursor:pointer;letter-spacing:.02em;
       transition:background .18s,border-color .18s,transform .14s,box-shadow .18s;
       box-shadow:0 8px 24px rgba(56,189,248,.12);
@@ -351,7 +354,7 @@
     }
     @keyframes popIn{from{transform:scale(0) rotate(-15deg);}to{transform:scale(1) rotate(0);}}
     .popupTitle{
-      font-family:'Bebas Neue',sans-serif;
+      font-family:'Space Grotesk',sans-serif;
       font-size:28px;letter-spacing:.06em;color:#fff;
       margin-bottom:10px;
     }
@@ -363,7 +366,7 @@
       display:inline-flex;align-items:center;justify-content:center;
       padding:11px 28px;border-radius:999px;
       background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.4);
-      color:#4ade80;font-family:'DM Sans',sans-serif;
+      color:#4ade80;font-family:'Inter',sans-serif;
       font-size:13px;font-weight:800;letter-spacing:.04em;
       cursor:pointer;
       transition:background .18s,transform .14s;
@@ -417,7 +420,7 @@
       border-radius:16px;padding:12px 14px;
     }
     .metaLabel{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
-    .metaValue{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.02em;}
+    .metaValue{font-family:'Space Grotesk',sans-serif;font-size:26px;letter-spacing:.02em;}
 
     .drawWrap{overflow-x:auto;padding-bottom:12px;}
     .bracket{display:flex;gap:24px;min-width:max-content;align-items:flex-start;}
@@ -480,8 +483,14 @@
   </style>
 </head>
 <body>
-  <div class="blob blob1"></div>
-  <div class="blob blob2"></div>
+  <div class="court" aria-hidden="true">
+    <svg class="court-lines" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid slice">
+      <line x1="120" y1="120" x2="880" y2="120"/><line x1="120" y1="1280" x2="880" y2="1280"/>
+      <line x1="200" y1="120" x2="200" y2="1280"/><line x1="800" y1="120" x2="800" y2="1280"/>
+      <line x1="200" y1="440" x2="800" y2="440"/><line x1="200" y1="960" x2="800" y2="960"/>
+      <line x1="500" y1="440" x2="500" y2="960"/><line class="net" x1="120" y1="700" x2="880" y2="700"/>
+    </svg>
+  </div>
 
   <!-- ── SUCCESS POPUP ── -->
   <div class="popupOverlay" id="successPopup" role="dialog" aria-modal="true">
@@ -498,10 +507,10 @@
     <div class="bannerInner">
       <div class="logoBlock">
         <div class="logoMark">
-          <img src="profile.jpg.png" alt="2026 Indy Classic" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Bebas Neue,sans-serif;font-size:22px;color:#09090f;letter-spacing:.02em;\'>IC</span>'">
+          <img src="profile.jpg.png" alt="2027 Indy Classic" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Space Grotesk,sans-serif;font-size:22px;color:#09090f;letter-spacing:.02em;\'>IC</span>'">
         </div>
         <div class="titleBlock">
-          <div class="eyebrow">2026 Indy Classic</div>
+          <div class="eyebrow">2027 Indy Classic</div>
           <h1>Consolation</h1>
           <div class="sub">Sign-up &amp; Draws Hub</div>
         </div>
@@ -1474,7 +1483,7 @@ async function openDraw(eventName){
 
   const metaHtml=`
     <div class="metaGrid">
-      <div class="metaCard"><div class="metaLabel">Event</div><div class="metaValue" style="font-size:16px;font-family:'DM Sans',sans-serif;font-weight:900;">${esc(eventName)}</div></div>
+      <div class="metaCard"><div class="metaLabel">Event</div><div class="metaValue" style="font-size:16px;font-family:'Inter',sans-serif;font-weight:900;">${esc(eventName)}</div></div>
       <div class="metaCard"><div class="metaLabel">${isDoublesDraw?"Teams":"Entries"}</div><div class="metaValue">${count}</div></div>
       <div class="metaCard"><div class="metaLabel">Draw Size</div><div class="metaValue">${drawData.size}</div></div>
     </div>`;
