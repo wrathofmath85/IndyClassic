@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel – 2027 Indy Classic</title>
+
+  <!-- Favicon: tennis ball emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --ink:#0a0f1a; --ink-2:#0d1424; --ink-3:#111a2d;
+      --line:rgba(255,255,255,.09); --line-soft:rgba(255,255,255,.06);
+      --text:rgba(236,242,251,.94); --muted:rgba(236,242,251,.56); --faint:rgba(236,242,251,.38);
+      --accent:#38bdf8; --accent-2:#7dd3fc; --on-accent:#04121b;
+      --warn:#fb7185;
+      --radius:16px; --radius-lg:20px; --shadow:0 24px 60px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{min-height:100%;}
+    body{
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text); background:var(--ink); min-height:100vh;
+      display:flex; align-items:flex-start; justify-content:center;
+      padding:32px 24px 40px; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative;
+    }
+    .court{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .court::before{content:"";position:absolute;top:-260px;left:50%;width:820px;height:620px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(56,189,248,.16),transparent 70%);filter:blur(8px);}
+    .court-lines{position:absolute;inset:0;opacity:.5;}
+    .court-lines line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+    .court-lines .net{stroke:rgba(56,189,248,.10);}
+
+    .outer{width:min(720px,100%);position:relative;z-index:1;display:flex;flex-direction:column;padding-bottom:0;}
+
+    .back-link{
+      display:inline-flex;align-items:center;gap:6px;color:var(--muted);
+      font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.04em;
+      text-decoration:none;margin-bottom:14px;padding:8px 14px;border-radius:999px;
+      background:var(--ink-3);border:1px solid var(--line);transition:color .18s,border-color .18s;
+      -webkit-tap-highlight-color:transparent;align-self:flex-start;
+    }
+    .back-link:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
+
+    .card{
+      width:100%;padding:34px 28px 30px;border-radius:var(--radius-lg);
+      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 130px),var(--ink-2);
+      border:1px solid var(--line);box-shadow:var(--shadow);text-align:center;position:relative;overflow:hidden;
+    }
+    .card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);}
+
+    .logo-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+    .logo-box{width:min(100%,230px);padding:11px;border-radius:16px;background:#fff;border:1px solid rgba(255,255,255,.6);box-shadow:0 10px 28px rgba(0,0,0,.35);}
+    .logo-box img{width:100%;max-width:208px;height:auto;object-fit:contain;display:block;}
+
+    h1{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px;text-align:center;}
+    .subtitle{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:26px;text-align:center;}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;text-align:left;}
+    .info{padding:15px 16px;border-radius:var(--radius);background:rgba(255,255,255,.035);border:1px solid var(--line-soft);}
+    .label{font-family:'Space Grotesk',sans-serif;font-size:11px;color:var(--faint);margin-bottom:7px;display:flex;align-items:center;gap:7px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+    .value{font-weight:800;font-size:15px;line-height:1.3;}
+    .value.rate{font-size:22px;color:var(--accent);}
+
+    .deadline-note{
+      margin-bottom:18px;padding:15px 16px;border-radius:var(--radius);
+      background:rgba(251,113,133,.10);border:1px solid rgba(251,113,133,.26);
+      color:rgba(255,220,225,.92);font-size:13.5px;line-height:1.55;text-align:left;
+      display:flex;align-items:flex-start;gap:10px;
+    }
+    .deadline-note .icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+    .deadline-note b{color:rgba(255,235,238,.96);}
+
+    .actions{margin-bottom:22px;}
+    .btn-book{
+      display:inline-flex;align-items:center;gap:10px;text-decoration:none;
+      color:var(--on-accent);font-weight:800;font-size:14px;padding:15px 24px;border-radius:999px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 12px 30px rgba(56,189,248,.22);
+      transition:transform .15s ease,filter .15s ease,box-shadow .15s ease;
+      -webkit-tap-highlight-color:transparent;white-space:nowrap;
+    }
+    @media (hover:hover) and (pointer:fine){
+      .btn-book:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 18px 40px rgba(56,189,248,.32);}
+    }
+    .btn-book:active{transform:scale(.99);}
+
+    .hotel-photo-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-soft);background:rgba(255,255,255,.03);}
+    .hotel-photo{width:100%;height:auto;display:block;object-fit:cover;max-height:400px;}
+
+    footer{margin-top:20px;padding:12px;font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.06em;color:var(--faint);text-align:center;}
+
+    @media (max-width:640px){.grid{grid-template-columns:1fr;}}
+    @media (max-width:480px){
+      body{padding:20px 16px 32px;}
+      .card{padding:26px 18px 24px;}
+      .logo-box{width:min(100%,190px);padding:9px;} .logo-box img{max-width:172px;}
+      h1{font-size:26px;} .value.rate{font-size:19px;}
+    }
+    @media (prefers-reduced-motion:reduce){.back-link,.btn-book{transition:none;}}
+  </style>
+</head>
+<body>
+  <div class="court" aria-hidden="true">
+    <svg class="court-lines" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid slice">
+      <line x1="120" y1="120" x2="880" y2="120"/><line x1="120" y1="1280" x2="880" y2="1280"/>
+      <line x1="200" y1="120" x2="200" y2="1280"/><line x1="800" y1="120" x2="800" y2="1280"/>
+      <line x1="200" y1="440" x2="800" y2="440"/><line x1="200" y1="960" x2="800" y2="960"/>
+      <line x1="500" y1="440" x2="500" y2="960"/><line class="net" x1="120" y1="700" x2="880" y2="700"/>
+    </svg>
+  </div>
+
+  <div class="outer">
+
+    <a href="index.html" class="back-link">← Home</a>
+
+    <div class="card">
+
+      <div class="logo-wrap">
+        <div class="logo-box">
+          <img src="profile.jpg.png" alt="2027 Indy Classic Logo" />
+        </div>
+      </div>
+
+      <h1>Host Hotel</h1>
+      <div class="subtitle">2027 Indy Classic · Book early to lock in the tournament rate</div>
+
+      <div class="grid">
+        <!-- TODO 2027: confirm nightly rate -->
+        <div class="info">
+          <div class="label">💳 Tournament Rate</div>
+          <div class="value rate">$189 / night</div>
+        </div>
+        <!-- TODO 2027: confirm booking deadline date -->
+        <div class="info">
+          <div class="label">⏰ Book By</div>
+          <div class="value">May 14, 2027</div>
+        </div>
+        <div class="info">
+          <div class="label">✅ Check In</div>
+          <div class="value">Thursday, June 3</div>
+        </div>
+        <div class="info">
+          <div class="label">🏁 Check Out</div>
+          <div class="value">Sunday, June 6</div>
+        </div>
+      </div>
+
+      <!-- TODO 2027: update deadline date to match "Book By" above -->
+      <div class="deadline-note">
+        <span class="icon">⚠️</span>
+        <span>
+          <b>Book before the deadline</b> or lose the $189 group rate.
+          If the room block sells out early, only standard rates will be available — book early to lock in your spot.
+        </span>
+      </div>
+
+      <!-- TODO 2027: replace with new Marriott group booking link -->
+      <div class="actions">
+        <a class="btn-book"
+           href="https://app.marriott.com/reslink?id=1771864825079&key=GRP&app=resvlink"
+           target="_blank" rel="noopener noreferrer">
+          Book Host Hotel ↗
+        </a>
+      </div>
+
+      <div class="hotel-photo-wrap">
+        <img class="hotel-photo" src="hotel.jpg" alt="2027 Indy Classic Host Hotel"
+             onerror="this.closest('.hotel-photo-wrap').style.display='none'">
+      </div>
+
+    </div>
+
+    <footer>© 2027 Indy Classic</footer>
+
+  </div>
+
+</body>
+</html>
