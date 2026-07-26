@@ -3,29 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Around Indy – 2026 Indy Classic</title>
+  <title>Around Indy – 2027 Indy Classic</title>
 
   <!-- Favicon: tennis ball emoji -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg1: #0f172a;
-      --bg2: #1e293b;
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
-      --glass: rgba(255,255,255,.10);
-      --glassBorder: rgba(255,255,255,.18);
-      --cardBg: rgba(255,255,255,.07);
-      --cardBorder: rgba(255,255,255,.12);
-      --shadow: 0 18px 50px rgba(0,0,0,.35);
-      --radius: 20px;
-      --sponsorBg: rgba(34,197,94,.12);
-      --sponsorBorder: rgba(34,197,94,.32);
+      --ink: #0a0f1a;
+      --ink-3: #111a2d;
+      --bg1: #0a0f1a;
+      --bg2: #0d1424;
+      --text: rgba(236,242,251,.94);
+      --muted: rgba(236,242,251,.56);
+      --faint: rgba(236,242,251,.38);
+      --accent: #38bdf8;
+      --accent-2: #7dd3fc;
+      --glass: rgba(255,255,255,.035);
+      --glassBorder: rgba(255,255,255,.09);
+      --cardBg: rgba(255,255,255,.035);
+      --cardBorder: rgba(255,255,255,.06);
+      --shadow: 0 24px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --sponsorBg: rgba(56,189,248,.10);
+      --sponsorBorder: rgba(56,189,248,.30);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,29 +40,21 @@
     body {
       font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.28), transparent 60%),
-        radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,.18), transparent 55%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
+      background: var(--ink);
       min-height: 100vh;
-      padding: 24px;
+      padding: 32px 24px 40px;
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      position: relative;
     }
 
-    .blob {
-      position: fixed;
-      width: 420px;
-      height: 420px;
-      border-radius: 999px;
-      filter: blur(45px);
-      opacity: .22;
-      z-index: 0;
-      pointer-events: none;
-    }
-    .blob.b1 { top: -140px; left: -140px; background: rgba(56,189,248,.9); }
-    .blob.b2 { bottom: -180px; right: -140px; background: rgba(168,85,247,.9); }
+    /* signature: court hairlines + soft glow */
+    .court{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .court::before{content:"";position:absolute;top:-260px;left:50%;width:820px;height:620px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(56,189,248,.16),transparent 70%);filter:blur(8px);}
+    .court-lines{position:absolute;inset:0;opacity:.5;}
+    .court-lines line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+    .court-lines .net{stroke:rgba(56,189,248,.10);}
 
     /* ── OUTER WRAP ── */
     .wrap {
@@ -92,16 +89,17 @@
 
     /* ── HEADER CARD ── */
     .header-card {
-      background: var(--glass);
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0) 120px), var(--bg2);
       border: 1px solid var(--glassBorder);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 28px 22px 22px;
+      padding: 30px 24px 24px;
       text-align: center;
       margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
     }
+    .header-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);}
 
     .logo-wrap {
       display: flex;
@@ -130,14 +128,19 @@
     }
 
     h1 {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
     }
 
     .page-sub {
-      font-size: 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
       color: var(--muted);
     }
 
@@ -241,9 +244,10 @@
 
     .section-header h2 {
       margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 15px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 600;
+      letter-spacing: .01em;
     }
 
     .count-pill {
@@ -291,8 +295,8 @@
         border-color: rgba(255,255,255,.20);
       }
       .attr-card.sponsor:hover {
-        background: linear-gradient(160deg, rgba(34,197,94,.18), rgba(255,255,255,.08));
-        border-color: rgba(34,197,94,.48);
+        background: linear-gradient(160deg, rgba(56,189,248,.16), rgba(255,255,255,.05));
+        border-color: rgba(56,189,248,.45);
       }
     }
 
@@ -320,8 +324,8 @@
       padding: 5px 9px;
       border-radius: 999px;
       border: 1px solid var(--sponsorBorder);
-      background: rgba(34,197,94,.15);
-      color: rgba(210,255,230,.95);
+      background: rgba(56,189,248,.14);
+      color: rgba(224,244,255,.95);
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -343,7 +347,7 @@
     .attr-meta a:hover { text-decoration: underline; }
 
     .attr-meta .map-link {
-      color: #86efac;
+      color: var(--accent-2);
     }
 
     .attr-meta .no-info {
@@ -432,8 +436,14 @@
 </head>
 
 <body>
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
+  <div class="court" aria-hidden="true">
+    <svg class="court-lines" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid slice">
+      <line x1="120" y1="120" x2="880" y2="120"/><line x1="120" y1="1280" x2="880" y2="1280"/>
+      <line x1="200" y1="120" x2="200" y2="1280"/><line x1="800" y1="120" x2="800" y2="1280"/>
+      <line x1="200" y1="440" x2="800" y2="440"/><line x1="200" y1="960" x2="800" y2="960"/>
+      <line x1="500" y1="440" x2="500" y2="960"/><line class="net" x1="120" y1="700" x2="880" y2="700"/>
+    </svg>
+  </div>
 
   <div class="wrap">
 
@@ -443,11 +453,11 @@
     <div class="header-card">
       <div class="logo-wrap">
         <div class="logo-box">
-          <img src="profile.jpg.png" alt="2026 Indy Classic Logo" />
+          <img src="profile.jpg.png" alt="2027 Indy Classic Logo" />
         </div>
       </div>
       <h1>Around Indy</h1>
-      <div class="page-sub">2026 Indy Classic &nbsp;·&nbsp; Places to explore in Indianapolis</div>
+      <div class="page-sub">2027 Indy Classic &nbsp;·&nbsp; Places to explore in Indianapolis</div>
     </div>
 
     <!-- Status / skeleton shown while loading -->
@@ -486,7 +496,7 @@
       <div class="visit-indy-arrow">↗</div>
     </a>
 
-    <footer>© 2026 Indy Classic</footer>
+    <footer>© 2027 Indy Classic</footer>
 
   </div><!-- /wrap -->
 
