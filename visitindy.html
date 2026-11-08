@@ -1,723 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Around Indy – 2027 Indy Classic</title>
-
-  <!-- Favicon: tennis ball emoji -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root{
-      --ink: #0a0f1a;
-      --ink-3: #111a2d;
-      --bg1: #0a0f1a;
-      --bg2: #0d1424;
-      --text: rgba(236,242,251,.94);
-      --muted: rgba(236,242,251,.56);
-      --faint: rgba(236,242,251,.38);
-      --accent: #38bdf8;
-      --accent-2: #7dd3fc;
-      --glass: rgba(255,255,255,.035);
-      --glassBorder: rgba(255,255,255,.09);
-      --cardBg: rgba(255,255,255,.035);
-      --cardBorder: rgba(255,255,255,.06);
-      --shadow: 0 24px 60px rgba(0,0,0,.45);
-      --radius: 18px;
-      --sponsorBg: rgba(56,189,248,.10);
-      --sponsorBorder: rgba(56,189,248,.30);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body { min-height: 100%; }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--text);
-      background: var(--ink);
-      min-height: 100vh;
-      padding: 32px 24px 40px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      position: relative;
-    }
-
-    /* signature: court hairlines + soft glow */
-    .court{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-    .court::before{content:"";position:absolute;top:-260px;left:50%;width:820px;height:620px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(56,189,248,.16),transparent 70%);filter:blur(8px);}
-    .court-lines{position:absolute;inset:0;opacity:.5;}
-    .court-lines line{stroke:rgba(255,255,255,.05);stroke-width:1;}
-    .court-lines .net{stroke:rgba(56,189,248,.10);}
-
-    /* ── OUTER WRAP ── */
-    .wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      padding-bottom: 32px;
-    }
-
-    /* ── BACK LINK ── */
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: rgba(255,255,255,.55);
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      margin-bottom: 14px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.12);
-      transition: color .18s ease, background .18s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .back-link:hover {
-      color: rgba(255,255,255,.90);
-      background: rgba(255,255,255,.12);
-    }
-
-    /* ── HEADER CARD ── */
-    .header-card {
-      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0) 120px), var(--bg2);
-      border: 1px solid var(--glassBorder);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 30px 24px 24px;
-      text-align: center;
-      margin-bottom: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .header-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);}
-
-    .logo-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .logo-box {
-      width: min(100%, 240px);
-      padding: 10px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(255,255,255,.35);
-      box-shadow: 0 14px 30px rgba(0,0,0,.30);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-box img {
-      width: 100%;
-      max-width: 220px;
-      height: auto;
-      object-fit: contain;
-      display: block;
-    }
-
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 30px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      margin-bottom: 8px;
-    }
-
-    .page-sub {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    /* ── STATUS / SKELETON ── */
-    .status-wrap {
-      margin-bottom: 14px;
-    }
-
-    .status-msg {
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: var(--cardBg);
-      border: 1px solid var(--cardBorder);
-      color: var(--muted);
-      font-size: 13.5px;
-    }
-
-    .status-msg.err {
-      background: rgba(244,63,94,.12);
-      border-color: rgba(244,63,94,.28);
-      color: rgba(255,210,215,.90);
-    }
-
-    /* Skeleton shimmer */
-    .skeleton {
-      border-radius: 12px;
-      background: linear-gradient(90deg,
-        rgba(255,255,255,.06) 25%,
-        rgba(255,255,255,.11) 50%,
-        rgba(255,255,255,.06) 75%
-      );
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-    }
-    @keyframes shimmer {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .skel-section {
-      margin-bottom: 16px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--cardBorder);
-    }
-    .skel-header {
-      height: 52px;
-      border-radius: 0;
-    }
-    .skel-body {
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .skel-card {
-      height: 72px;
-      border-radius: 12px;
-    }
-
-    /* ── RETRY BUTTON ── */
-    .retry-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.18);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background .18s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .retry-btn:hover { background: rgba(255,255,255,.16); }
-
-    /* ── SECTION ── */
-    .section {
-      margin-bottom: 16px;
-      border: 1px solid var(--cardBorder);
-      border-radius: var(--radius);
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .section-header {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border-bottom: 1px solid var(--cardBorder);
-      background: rgba(255,255,255,.05);
-    }
-
-    .section-header h2 {
-      margin: 0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: .01em;
-    }
-
-    .count-pill {
-      font-size: 12px;
-      color: var(--muted);
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid var(--cardBorder);
-      white-space: nowrap;
-      font-weight: 600;
-    }
-
-    /* ── ATTRACTION GRID ── */
-    .attr-list {
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    @media (min-width: 600px) {
-      .attr-list { grid-template-columns: 1fr 1fr; }
-      .skel-body  { grid-template-columns: 1fr 1fr; }
-    }
-
-    /* ── ATTRACTION CARD ── */
-    .attr-card {
-      border: 1px solid var(--cardBorder);
-      border-radius: 14px;
-      background: var(--cardBg);
-      padding: 13px 14px;
-      box-shadow: 0 8px 22px rgba(0,0,0,.18);
-      transition: background .18s ease, border-color .18s ease;
-    }
-
-    .attr-card.sponsor {
-      border-color: var(--sponsorBorder);
-      background: linear-gradient(160deg, var(--sponsorBg), var(--cardBg));
-    }
-
-    @media (hover:hover) and (pointer:fine) {
-      .attr-card:hover {
-        background: rgba(255,255,255,.10);
-        border-color: rgba(255,255,255,.20);
-      }
-      .attr-card.sponsor:hover {
-        background: linear-gradient(160deg, rgba(56,189,248,.16), rgba(255,255,255,.05));
-        border-color: rgba(56,189,248,.45);
-      }
-    }
-
-    .attr-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .attr-name {
-      margin: 0;
-      font-weight: 800;
-      font-size: 14.5px;
-      line-height: 1.25;
-    }
-
-    .sponsor-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid var(--sponsorBorder);
-      background: rgba(56,189,248,.14);
-      color: rgba(224,244,255,.95);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .attr-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 14px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .attr-meta a {
-      color: #7dd3fc;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .attr-meta a:hover { text-decoration: underline; }
-
-    .attr-meta .map-link {
-      color: var(--accent-2);
-    }
-
-    .attr-meta .no-info {
-      color: rgba(255,255,255,.35);
-      font-style: italic;
-    }
-
-    /* ── VISIT INDY CALLOUT ── */
-    .visit-indy {
-      margin-top: 6px;
-      padding: 18px 20px;
-      border-radius: var(--radius);
-      background: var(--glass);
-      border: 1px solid var(--glassBorder);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-      transition: background .18s ease, border-color .18s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    @media (hover:hover) and (pointer:fine) {
-      .visit-indy:hover {
-        background: rgba(255,255,255,.14);
-        border-color: rgba(255,255,255,.26);
-      }
-    }
-
-    .visit-indy-icon {
-      font-size: 30px;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    .visit-indy-text {
-      flex: 1;
-    }
-
-    .visit-indy-title {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 3px;
-      letter-spacing: -0.01em;
-    }
-
-    .visit-indy-sub {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .visit-indy-arrow {
-      font-size: 20px;
-      color: rgba(255,255,255,.40);
-      flex-shrink: 0;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      margin-top: 20px;
-      padding-top: 12px;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.35);
-      text-align: center;
-    }
-
-    @media (max-width: 480px) {
-      body { padding: 16px; }
-      h1 { font-size: 24px; }
-      .logo-box { width: min(100%, 200px); padding: 8px; }
-      .logo-box img { max-width: 184px; }
-      .visit-indy { gap: 12px; }
-      .visit-indy-icon { font-size: 24px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .skeleton { animation: none; }
-      .back-link, .attr-card, .visit-indy, .retry-btn { transition: none; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Around Indy – 2027 Indy Classic</title>
+<meta name="description" content="Restaurants, bars, sights and museums in Indianapolis for Indy Classic players.">
+<meta name="theme-color" content="#070b14">
+<meta property="og:title" content="Around Indy – 2027 Indy Classic">
+<meta property="og:description" content="Restaurants, bars, sights and museums in Indianapolis for Indy Classic players.">
+<meta property="og:image" content="profile.jpg.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+<link rel="apple-touch-icon" href="profile.jpg.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=2027a">
+<script src="config.js?v=2027a" defer></script>
+<script src="site.js?v=2027a" defer></script>
 </head>
-
-<body>
-  <div class="court" aria-hidden="true">
-    <svg class="court-lines" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid slice">
-      <line x1="120" y1="120" x2="880" y2="120"/><line x1="120" y1="1280" x2="880" y2="1280"/>
-      <line x1="200" y1="120" x2="200" y2="1280"/><line x1="800" y1="120" x2="800" y2="1280"/>
-      <line x1="200" y1="440" x2="800" y2="440"/><line x1="200" y1="960" x2="800" y2="960"/>
-      <line x1="500" y1="440" x2="500" y2="960"/><line class="net" x1="120" y1="700" x2="880" y2="700"/>
-    </svg>
+<body data-page="around">
+<main class="page" id="app">
+  <div class="page-head">
+    <div class="eyebrow">2027 Indy Classic</div>
+    <h1 class="h1">Around Indy</h1>
+    <p class="lead">Where to eat, drink and explore while you're in town. Sponsors are marked — please show them some love!</p>
   </div>
 
-  <div class="wrap">
+  <input class="input" id="q" type="search" placeholder="Search places…" autocomplete="off" aria-label="Search places">
+  <div class="chips" id="chips"></div>
+  <div id="list"><div class="skel" style="height:90px;margin-top:12px"></div><div class="skel" style="height:90px;margin-top:10px"></div><div class="skel" style="height:90px;margin-top:10px"></div></div>
 
-    <a href="index.html" class="back-link">← Home</a>
+  <a class="callout sky mt20" href="https://www.visitindy.com" target="_blank" rel="noopener noreferrer">
+    <div class="ic">🏙️</div><div><div class="t">More to explore — VisitIndy.com ↗</div><div class="s">Events and activities happening in Indianapolis during your stay</div></div>
+  </a>
+</main>
 
-    <!-- Header card with logo -->
-    <div class="header-card">
-      <div class="logo-wrap">
-        <div class="logo-box">
-          <img src="profile.jpg.png" alt="2027 Indy Classic Logo" />
-        </div>
-      </div>
-      <h1>Around Indy</h1>
-      <div class="page-sub">2027 Indy Classic &nbsp;·&nbsp; Places to explore in Indianapolis</div>
-    </div>
+<style>
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex-shrink:0;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-weight:600;font-size:13px;padding:8px 13px;border-radius:999px;cursor:pointer}
+  .chip.on{background:var(--ball);color:var(--on-ball);border-color:var(--ball)}
+  .grp{margin-top:20px}
+  .places{display:grid;gap:8px}
+  @media(min-width:640px){.places{grid-template-columns:1fr 1fr}}
+  .place{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+  .place.sp{border-color:rgba(212,245,60,.35);background:linear-gradient(150deg,rgba(212,245,60,.09),transparent 60%),var(--surface)}
+  .place .n{font-weight:800;font-size:15px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+  .place .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .place .addr{font-size:12.5px;color:var(--muted);margin-top:3px}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const { esc } = window.ICsite;
+  const TYPES = [
+    { key:"LGBT Restaurant", title:"🍽️ LGBT Restaurants" },
+    { key:"LGBT Bar",        title:"🍸 LGBT Bars" },
+    { key:"Sights",          title:"📸 Sights" },
+    { key:"Museums/Cultur",  title:"🏛️ Museums" },
+    { key:"Nature",          title:"🌿 Nature" },
+  ];
+  let all = [], cat = "all";
+  const list = document.getElementById("list"), q = document.getElementById("q"), chips = document.getElementById("chips");
 
-    <!-- Status / skeleton shown while loading -->
-    <div class="status-wrap" id="statusWrap">
-      <div class="skel-section">
-        <div class="skel-header skeleton"></div>
-        <div class="skel-body">
-          <div class="skel-card skeleton"></div>
-          <div class="skel-card skeleton"></div>
-          <div class="skel-card skeleton"></div>
-          <div class="skel-card skeleton"></div>
-        </div>
-      </div>
-      <div class="skel-section">
-        <div class="skel-header skeleton"></div>
-        <div class="skel-body">
-          <div class="skel-card skeleton"></div>
-          <div class="skel-card skeleton"></div>
-        </div>
-      </div>
-    </div>
+  function parseCSV(text){ const rows=[]; let row=[],cur="",inQ=false;
+    for(let i=0;i<text.length;i++){ const c=text[i],n=text[i+1];
+      if(c=='"'){ if(inQ&&n=='"'){cur+='"';i++;} else inQ=!inQ; }
+      else if(c==","&&!inQ){row.push(cur);cur="";}
+      else if((c=="\n"||c=="\r")&&!inQ){ if(c=="\r"&&n=="\n")i++; row.push(cur);rows.push(row);row=[];cur=""; }
+      else cur+=c; }
+    if(cur.length||row.length){row.push(cur);rows.push(row);} return rows; }
+  const link = u => !u ? "" : (/^https?:\/\//i.test(u) ? u : "https://"+u);
+  const map = a => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a);
 
-    <!-- Content injected by JS -->
-    <div id="content"></div>
-
-    <!-- Visit Indy callout -->
-    <a class="visit-indy"
-       href="https://www.visitindy.com"
-       target="_blank"
-       rel="noopener noreferrer">
-      <div class="visit-indy-icon">🏙️</div>
-      <div class="visit-indy-text">
-        <div class="visit-indy-title">More to Explore — VisitIndy.com</div>
-        <div class="visit-indy-sub">Search events and activities happening in Indianapolis during your stay</div>
-      </div>
-      <div class="visit-indy-arrow">↗</div>
-    </a>
-
-    <footer>© 2027 Indy Classic</footer>
-
-  </div><!-- /wrap -->
-
-  <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwtmbtFt6Gy3K8RO4hyOb5apbN9sT42_lBhk1ULoVP8JSxntpygBQ5fzAlb-RsQUn4Yi9NzdNh9xpZ/pub?gid=0&single=true&output=csv";
-
-    const TYPE_ORDER = [
-      { key: "LGBT Restaurant", title: "🍽️ LGBT Restaurants" },
-      { key: "LGBT Bar",        title: "🍸 LGBT Bars" },
-      { key: "Sights",          title: "📸 Sights" },
-      { key: "Museums/Cultur",  title: "🏛️ Museums" },
-      { key: "Nature",          title: "🌿 Nature" }
-    ];
-
-    /* ── HELPERS ── */
-    function norm(s){ return (s ?? "").toString().trim(); }
-    function isSponsor(val){ return norm(val).toLowerCase() === "yes"; }
-    function sortByName(a, b){ return a.name.localeCompare(b.name, undefined, { sensitivity: "base" }); }
-
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, c => (
-        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
-      ));
+  function render(){
+    const term = q.value.trim().toLowerCase();
+    const groups = TYPES.filter(t => cat==="all" || cat===t.key).map(t => {
+      const items = all.filter(x => x.type===t.key && (!term || (x.name+" "+x.address).toLowerCase().includes(term)))
+        .sort((a,b)=> (b.sponsor-a.sponsor) || a.name.localeCompare(b.name));
+      return { ...t, items };
+    }).filter(g => g.items.length);
+    list.innerHTML = groups.length ? groups.map(g => `<section class="grp"><div class="sec-title">${g.title}<span class="r faint">${g.items.length}</span></div>
+      <div class="places">${g.items.map(x => `<div class="place${x.sponsor?" sp":""}"><div class="n"><span>${esc(x.name)}</span>${x.sponsor?'<span class="pill ball">🏆 Sponsor</span>':""}</div>
+        ${x.address?`<div class="addr">${esc(x.address)}</div>`:""}
+        <div class="acts">${x.address?`<a class="pill sky" href="${map(x.address)}" target="_blank" rel="noopener">📍 Map</a>`:""}${x.web?`<a class="pill" href="${esc(link(x.web))}" target="_blank" rel="noopener">🌐 Website</a>`:""}</div></div>`).join("")}</div></section>`).join("")
+      : `<p class="empty mt16">No places match “${esc(q.value)}”.</p>`;
+  }
+  function drawChips(){
+    const present = TYPES.filter(t => all.some(x => x.type===t.key));
+    chips.innerHTML = [`<button class="chip on" data-k="all">All · ${all.length}</button>`, ...present.map(t => `<button class="chip" data-k="${esc(t.key)}">${t.title}</button>`)].join("");
+    chips.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => { cat=b.dataset.k; chips.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b)); render(); }));
+  }
+  async function load(){
+    try{
+      const url = window.IC.aroundIndyCsv; const r = await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(), { cache:"no-store" });
+      if(!r.ok) throw new Error(r.status);
+      const rows = parseCSV(await r.text()); const H = rows[0].map(h=>h.trim().toLowerCase()); const ix = n => H.indexOf(n);
+      const [iT,iN,iA,iS,iW] = ["type","name","address","sponsor","web"].map(ix);
+      if([iT,iN,iA,iS,iW].some(i=>i<0)) throw new Error("Spreadsheet columns changed");
+      all = rows.slice(1).map(r => ({ type:(r[iT]||"").trim(), name:(r[iN]||"").trim(), address:(r[iA]||"").trim(), sponsor:(r[iS]||"").trim().toLowerCase()==="yes", web:(r[iW]||"").trim() }))
+        .filter(x => x.type && x.name && TYPES.some(t=>t.key===x.type));
+      drawChips(); render();
+    }catch(e){
+      list.innerHTML = `<div class="err mt16">Couldn't load places right now. <button class="btn sm mt8" id="retry">↻ Try again</button></div>`;
+      document.getElementById("retry").onclick = load;
     }
-
-    function safeLink(url){
-      const u = norm(url);
-      if(!u) return "";
-      if(!/^https?:\/\//i.test(u)) return "https://" + u;
-      return u;
-    }
-
-    function mapsLink(address){
-      if(!address) return "";
-      return "https://www.google.com/maps/search/" + encodeURIComponent(address);
-    }
-
-    /* ── STRONG cache-busting fetch ── */
-    async function fetchCSV(url){
-      const bust = url
-        + (url.includes("?") ? "&" : "?")
-        + "t=" + Date.now()
-        + "&r=" + Math.random().toString(36).slice(2);
-
-      const res = await fetch(bust, {
-        cache: "no-store",
-        headers: {
-          "Pragma":        "no-cache",
-          "Cache-Control": "no-cache"
-        }
-      });
-
-      if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
-      return res.text();
-    }
-
-    /* ── CSV PARSER ── */
-    function parseCSV(text){
-      const rows = [];
-      let row = [], cur = "", inQuotes = false;
-
-      for(let i = 0; i < text.length; i++){
-        const c = text[i], n = text[i+1];
-        if(c === '"'){
-          if(inQuotes && n === '"'){ cur += '"'; i++; }
-          else inQuotes = !inQuotes;
-        } else if(c === "," && !inQuotes){
-          row.push(cur); cur = "";
-        } else if((c === "\n" || c === "\r") && !inQuotes){
-          if(c === "\r" && n === "\n") i++;
-          row.push(cur); rows.push(row); row = []; cur = "";
-        } else {
-          cur += c;
-        }
-      }
-      if(cur.length || row.length){ row.push(cur); rows.push(row); }
-      return rows;
-    }
-
-    /* ── RENDER ── */
-    function render(groups){
-      const content = document.getElementById("content");
-      content.innerHTML = "";
-
-      TYPE_ORDER.forEach(t => {
-        const items = groups.get(t.key) || [];
-        if(!items.length) return;
-
-        const sponsors = items.filter(x => x.sponsor).sort(sortByName);
-        const others   = items.filter(x => !x.sponsor).sort(sortByName);
-        const ordered  = [...sponsors, ...others];
-
-        const section = document.createElement("section");
-        section.className = "section";
-
-        // Section header
-        const header = document.createElement("div");
-        header.className = "section-header";
-        header.innerHTML = `
-          <h2>${t.title}</h2>
-          <div class="count-pill">${items.length} place${items.length === 1 ? "" : "s"}</div>
-        `;
-
-        // Card grid
-        const list = document.createElement("div");
-        list.className = "attr-list";
-
-        ordered.forEach(x => {
-          const card = document.createElement("div");
-          card.className = "attr-card" + (x.sponsor ? " sponsor" : "");
-
-          const web     = safeLink(x.web);
-          const mapUrl  = mapsLink(x.address);
-
-          const webHtml = web
-            ? `<a href="${escapeHtml(web)}" target="_blank" rel="noopener noreferrer">Website ↗</a>`
-            : `<span class="no-info">No website listed</span>`;
-
-          const addrHtml = x.address
-            ? `<a class="map-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">📍 ${escapeHtml(x.address)} ↗</a>`
-            : `<span class="no-info">Address not listed</span>`;
-
-          card.innerHTML = `
-            <div class="attr-top">
-              <p class="attr-name">${escapeHtml(x.name || "Unnamed")}</p>
-              ${x.sponsor ? `<span class="sponsor-chip">🏆 Sponsor</span>` : ""}
-            </div>
-            <div class="attr-meta">
-              ${addrHtml}
-              ${webHtml}
-            </div>
-          `;
-
-          list.appendChild(card);
-        });
-
-        section.appendChild(header);
-        section.appendChild(list);
-        content.appendChild(section);
-      });
-    }
-
-    /* ── SHOW ERROR ── */
-    function showError(msg){
-      const wrap = document.getElementById("statusWrap");
-      wrap.innerHTML = `
-        <div class="status-msg err">
-          ${escapeHtml(msg)}
-          <br>
-          <button class="retry-btn" onclick="load()">↻ Try Again</button>
-        </div>
-      `;
-    }
-
-    /* ── LOAD ── */
-    async function load(){
-      // Reset to skeleton on retry
-      const statusWrap = document.getElementById("statusWrap");
-      statusWrap.innerHTML = `
-        <div class="skel-section">
-          <div class="skel-header skeleton"></div>
-          <div class="skel-body">
-            <div class="skel-card skeleton"></div>
-            <div class="skel-card skeleton"></div>
-            <div class="skel-card skeleton"></div>
-            <div class="skel-card skeleton"></div>
-          </div>
-        </div>
-        <div class="skel-section">
-          <div class="skel-header skeleton"></div>
-          <div class="skel-body">
-            <div class="skel-card skeleton"></div>
-            <div class="skel-card skeleton"></div>
-          </div>
-        </div>
-      `;
-      document.getElementById("content").innerHTML = "";
-
-      try{
-        const text = await fetchCSV(CSV_URL);
-        const rows = parseCSV(text);
-        if(rows.length < 2) throw new Error("The attractions list appears to be empty right now.");
-
-        const headers = rows[0].map(h => norm(h));
-        const idx = name => headers.findIndex(h => h.toLowerCase() === name.toLowerCase());
-
-        const iType = idx("Type"), iName = idx("Name"), iAddress = idx("Address"),
-              iSponsor = idx("Sponsor"), iWeb = idx("Web");
-
-        if([iType, iName, iAddress, iSponsor, iWeb].some(i => i === -1)){
-          throw new Error("Spreadsheet format has changed. Please contact the tournament director.");
-        }
-
-        const groups = new Map();
-        TYPE_ORDER.forEach(t => groups.set(t.key, []));
-
-        for(let r = 1; r < rows.length; r++){
-          const row = rows[r] || [];
-          const type = norm(row[iType]);
-          if(!type) continue;
-          const item = {
-            type,
-            name:    norm(row[iName]),
-            address: norm(row[iAddress]),
-            sponsor: isSponsor(row[iSponsor]),
-            web:     norm(row[iWeb])
-          };
-          if(groups.has(type)) groups.get(type).push(item);
-        }
-
-        // Hide skeleton, render content
-        statusWrap.innerHTML = "";
-        render(groups);
-
-      }catch(e){
-        console.error(e);
-        showError("Could not load attractions. Please check your connection and try again.");
-      }
-    }
-
-    load();
-  </script>
+  }
+  q.addEventListener("input", render);
+  load();
+});
+</script>
 </body>
 </html>

@@ -2,460 +2,108 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026 Indy Classic – Financials</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --navy: #0a1628;
-    --navy-mid: #0e1e38;
-    --navy-light: #162840;
-    --gold: #c9a84c;
-    --gold-light: #e8c96a;
-    --gold-dim: #8a6d2a;
-    --green: #1a4a2e;
-    --green-bright: #2d7a4a;
-    --glass-bg: rgba(255,255,255,0.05);
-    --glass-border: rgba(201,168,76,0.2);
-    --glass-hover: rgba(255,255,255,0.08);
-    --text-primary: #f0e8d0;
-    --text-secondary: rgba(240,232,208,0.65);
-    --text-dim: rgba(240,232,208,0.35);
-    --red: #e05050;
-    --positive: #4caf7a;
-    --projected: #e8a040;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Source Sans 3', sans-serif;
-    background: var(--navy);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  .bg-layer {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(26,74,46,0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 85% 80%, rgba(201,168,76,0.12) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 100% at 50% 50%, #0a1628 0%, #060e1a 100%);
-  }
-  .bg-court {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
-    background-image:
-      linear-gradient(0deg, transparent 49.5%, rgba(201,168,76,0.8) 49.5%, rgba(201,168,76,0.8) 50.5%, transparent 50.5%),
-      linear-gradient(90deg, transparent 49.5%, rgba(201,168,76,0.8) 49.5%, rgba(201,168,76,0.8) 50.5%, transparent 50.5%);
-    background-size: 80px 80px;
-  }
-
-  .page-wrap {
-    position: relative; z-index: 1;
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 40px 20px 80px;
-  }
-
-  /* ── Header ── */
-  header {
-    text-align: center;
-    margin-bottom: 48px;
-    animation: fadeDown 0.8s ease both;
-  }
-  .logo-img {
-    width: 260px;
-    height: auto;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 18px;
-    padding: 16px 20px;
-    box-shadow: 0 12px 48px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
-  }
-  .page-heading {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.45em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-top: 20px;
-    opacity: 0.8;
-  }
-  .divider-gold {
-    width: 120px; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 12px auto 0;
-  }
-
-  /* ── Glass Card ── */
-  .glass-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-    animation: fadeUp 0.7s ease both;
-    opacity: 0;
-    animation-fill-mode: both;
-  }
-  .glass-card + .glass-card { margin-top: 24px; }
-  .glass-card:nth-child(1) { animation-delay: 0.1s; }
-  .glass-card:nth-child(2) { animation-delay: 0.2s; }
-  .glass-card:nth-child(3) { animation-delay: 0.3s; }
-
-  .card-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 24px 14px;
-    border-bottom: 1px solid var(--glass-border);
-    background: rgba(255,255,255,0.02);
-  }
-  .card-header-label {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.35em; text-transform: uppercase;
-    color: var(--gold);
-  }
-  .card-total {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 18px; font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .card-total.revenue { color: var(--positive); }
-  .card-total.expense { color: var(--red); }
-
-  /* ── Line Items ── */
-  .line-items { padding: 8px 0; }
-  .line-item {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    padding: 10px 24px;
-    gap: 12px;
-    transition: background 0.15s;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-  }
-  .line-item:last-child { border-bottom: none; }
-  .line-item:hover { background: var(--glass-hover); }
-
-  .item-label {
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--text-primary);
-    opacity: 0.9;
-  }
-
-  /* Projected badge */
-  .projected-badge {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--projected);
-    background: rgba(232,160,64,0.12);
-    border: 1px solid rgba(232,160,64,0.3);
-    border-radius: 4px;
-    padding: 2px 6px;
-    white-space: nowrap;
-  }
-  /* Invisible spacer so final rows still align */
-  .projected-spacer {
-    display: inline-block;
-    width: 62px; /* approx same as badge */
-  }
-
-  .item-amount {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px; font-weight: 600;
-    letter-spacing: 0.03em;
-    white-space: nowrap;
-    min-width: 100px; text-align: right;
-  }
-  .revenue-amt { color: rgba(76,175,122,0.9); }
-  .expense-amt { color: var(--text-primary); }
-  /* Projected amounts rendered slightly dimmer/amber */
-  .projected-amt { color: var(--projected) !important; }
-
-  /* ── Loading / Error states ── */
-  .status-row {
-    padding: 20px 24px;
-    font-size: 13px;
-    color: var(--text-dim);
-    font-style: italic;
-    text-align: center;
-  }
-  .status-row.error { color: var(--red); font-style: normal; }
-
-  /* ── Net Income Banner ── */
-  .net-banner {
-    background: linear-gradient(135deg, rgba(26,74,46,0.5), rgba(10,22,40,0.7));
-    border: 1px solid rgba(76,175,122,0.3);
-    border-radius: 16px;
-    padding: 28px 32px;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 16px;
-    margin-top: 24px;
-    box-shadow: 0 0 40px rgba(76,175,122,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
-    animation: fadeUp 0.9s 0.4s ease both;
-    opacity: 0;
-    animation-fill-mode: both;
-  }
-  .net-banner.negative {
-    background: linear-gradient(135deg, rgba(80,20,20,0.5), rgba(10,22,40,0.7));
-    border-color: rgba(224,80,80,0.3);
-    box-shadow: 0 0 40px rgba(224,80,80,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .net-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px; font-weight: 700;
-    color: var(--text-primary);
-  }
-  .net-label small {
-    display: block;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.35em; text-transform: uppercase;
-    color: var(--text-secondary);
-    margin-bottom: 2px;
-  }
-  .net-amount {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 36px; font-weight: 700;
-    letter-spacing: 0.03em;
-    color: var(--positive);
-    text-shadow: 0 0 20px rgba(76,175,122,0.3);
-  }
-  .net-amount.negative { color: var(--red); text-shadow: 0 0 20px rgba(224,80,80,0.3); }
-
-  /* ── Projected legend ── */
-  .projected-legend {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 16px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--projected);
-    opacity: 0.75;
-    animation: fadeUp 1s 0.5s ease both;
-    opacity: 0;
-    animation-fill-mode: both;
-  }
-  .projected-legend span {
-    display: inline-block;
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    background: rgba(232,160,64,0.4);
-    border: 1px solid rgba(232,160,64,0.6);
-  }
-
-  /* ── Animations ── */
-  @keyframes fadeDown { from { opacity:0; transform: translateY(-20px); } to { opacity:1; transform: none; } }
-  @keyframes fadeUp   { from { opacity:0; transform: translateY(20px);  } to { opacity:1; transform: none; } }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Financials – 2027 Indy Classic</title>
+<meta name="description" content="Indy Classic tournament income statement: revenues, expenses and net income.">
+<meta name="theme-color" content="#070b14">
+<meta property="og:title" content="Financials – 2027 Indy Classic">
+<meta property="og:description" content="Indy Classic tournament income statement: revenues, expenses and net income.">
+<meta property="og:image" content="profile.jpg.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+<link rel="apple-touch-icon" href="profile.jpg.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=2027a">
+<script src="config.js?v=2027a" defer></script>
+<script src="site.js?v=2027a" defer></script>
 </head>
-<body>
-
-<div class="bg-layer"></div>
-<div class="bg-court"></div>
-
-<div class="page-wrap">
-
-  <header>
-    <div>
-      <!-- UPDATE src to your logo file path -->
-      <img class="logo-img" src="profile.jpg.png" alt="2026 Indy Classic">
-    </div>
-    <div class="page-heading">2026 Indy Classic · Income Statement</div>
-    <div class="divider-gold"></div>
-  </header>
-
-  <!-- REVENUES -->
-  <div class="glass-card" id="revenue-card">
-    <div class="card-header">
-      <span class="card-header-label">Revenues</span>
-      <span class="card-total revenue" id="revenue-total">—</span>
-    </div>
-    <div class="line-items" id="revenue-items">
-      <div class="status-row">Loading revenues.csv…</div>
-    </div>
+<body data-page="financials">
+<main class="page" id="app">
+  <div class="page-head">
+    <div class="eyebrow" id="finEyebrow">Income Statement</div>
+    <h1 class="h1">Tournament Financials</h1>
+    <p class="lead">Where every dollar came from and where it went. Pulled live from our books.</p>
   </div>
 
-  <!-- EXPENSES -->
-  <div class="glass-card" id="expense-card">
-    <div class="card-header">
-      <span class="card-header-label">Expenses</span>
-      <span class="card-total expense" id="expense-total">—</span>
-    </div>
-    <div class="line-items" id="expense-items">
-      <div class="status-row">Loading expenses.csv…</div>
-    </div>
+  <div class="grid g2" id="kpis">
+    <div class="stat"><div class="k">Revenue</div><div class="v big" id="kRev" style="color:var(--green)">—</div></div>
+    <div class="stat"><div class="k">Additional income</div><div class="v big" id="kSpon" style="color:var(--green)">—</div></div>
+    <div class="stat"><div class="k">Expenses</div><div class="v big" id="kExp" style="color:var(--rose)">—</div></div>
+    <div class="stat" id="kNetBox"><div class="k">Net income</div><div class="v big" id="kNet">—</div></div>
+  </div>
+  <div class="card mt12" id="splitCard" style="display:none">
+    <div class="small muted" style="margin-bottom:8px">How total income was used</div>
+    <div class="fin-bar"><span id="barExp"></span><span id="barNet"></span></div>
+    <div class="small mt8" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span><i class="lg" style="background:var(--rose)"></i>Expenses <b id="pExp"></b></span><span><i class="lg" style="background:var(--ball)"></i>Net <b id="pNet"></b></span></div>
   </div>
 
-  <!-- ADDITIONAL INCOME -->
-  <div class="glass-card" id="sponsor-card">
-    <div class="card-header">
-      <span class="card-header-label">Additional Income</span>
-      <span class="card-total revenue" id="sponsor-total">—</span>
-    </div>
-    <div class="line-items" id="sponsor-items">
-      <div class="status-row">Loading additionalincome.csv…</div>
-    </div>
-  </div>
+  <section class="section"><div class="sec-title">Revenues <span class="r" id="tRev"></span></div><div class="card fin" id="rev"><div class="skel" style="height:120px"></div></div></section>
+  <section class="section"><div class="sec-title">Expenses <span class="r" id="tExp"></span></div><div class="card fin" id="exp"><div class="skel" style="height:200px"></div></div></section>
+  <section class="section"><div class="sec-title">Additional income <span class="r" id="tSpon"></span></div><div class="card fin" id="spon"><div class="skel" style="height:90px"></div></div></section>
+  <p class="small faint mt12" id="projNote" style="display:none"><span class="pill gold">Projected</span> &nbsp;Amounts marked projected are estimates and may change.</p>
+</main>
 
-  <!-- NET INCOME -->
-  <div class="net-banner" id="net-banner">
-    <div class="net-label">
-      <small>Net Income · Tournament</small>
-      After All Revenues &amp; Expenses
-    </div>
-    <div class="net-amount" id="net-amount">—</div>
-  </div>
-
-  <!-- Legend -->
-  <div class="projected-legend" id="projected-legend" style="display:none;">
-    <span></span> Projected (subject to change)
-  </div>
-
-</div>
-
+<style>
+  .fin{padding:6px 16px}
+  .li{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .li:last-child{border-bottom:0}
+  .li .l{flex:1;min-width:0}
+  .li .a{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .li.proj .a{color:#fde68a}
+  .li .pill{font-size:10px;padding:2px 7px}
+  .fin-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--bg-2)}
+  .fin-bar span{display:block;height:100%}
+  #barExp{background:var(--rose)} #barNet{background:var(--ball)}
+  .lg{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}
+  #kpis .v.big{font-size:clamp(20px,5.4vw,26px)}
+</style>
 <script>
-// ─── CSV filenames ───────────────────────────────────────────────────────────
-const CSV_FILES = {
-  revenue: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYwXJipDZfGHgIyCgAwUEw0BRU5qtbHXjHpYaCKkwZO8ABKt9gD5UvuhClZqK_pi_56creAK31sPGh/pub?gid=0&single=true&output=csv',
-  expense: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYwXJipDZfGHgIyCgAwUEw0BRU5qtbHXjHpYaCKkwZO8ABKt9gD5UvuhClZqK_pi_56creAK31sPGh/pub?gid=354141536&single=true&output=csv',
-  sponsor: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYwXJipDZfGHgIyCgAwUEw0BRU5qtbHXjHpYaCKkwZO8ABKt9gD5UvuhClZqK_pi_56creAK31sPGh/pub?gid=1651801351&single=true&output=csv',
-};
+document.addEventListener("DOMContentLoaded", () => {
+  const F = window.IC.financials, esc = window.ICsite.esc;
+  document.getElementById("finEyebrow").textContent = F.heading;
 
-// ─── Utilities ───────────────────────────────────────────────────────────────
-function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
-  if (lines.length < 2) return [];
-
-  // Proper quoted-field CSV parser
-  function splitLine(line) {
-    const cols = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"' && !inQ) { inQ = true; }
-      else if (ch === '"' && inQ) { inQ = false; }
-      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-      else { cur += ch; }
-    }
-    cols.push(cur.trim());
-    return cols;
+  function splitLine(line){ const out=[]; let cur="", q=false;
+    for (let i=0;i<line.length;i++){ const c=line[i];
+      if (c=='"'){ if (q && line[i+1]=='"'){cur+='"';i++;} else q=!q; }
+      else if (c==',' && !q){ out.push(cur.trim()); cur=""; } else cur+=c; }
+    out.push(cur.trim()); return out; }
+  function parse(text){
+    const lines=text.trim().split(/\r?\n/); if(lines.length<2) return [];
+    const H=splitLine(lines[0]).map(h=>h.toLowerCase().replace(/[^a-z0-9]/g,""));
+    const iI=H.indexOf("item"), iA=H.indexOf("amount"), iF=H.findIndex(h=>h.includes("final"));
+    if(iI<0||iA<0) return [];
+    return lines.slice(1).map(l=>{ const c=splitLine(l);
+      const neg=/^\(.*\)$/.test(c[iA]||"");
+      let amt=parseFloat((c[iA]||"0").replace(/[^0-9.\-]/g,""))||0; if(neg) amt=-Math.abs(amt);
+      return { label:c[iI]||"", amount:amt, final: iF<0 ? true : (c[iF]||"").toLowerCase()==="yes" };
+    }).filter(r=>r.label);
   }
+  const money=(n,blankZero)=> (blankZero&&n===0) ? "—" : (n<0?"(":"")+"$"+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+(n<0?")":"");
+  const sum=a=>a.reduce((s,r)=>s+r.amount,0);
 
-  const headers = splitLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
-  const idxItem   = headers.findIndex(h => h === 'item');
-  const idxAmount = headers.findIndex(h => h === 'amount');
-  const idxFinal  = headers.findIndex(h => h.includes('final'));
-
-  if (idxItem === -1 || idxAmount === -1) return [];
-
-  return lines.slice(1).map(line => {
-    const cols = splitLine(line);
-    const label  = cols[idxItem]  ?? '';
-    const amount = parseFloat((cols[idxAmount] ?? '0').replace(/[^0-9.\-]/g, '')) || 0;
-    const finalVal = idxFinal !== -1 ? (cols[idxFinal] ?? '').trim() : 'Yes';
-    const isFinal  = finalVal.toLowerCase() === 'yes';
-    return { label, amount, isFinal };
-  }).filter(r => r.label !== '');
-}
-
-function fmt(n) {
-  if (n === 0) return '$ —';
-  const str = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return '$ ' + str;
-}
-function fmtNet(n) {
-  const str = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return (n < 0 ? '(' : '') + '$' + str + (n < 0 ? ')' : '');
-}
-function sum(arr) { return arr.reduce((a, r) => a + (r.amount || 0), 0); }
-function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ─── Rendering ───────────────────────────────────────────────────────────────
-function renderSection(sectionKey, rows, amtClass) {
-  const container = document.getElementById(sectionKey + '-items');
-  if (!rows.length) {
-    container.innerHTML = '<div class="status-row">No data found.</div>';
-    return;
+  async function load(url){ const r=await fetch(url,{cache:"no-store"}); if(!r.ok) throw new Error("HTTP "+r.status); return parse(await r.text()); }
+  function render(id,rows){
+    const el=document.getElementById(id);
+    el.innerHTML = rows.length ? rows.map(r=>`<div class="li${r.final?"":" proj"}"><span class="l">${esc(r.label)}</span>${r.final?"":'<span class="pill gold">Projected</span>'}<span class="a">${money(r.amount,true)}</span></div>`).join("")
+      : '<p class="empty" style="margin:10px 0">Nothing here yet.</p>';
   }
-  container.innerHTML = rows.map(row => `
-    <div class="line-item">
-      <span class="item-label">${esc(row.label)}</span>
-      ${row.isFinal
-        ? '<span class="projected-spacer"></span>'
-        : '<span class="projected-badge">Projected</span>'}
-      <span class="item-amount ${amtClass} ${row.isFinal ? '' : 'projected-amt'}">${fmt(row.amount)}</span>
-    </div>
-  `).join('');
-}
-
-function updateTotalsAndNet(data) {
-  const rev  = sum(data.revenue);
-  const exp  = sum(data.expense);
-  const spon = sum(data.sponsor);
-  const net  = rev + spon - exp;
-
-  document.getElementById('revenue-total').textContent = fmt(rev);
-  document.getElementById('expense-total').textContent = fmt(exp);
-  document.getElementById('sponsor-total').textContent = fmt(spon);
-
-  const netEl  = document.getElementById('net-amount');
-  const banner = document.getElementById('net-banner');
-  netEl.textContent = fmtNet(net);
-  netEl.className   = 'net-amount' + (net < 0 ? ' negative' : '');
-  banner.className  = 'net-banner'  + (net < 0 ? ' negative' : '');
-}
-
-function showProjectedLegendIfNeeded(data) {
-  const hasProjected = [...data.revenue, ...data.expense, ...data.sponsor].some(r => !r.isFinal);
-  if (hasProjected) {
-    const legend = document.getElementById('projected-legend');
-    legend.style.display = 'flex';
-  }
-}
-
-// ─── Data loading ─────────────────────────────────────────────────────────────
-async function loadCSV(filename) {
-  const res = await fetch(filename);
-  if (!res.ok) throw new Error(`HTTP ${res.status} loading ${filename}`);
-  return parseCSV(await res.text());
-}
-
-async function init() {
-  const data = { revenue: [], expense: [], sponsor: [] };
-
-  const tasks = [
-    { key: 'revenue', file: CSV_FILES.revenue, amtClass: 'revenue-amt' },
-    { key: 'expense', file: CSV_FILES.expense, amtClass: 'expense-amt' },
-    { key: 'sponsor', file: CSV_FILES.sponsor, amtClass: 'revenue-amt' },
-  ];
-
-  await Promise.all(tasks.map(async ({ key, file, amtClass }) => {
-    try {
-      data[key] = await loadCSV(file);
-      renderSection(key, data[key], amtClass);
-    } catch (err) {
-      const container = document.getElementById(key + '-items');
-      container.innerHTML = `<div class="status-row error">⚠ Could not load data. Check that the Google Sheet is published to the web.<br><small>${err.message}</small></div>`;
-    }
-  }));
-
-  updateTotalsAndNet(data);
-  showProjectedLegendIfNeeded(data);
-}
-
-init();
+  const D={};
+  Promise.all([["rev",F.revenueCsv],["exp",F.expenseCsv],["spon",F.sponsorCsv]].map(async([k,u])=>{
+    try{ D[k]=await load(u); render(k,D[k]); }
+    catch(e){ D[k]=[]; document.getElementById(k).innerHTML=`<div class="err" style="margin:10px 0">Couldn't load this section — check that the Google Sheet is published to the web. <small>(${esc(e.message)})</small></div>`; }
+  })).then(()=>{
+    const rev=sum(D.rev), exp=sum(D.exp), sp=sum(D.spon), net=rev+sp-exp;
+    const set=(id,v)=>document.getElementById(id).textContent=v;
+    set("kRev",money(rev)); set("kExp",money(exp)); set("kSpon",money(sp)); set("kNet",money(net));
+    set("tRev",money(rev)); set("tExp",money(exp)); set("tSpon",money(sp));
+    const kn=document.getElementById("kNet"); kn.style.color = net<0 ? "var(--rose)" : "var(--ball)";
+    if(rev+sp>0 && net>=0){ const pe=exp/(rev+sp)*100;
+      document.getElementById("barExp").style.width=pe+"%"; document.getElementById("barNet").style.width=(100-pe)+"%";
+      set("pExp",pe.toFixed(0)+"%"); set("pNet",(100-pe).toFixed(0)+"%"); document.getElementById("splitCard").style.display=""; }
+    if([...D.rev,...D.exp,...D.spon].some(r=>!r.final)) document.getElementById("projNote").style.display="";
+  });
+});
 </script>
 </body>
 </html>
