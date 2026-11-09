@@ -1114,5 +1114,14 @@
   loadData();
   setInterval(loadData,REFRESH_MS);
 </script>
+<!-- Home button, shown only when opened from the home screen (no browser back button there) -->
+<script>
+(function(){
+  if(!(window.matchMedia("(display-mode: standalone)").matches || navigator.standalone===true)) return;
+  var a=document.createElement("a"); a.href="index.html"; a.textContent="\u2190 Home"; a.setAttribute("aria-label","Back to Indy Classic home");
+  a.style.cssText="position:fixed;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9999;padding:10px 16px;border-radius:999px;background:#d4f53c;color:#0d1400;font:800 14px/1 system-ui,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.45)";
+  document.body.appendChild(a);
+})();
+</script>
 </body>
 </html>

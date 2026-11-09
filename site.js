@@ -128,13 +128,84 @@
   function openMore() {
     openSheet(`
       <div class="btn-row two">${regBtn("block")}${payBtn("block")}</div>
+      ${isStandalone() ? "" : `<button class="btn sky block mt8" type="button" id="moreInstall">📲 Add to my home screen</button>`}
       ${MAP.map((g) => `<h3>${g.group}</h3><div class="sheet-grid">${g.items.map(([e, t, u]) =>
         `<a href="${href(u)}"${tgt(u)}><span class="i">${e}</span>${esc(t)}${soon(u) ? '<span class="soon">Soon</span>' : ""}</a>`).join("")}</div>`).join("")}`);
+    const mi = $("#moreInstall"); if (mi) mi.addEventListener("click", () => { closeSheet(); setTimeout(startInstall, 250); });
   }
   const regBtn = (cls = "") => `<a class="btn primary ${cls}" href="${C.links.register}" target="_blank" rel="noopener noreferrer">Register ↗</a>`;
   const payBtn = (cls = "") => C.links.payment
     ? `<a class="btn ${cls}" href="${C.links.payment}" target="_blank" rel="noopener noreferrer">Payment ↗</a>`
     : `<span class="btn ${cls}" aria-disabled="true">Payment · opens soon</span>`;
+
+
+  /* ── "Add to Home Screen" helper ──────────────────────────────── */
+  const UA = navigator.userAgent || "";
+  const isIOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(UA);
+  const isInApp = /FBAN|FBAV|Instagram|Line\/|Twitter|LinkedInApp|Snapchat/i.test(UA);
+  const isStandalone = () => window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; });
+  window.addEventListener("appinstalled", () => { hideInstall(); store("icInstalled", "1"); toast("Added to your home screen! 🎾"); });
+  function store(k, v) { try { v === undefined ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+  function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  const SHARE_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>`;
+  const PLUS_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-4px"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>`;
+  const DOTS_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align:-4px"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>`;
+
+  async function startInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const r = await deferredPrompt.userChoice.catch(() => null);
+      deferredPrompt = null;
+      if (r && r.outcome === "accepted") { hideInstall(); store("icInstalled", "1"); }
+      return;
+    }
+    const step = (n, html) => `<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)"><span style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--ball);color:var(--on-ball);font-weight:800;display:grid;place-items:center">${n}</span><div style="padding-top:3px">${html}</div></div>`;
+    let steps;
+    if (isInApp) {
+      steps = step(1, `Tap the <b>⋯</b> or <b>${SHARE_SVG}</b> menu in this app and choose <b>Open in browser</b> (Safari or Chrome).`) +
+              step(2, `Then tap <b>Add to Home Screen</b> from there.`);
+    } else if (isIOS) {
+      steps = step(1, `Tap the <b>Share</b> button ${SHARE_SVG}. In Safari it's at the bottom of the screen (on newer iPhones, tap <b>⋯</b> first).`) +
+              step(2, `Scroll down and tap <b>Add to Home Screen</b> ${PLUS_SVG}`) +
+              step(3, `Tap <b>Add</b> in the top-right corner. Done!`) +
+              `<p class="small faint" style="margin-top:6px">Don't see it? Open this page in <b>Safari</b> and try again.</p>`;
+    } else if (isAndroid) {
+      steps = step(1, `Tap the <b>menu</b> ${DOTS_SVG} in the top-right corner of Chrome.`) +
+              step(2, `Tap <b>Add to Home screen</b> or <b>Install app</b>.`) +
+              step(3, `Tap <b>Install</b> or <b>Add</b>. Done!`);
+    } else {
+      steps = step(1, `Open <b>${esc(location.host + location.pathname.replace(/[^/]*$/, ""))}</b> on your phone.`) +
+              step(2, `iPhone: Share ${SHARE_SVG} → <b>Add to Home Screen</b>. Android: menu ${DOTS_SVG} → <b>Install app</b>.`);
+    }
+    openSheet(`<div style="display:flex;gap:14px;align-items:center;margin:4px 0 10px">
+        <img src="apple-touch-icon.png" alt="" style="width:56px;height:56px;border-radius:13px">
+        <div><div style="font-family:var(--display);font-weight:700;font-size:19px">Add Indy Classic to your phone</div>
+        <div class="small muted">Opens like an app: courts, schedule &amp; updates in one tap.</div></div></div>
+      ${steps}
+      <button class="btn block mt12" type="button" onclick="document.body.classList.remove('sheet-open')">Got it</button>`);
+  }
+  function hideInstall() { const b = $(".install"); if (b) { b.classList.remove("show"); setTimeout(() => b.remove(), 300); } }
+  function maybeShowInstall() {
+    if (isStandalone() || read("icInstalled") || !(isIOS || isAndroid)) return;
+    const snoozed = Number(read("icInstallSnooze") || 0);
+    if (Date.now() < snoozed) return;
+    setTimeout(() => {
+      if ($(".install") || document.body.classList.contains("sheet-open")) return;
+      document.body.append(h(`<div class="install" role="dialog" aria-label="Add to home screen">
+        <img src="apple-touch-icon.png" alt="">
+        <div class="install-txt"><b>Get the Indy Classic app</b><span>Add it to your home screen</span></div>
+        <button class="btn primary sm" type="button" data-i="go">Add</button>
+        <button class="install-x" type="button" aria-label="Not now" data-i="x">×</button></div>`));
+      const b = $(".install");
+      requestAnimationFrame(() => b.classList.add("show"));
+      $("[data-i=go]", b).addEventListener("click", () => { hideInstall(); startInstall(); });
+      $("[data-i=x]", b).addEventListener("click", () => { hideInstall(); store("icInstallSnooze", String(Date.now() + 3 * 864e5)); });
+    }, 2500);
+  }
 
   /* ── chrome: background, top bar, tab bar, footer ─────────────── */
   function chrome() {
@@ -448,9 +519,10 @@
     const key = document.body.dataset.page, root = $("#app");
     if (key && P[key] && root) P[key](root);
     tickCountdowns(); if ($("[data-cd]")) setInterval(tickCountdowns, 1000);
+    maybeShowInstall();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 
   // expose helpers for page-specific scripts (Financials, Around Indy, Consolation)
-  window.ICsite = { esc, toast, openSheet, closeSheet, now, href, lightbox };
+  window.ICsite = { esc, toast, openSheet, closeSheet, now, href, lightbox, startInstall };
 })();
