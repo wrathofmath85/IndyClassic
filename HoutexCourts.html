@@ -160,6 +160,19 @@
   }
   .court.live { background:var(--live-bg); border-color:var(--live-border); box-shadow:var(--live-shadow); }
   .court.hot  { background:var(--hot-bg);  border-color:var(--hot-border);  box-shadow:var(--hot-shadow);  }
+  .court.final { background:rgba(99,102,241,.10); border-color:rgba(129,140,248,.65);
+    box-shadow:0 0 0 1px rgba(129,140,248,.5), 0 0 28px rgba(99,102,241,.22), 0 8px 32px rgba(0,0,0,.5); }
+  .court-badge.final { background:rgba(99,102,241,.25); border-color:rgba(129,140,248,.5); color:#c7d2fe; }
+  .court.final .player-dot { background:rgba(255,255,255,.18); }
+  .court.final .winner .player-dot { background:#a5b4fc; box-shadow:0 0 6px rgba(165,180,252,.7); }
+  .court.final .winner .player-name, .court.final .winner .pname { color:#fff; }
+  .court.final .loser  .player-name, .court.final .loser  .pname { color:var(--muted2); }
+  .court.final .no-winner .player-name, .court.final .no-winner .pname { color:var(--text); }
+  .score-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:6px;
+    background:rgba(99,102,241,.22); border:1px solid rgba(129,140,248,.45);
+    font-family:'Barlow Condensed',sans-serif; font-size:clamp(11px,1.05vw,16px); font-weight:800; color:#fff; }
+  .score-chip .dur-label { color:#c7d2fe; font-size:8px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+  .win-tick { color:#a5b4fc; font-weight:900; margin-left:4px; }
 
   /* ── Court top row ── */
   .court-top {
@@ -416,6 +429,11 @@
   }
   .mob-court.live { background:var(--live-bg); border-color:var(--live-border); }
   .mob-court.hot  { background:var(--hot-bg);  border-color:var(--hot-border);  }
+  .mob-court.final { background:rgba(99,102,241,.10); border-color:rgba(129,140,248,.65); }
+  .mob-badge.final { background:rgba(99,102,241,.25); border-color:rgba(129,140,248,.5); color:#c7d2fe; }
+  .mob-court.final .mob-player-dot { background:rgba(255,255,255,.18); }
+  .mob-court.final .winner .mob-player-dot { background:#a5b4fc; }
+  .mob-court.final .loser .mob-player-name, .mob-court.final .loser .mob-pname { color:var(--muted2); }
 
   .mob-court-top {
     display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;
@@ -597,7 +615,8 @@
   const JSON_URL       = "https://script.google.com/macros/s/AKfycbwpo_nDZtrusNM0ZfTCyJGMxtV_Vi9I97njwIKkMK5cQkoOFgzi1mvxe1pgbcytMtWi8w/exec";
   const NUM_COURTS     = 16;   // minimum courts shown; grows automatically if a higher court number appears
   const UPCOMING_COUNT = 8;
-  const STALE_MINUTES  = 3;    // feed older than this = laptop probably stopped sending
+  const STALE_MINUTES  = 3;
+  const FINAL_SHOW_MINUTES = 5;  // finished match + score stays on its court this long    // feed older than this = laptop probably stopped sending
   const REFRESH_MS     = 30000;
   const HOT_MINUTES    = 120;
 
@@ -873,6 +892,7 @@
       const m     = /(\d+)/.exec(tidy(r.court));
       const court = m ? parseInt(m[1],10) : null;
       const since = Number(r.on_court_since)||0;
+      const fin   = Number(r.final_since)||0;
       const {t1d,t2d,dbl} = parseTeams(r.team1,r.team2);
       return {
         _row:idx, date:tidy(r.date),
@@ -880,6 +900,9 @@
         time:      since ? new Date(since*1000) : null, // when it first showed up on a court
         hasTime:   court!=null,
         done:      !!tidy(r.result),
+        result:    tidy(r.result),
+        winner:    tidy(r.winner),                      // "1", "2" or ""
+        finalAt:   fin ? new Date(fin*1000) : null,     // when grab.py first saw the result
         known:     !!(tidy(r.team1)&&tidy(r.team2)),
         event:tidy(r.event), round:tidy(r.round),
         rawT1:tidy(r.team1), rawT2:tidy(r.team2), t1d, t2d, dbl, court
@@ -901,16 +924,28 @@
     return placed.reduce((best,r)=> r.time > best.time ? r : best);
   }
 
-  /* Current match per court: unfinished, on a court; newest placement wins */
+  /* What each court shows:
+     1. a match that went final in the last FINAL_SHOW_MINUTES (score on screen), else
+     2. the current unfinished match (newest placement wins), else nothing */
+  function isFreshFinal(r){
+    return r.done && r.finalAt && (Date.now()-r.finalAt.getTime())/60000 < FINAL_SHOW_MINUTES;
+  }
   function getLatestByCourt(normalized){
-    const map = new Map();
+    const finals=new Map(), live=new Map();
     for(const r of normalized){
-      if(r.court==null || r.done) continue;
-      const prev=map.get(r.court);
-      const key=(r.time||r.startTime||new Date(0)).getTime();
-      const pk =prev?(prev.time||prev.startTime||new Date(0)).getTime():-1;
-      if(!prev || key>pk) map.set(r.court,r);
+      if(r.court==null) continue;
+      if(isFreshFinal(r)){
+        const p=finals.get(r.court);
+        if(!p || r.finalAt>p.finalAt) finals.set(r.court,r);
+      } else if(!r.done){
+        const p=live.get(r.court);
+        const key=(r.time||r.startTime||new Date(0)).getTime();
+        const pk =p?(p.time||p.startTime||new Date(0)).getTime():-1;
+        if(!p || key>pk) live.set(r.court,r);
+      }
     }
+    const map=new Map(live);
+    for(const [c,r] of finals) map.set(c,{...r, showFinal:true});
     return map;
   }
 
@@ -943,6 +978,21 @@
       setPlayerCell(card.querySelector('[data-team1]'), row.t1d, row.dbl);
       setPlayerCell(card.querySelector('[data-team2]'), row.t2d, row.dbl);
       card.querySelector('[data-event]').textContent = [row.event,row.round].filter(Boolean).join(' · ');
+
+      if(row.showFinal){
+        card.classList.remove('empty'); card.classList.add('final');
+        const badge = card.querySelector('[data-badge]');
+        badge.textContent='Final'; badge.className='court-badge final';
+        const rowsEl = card.querySelectorAll('.player-row');
+        rowsEl.forEach((el,i)=>{
+          const w = row.winner ? (row.winner===String(i+1) ? 'winner' : 'loser') : 'no-winner';
+          el.classList.add(w);
+          if(w==='winner') el.insertAdjacentHTML('beforeend','<span class="win-tick">✓</span>');
+        });
+        card.querySelector('.court-dur').innerHTML =
+          `<div class="score-chip"><span class="dur-label">Final</span>${esc(row.result)}</div>`;
+        continue;
+      }
 
       const durEl = card.querySelector('[data-dur]');
       if(row.time){
@@ -1039,9 +1089,10 @@
       html.push(`<div style="color:var(--muted);font-size:14px;padding:8px 0;">No matches currently on court.</div>`);
     } else {
       for(const [num,row] of liveCourts){
-        const hot      = row.time && ((new Date()-row.time)/60000 >= HOT_MINUTES);
-        const cls      = hot?'hot':'live';
-        const badgeTxt = hot?'2h+ 🔥':'Live';
+        const hot      = !row.showFinal && row.time && ((new Date()-row.time)/60000 >= HOT_MINUTES);
+        const cls      = row.showFinal?'final':(hot?'hot':'live');
+        const badgeTxt = row.showFinal?'Final':(hot?'2h+ 🔥':'Live');
+        const wl = i => row.showFinal && row.winner ? (row.winner===String(i)?'winner':'loser') : '';
         const evTxt    = [row.event,row.round].filter(Boolean).join(' · ');
         const durStarted = row.time ? `data-started="${row.time.toISOString()}"` : '';
         const durTxt   = row.time ? formatDuration(row.time) : '—';
@@ -1062,21 +1113,20 @@
               <div class="mob-badge ${cls}">${badgeTxt}</div>
             </div>
             <div class="mob-players">
-              <div class="mob-player-row">
+              <div class="mob-player-row ${wl(1)}">
                 <div class="mob-player-dot"></div>
-                ${makeMobNames(row.t1d,row.dbl)}
+                ${makeMobNames(row.t1d,row.dbl)}${wl(1)==='winner'?'<span class="win-tick">✓</span>':''}
               </div>
               <div class="mob-vs">VS</div>
-              <div class="mob-player-row">
+              <div class="mob-player-row ${wl(2)}">
                 <div class="mob-player-dot"></div>
-                ${makeMobNames(row.t2d,row.dbl)}
+                ${makeMobNames(row.t2d,row.dbl)}${wl(2)==='winner'?'<span class="win-tick">✓</span>':''}
               </div>
             </div>
             <div class="mob-dur">
-              <div class="mob-dur-chip">
-                <span class="dlabel">Duration</span>
-                <span class="dval" ${durStarted}>${durTxt}</span>
-              </div>
+              ${row.showFinal
+                ? `<div class="score-chip"><span class="dur-label">Final</span>${esc(row.result)}</div>`
+                : `<div class="mob-dur-chip"><span class="dlabel">Duration</span><span class="dval" ${durStarted}>${durTxt}</span></div>`}
             </div>
           </div>`);
       }
