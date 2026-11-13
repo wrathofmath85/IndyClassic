@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOUTEX45 · Court Board</title>
+<style>
+  /* ====== SETTINGS: paste your Apps Script web app URL below (in the script section) ====== */
+  :root {
+    --bg: #0d1520;
+    --panel: #15212f;
+    --panel-2: #1c2b3c;
+    --line: #2a3b50;
+    --text: #eef3f8;
+    --muted: #8fa3b8;
+    --accent: #ff8a3d;      /* Houston orange */
+    --accent-2: #3dc6c0;    /* teal */
+    --live: #3ddc84;
+    --warn: #ffc94d;
+    --bad: #ff5d5d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { padding: 16px clamp(12px, 3vw, 32px) 40px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+    border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 18px; }
+  .brand { display: flex; flex-direction: column; margin-right: auto; }
+  .brand h1 { margin: 0; font-size: clamp(22px, 3vw, 34px); letter-spacing: .02em; }
+  .brand h1 span { color: var(--accent); }
+  .brand small { color: var(--muted); font-size: 13px; }
+
+  .days { display: flex; gap: 6px; }
+  .days button { background: var(--panel); color: var(--muted); border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 14px; font-size: 14px; cursor: pointer; }
+  .days button.on { background: var(--accent); color: #1a0d00; border-color: var(--accent); font-weight: 700; }
+
+  .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--live); box-shadow: 0 0 8px var(--live); }
+  .dot.warn { background: var(--warn); }
+  .dot.bad { background: var(--bad); }
+
+  .search { background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 8px 12px; font-size: 14px; min-width: 200px; }
+
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted);
+    margin: 26px 0 12px; display: flex; align-items: center; gap: 10px; }
+  h2 .count { background: var(--panel-2); color: var(--text); border-radius: 999px;
+    padding: 2px 9px; font-size: 12px; letter-spacing: 0; }
+
+  /* Court grid */
+  .courts { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .court { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; border-top: 4px solid var(--accent-2); }
+  .court-name { font-size: 26px; font-weight: 800; letter-spacing: .01em; }
+  .court-meta { color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
+  .team { font-size: 17px; font-weight: 600; line-height: 1.3; }
+  .vs { color: var(--muted); font-size: 12px; margin: 4px 0; text-transform: uppercase; letter-spacing: .1em; }
+  .next { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line);
+    font-size: 13px; color: var(--muted); }
+  .next b { color: var(--text); font-weight: 600; }
+
+  .empty { background: var(--panel); border: 1px dashed var(--line); border-radius: 12px;
+    padding: 22px; color: var(--muted); text-align: center; }
+
+  /* Schedule list */
+  .slot { margin-bottom: 18px; }
+  .slot-time { font-weight: 800; color: var(--accent); font-size: 18px; margin: 0 0 6px; }
+  .row { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 9px 12px; margin-bottom: 6px; }
+  .row.tbd { opacity: .45; }
+  .row.done { opacity: .7; }
+  .badge { text-align: center; border-radius: 6px; padding: 5px 4px; font-size: 13px; font-weight: 700;
+    background: var(--panel-2); color: var(--muted); }
+  .badge.has { background: var(--accent-2); color: #002523; }
+  .row .ev { font-size: 12px; color: var(--muted); }
+  .row .players { font-size: 15px; }
+  .row .players .v { color: var(--muted); margin: 0 6px; font-size: 12px; }
+  .row .res { font-size: 13px; color: var(--warn); margin-top: 2px; }
+
+  .err { background: #3a1616; border: 1px solid var(--bad); color: #ffd6d6; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 14px; display: none; }
+  footer { margin-top: 30px; color: var(--muted); font-size: 12px; text-align: center; }
+  mark { background: var(--warn); color: #000; border-radius: 3px; padding: 0 2px; }
+
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 70px 1fr; }
+    .search { min-width: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>HOUTEX45 <span>Court Board</span></h1>
+    <small>Memorial Tennis Center · Houston</small>
+  </div>
+  <div class="days" id="days"></div>
+  <input class="search" id="search" type="search" placeholder="Find a player…">
+  <div class="status"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
+</header>
+
+<div class="err" id="err"></div>
+
+<h2>On court now <span class="count" id="liveCount">0</span></h2>
+<div id="courts" class="courts"></div>
+
+<h2>Schedule <span class="count" id="schedCount">0</span></h2>
+<div id="schedule"></div>
+
+<footer>Refreshes automatically every 30 seconds · Data from the tournament site</footer>
+
+<script>
+  // ====== SETTINGS ======
+  const DATA_URL = "PASTE-YOUR-WEB-APP-URL-HERE";   // Apps Script web app URL, ends in /exec
+  const REFRESH_SECONDS = 30;
+  // =======================
+
+  let data = { matches: [] };
+  let selectedDay = null;
+  let userPickedDay = false;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s || "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  function minutesOf(t) {            // "8:00 AM" -> 480
+    const m = /(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(t || "");
+    if (!m) return 9999;
+    let h = +m[1] % 12; if (m[3].toUpperCase() === "PM") h += 12;
+    return h * 60 + +m[2];
+  }
+  function courtNum(c) { const m = /(\d+)/.exec(c || ""); return m ? +m[1] : 999; }
+  function todayLabel() {           // matches Python's "%a %b %d", e.g. "Fri Nov 13"
+    const d = new Date();
+    const wd = d.toLocaleDateString("en-US", { weekday: "short" });
+    const mo = d.toLocaleDateString("en-US", { month: "short" });
+    return `${wd} ${mo} ${String(d.getDate()).padStart(2, "0")}`;
+  }
+  const isFinished = m => !!(m.result && m.result.trim());
+  const isTBD = m => !m.team1 && !m.team2;
+  const teamText = t => t || "TBD";
+
+  function highlight(text, q) {
+    const safe = esc(text);
+    if (!q) return safe;
+    const i = text.toLowerCase().indexOf(q);
+    if (i < 0) return safe;
+    return esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + q.length)) + "</mark>" + esc(text.slice(i + q.length));
+  }
+
+  async function load() {
+    if (!DATA_URL.startsWith("http")) {
+      showErr("DATA_URL isn't set yet. Edit index.html and paste your Apps Script web app URL.");
+      return;
+    }
+    try {
+      const res = await fetch(DATA_URL + (DATA_URL.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+      data = await res.json();
+      showErr("");
+      render();
+    } catch (e) {
+      showErr("Couldn't reach the data feed — will keep retrying. (" + e.message + ")");
+      updateStatus();
+    }
+  }
+
+  function showErr(msg) { $("err").textContent = msg; $("err").style.display = msg ? "block" : "none"; }
+
+  function updateStatus() {
+    const epoch = data.updated_epoch || 0;
+    const ageMin = epoch ? (Date.now() / 1000 - epoch) / 60 : Infinity;
+    const dot = $("dot");
+    dot.className = "dot " + (ageMin < 3 ? "ok" : ageMin < 10 ? "warn" : "bad");
+    if (!epoch) { $("updated").textContent = "No data yet"; return; }
+    const when = new Date(epoch * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+    $("updated").textContent = ageMin < 3 ? `Live · updated ${when}` : `Last update ${when} (${Math.round(ageMin)} min ago)`;
+  }
+
+  function render() {
+    updateStatus();
+    const matches = data.matches || [];
+    const days = [...new Set(matches.map(m => m.date).filter(Boolean))];
+
+    if (!userPickedDay || !days.includes(selectedDay)) {
+      const today = todayLabel();
+      selectedDay = days.includes(today) ? today : days[0] || null;
+    }
+
+    $("days").innerHTML = days.map(d =>
+      `<button class="${d === selectedDay ? "on" : ""}" data-day="${esc(d)}">${esc(d)}</button>`).join("");
+    $("days").querySelectorAll("button").forEach(b => b.onclick = () => {
+      selectedDay = b.dataset.day; userPickedDay = true; render();
+    });
+
+    const q = $("search").value.trim().toLowerCase();
+    const dayMatches = matches.filter(m => m.date === selectedDay)
+      .filter(m => !q || (m.team1 + " " + m.team2).toLowerCase().includes(q))
+      .sort((a, b) => minutesOf(a.time) - minutesOf(b.time));
+
+    // ---- On court: group unfinished matches by court
+    const byCourt = {};
+    dayMatches.filter(m => m.court && !isFinished(m)).forEach(m => (byCourt[m.court] = byCourt[m.court] || []).push(m));
+    const courts = Object.keys(byCourt).sort((a, b) => courtNum(a) - courtNum(b) || a.localeCompare(b));
+    $("liveCount").textContent = courts.length;
+    $("courts").innerHTML = courts.length ? courts.map(c => {
+      const [now, next] = byCourt[c];
+      return `<div class="court">
+        <div class="court-name">${esc(c)}</div>
+        <div class="court-meta">${esc(now.event)}${now.round ? " · " + esc(now.round) : ""} · ${esc(now.time)}</div>
+        <div class="team">${highlight(teamText(now.team1), q)}</div>
+        <div class="vs">vs</div>
+        <div class="team">${highlight(teamText(now.team2), q)}</div>
+        ${next ? `<div class="next">Next: <b>${esc(teamText(next.team1))}</b> vs <b>${esc(teamText(next.team2))}</b> · ${esc(next.event)}</div>` : ""}
+      </div>`;
+    }).join("") : `<div class="empty">No courts assigned yet${selectedDay ? " for " + esc(selectedDay) : ""}.</div>`;
+
+    // ---- Full schedule grouped by time
+    $("schedCount").textContent = dayMatches.length;
+    const slots = {};
+    dayMatches.forEach(m => (slots[m.time] = slots[m.time] || []).push(m));
+    const times = Object.keys(slots).sort((a, b) => minutesOf(a) - minutesOf(b));
+    $("schedule").innerHTML = times.length ? times.map(t => `
+      <div class="slot">
+        <div class="slot-time">${esc(t)}</div>
+        ${slots[t].map(m => `
+          <div class="row ${isTBD(m) ? "tbd" : ""} ${isFinished(m) ? "done" : ""}">
+            <div class="badge ${m.court ? "has" : ""}">${esc(m.court || "—")}</div>
+            <div>
+              <div class="ev">${esc(m.event)}${m.round ? " · " + esc(m.round) : ""}</div>
+              <div class="players">${highlight(teamText(m.team1), q)}<span class="v">vs</span>${highlight(teamText(m.team2), q)}</div>
+              ${isFinished(m) ? `<div class="res">${esc(m.result)}</div>` : ""}
+            </div>
+          </div>`).join("")}
+      </div>`).join("")
+      : `<div class="empty">${q ? "No matches for that name." : "No matches scheduled for this day yet."}</div>`;
+  }
+
+  $("search").addEventListener("input", render);
+  load();
+  setInterval(load, REFRESH_SECONDS * 1000);
+  setInterval(updateStatus, 15000);
+</script>
+</body>
+</html>
