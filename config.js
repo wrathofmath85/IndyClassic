@@ -162,6 +162,7 @@ window.IC = {
     ["Marketing & Sponsorship Guru", "Mark Phillips"],
     ["Catering Coordinator", "Haley Bougher"],
     ["Brewmaster General", "Sherwin Bocade"],
+    ["Unpaid Intern (AI Division)", "Claude"],
   ],
 
   /* Sponsor logos: files are named tier1sponsor01.jpg, tier2sponsor01.jpg …
