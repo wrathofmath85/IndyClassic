@@ -15,6 +15,7 @@ window.IC = {
   name: "Indy Classic",
   city: "Indianapolis, IN",
   logo: "profile.jpg.png",              // full logo (with title sponsor)
+  logoDark: "logo-dark.png",            // same logo with white lettering, used on the home page. Set to "" to go back to the white box.
   startDate: "2027-06-03",               // Thursday
   endDate:   "2027-06-06",               // Sunday
   playStartDate: "2027-06-04",           // first day of play (Friday) — the date shown under the logo

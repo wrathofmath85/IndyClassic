@@ -343,3 +343,17 @@ a.callout{text-decoration:none;color:inherit}
 .install-x{width:32px;height:32px;flex-shrink:0;border:0;background:none;color:var(--faint);font-size:22px;cursor:pointer;border-radius:50%}
 .install-x:hover{color:var(--text);background:rgba(255,255,255,.06)}
 @media(min-width:861px){.install{display:none}}
+
+/* ── Home logo: "Spotlight" (dark-background logo on a glow + court lines) ── */
+.hero.spot{background:
+  radial-gradient(70% 38% at 50% 22%,rgba(212,245,60,.20),transparent 70%),
+  radial-gradient(50% 30% at 50% 8%,rgba(56,189,248,.10),transparent 70%),var(--surface)}
+.hero.spot::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(rgba(255,255,255,.06),rgba(255,255,255,.06)) 50% 0/1px 100% no-repeat,
+    linear-gradient(90deg,transparent 12%,rgba(255,255,255,.05) 12%,rgba(255,255,255,.05) calc(12% + 1px),transparent calc(12% + 1px),
+      transparent 88%,rgba(255,255,255,.05) 88%,rgba(255,255,255,.05) calc(88% + 1px),transparent calc(88% + 1px));
+  -webkit-mask:linear-gradient(#000,transparent 55%);mask:linear-gradient(#000,transparent 55%)}
+.hero.spot>*{position:relative;z-index:1}
+.logo-spot{max-width:460px;margin:0 auto 18px;padding:8px 6px}
+.logo-spot img{width:100%;height:auto;filter:drop-shadow(0 12px 28px rgba(0,0,0,.55))}
