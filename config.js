@@ -17,6 +17,7 @@ window.IC = {
   logo: "profile.jpg.png",              // full logo (with title sponsor)
   startDate: "2027-06-03",               // Thursday
   endDate:   "2027-06-06",               // Sunday
+  playStartDate: "2027-06-04",           // first day of play (Friday) — the date shown under the logo
   utcOffset: "-04:00",                   // EDT in June — leave alone
 
   // Pages listed here show a "Soon" tag and link to holdhorse.html
@@ -160,7 +161,6 @@ window.IC = {
     ["Marketing & Sponsorship Guru", "Mark Phillips"],
     ["Catering Coordinator", "Haley Bougher"],
     ["Brewmaster General", "Sherwin Bocade"],
-    ["Masters of Miscellany", "Paul Warney & Garth Brazelton"],
   ],
 
   /* Sponsor logos: files are named tier1sponsor01.jpg, tier2sponsor01.jpg …
@@ -183,7 +183,7 @@ window.IC = {
 
   /* FAQ on the home page. Use {links} freely — plain HTML is fine. */
   faq: [
-    ["When does play start?", "First ball is <b>Friday at 8:00 AM</b> at the Indianapolis Racquet Club. Championships wrap up Sunday afternoon. Check <a href='MatchDisplay6.html'>Court Assignments</a> for your match times."],
+    ["When does play start?", "First ball is <b>Friday, June 4th at 8:00 AM</b> at the Indianapolis Racquet Club. Championships wrap up Sunday afternoon. Check <a href='MatchDisplay6.html'>Court Assignments</a> for your match times."],
     ["Is food provided?", "Yes! Coffee bar from 7:30 AM (until it's gone), snacks all day, and lunch at noon Friday and Saturday — all in the Upstairs Lounge."],
     ["Do I get a t-shirt?", "Yep — shirts are included with registration. You pick your color when you sign up."],
     ["Lost my first match. Now what?", "Sign up for the singles or doubles consolation draw on the <a href='Consolation.html'>Consolation hub</a> — sign-up windows and draws post there live."],

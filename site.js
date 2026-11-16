@@ -322,7 +322,7 @@
     root.innerHTML = `
       <section class="card hero hl fade-in">
         <div class="logo-plate"><img src="${C.logo}" alt="${C.year} ${C.name} presented by our title sponsor"></div>
-        <div class="datebar"><span>${fmtDay(C.startDate, { month: "long", day: "numeric" })}–${dObj(C.endDate).getDate()}, ${C.year}</span><i></i><span>${C.city}</span></div>
+        <div class="datebar"><span>${fmtDay(C.playStartDate || C.startDate, { month: "long", day: "numeric" })}–${dObj(C.endDate).getDate()}, ${C.year}</span><i></i><span>${C.city}</span></div>
         ${heroExtra}
         ${ph === "live" ? "" : `<div class="btn-row two mt20" style="max-width:420px;margin-left:auto;margin-right:auto">${regBtn()}${payBtn()}</div>`}
       </section>
